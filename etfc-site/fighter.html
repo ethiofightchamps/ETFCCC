@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fighter Profile — ETFC</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div id="nav-mount" data-active=""></div>
+
+<div class="container" style="padding-top:48px;">
+  <div class="fighter-hero">
+    <div class="fighter-photo"></div>
+    <div>
+      <div class="fighter-tag">Lightweight &middot; Main Event</div>
+      <h1 class="fighter-name">Fighter Name</h1>
+      <div class="fighter-record">[W]-[L]-[D]</div>
+      <p class="text-dim mt-24" style="max-width:520px;">
+        [Fighter bio — background, training camp, notable wins. Replace with real content once ETFC sends the roster.]
+      </p>
+      <div style="display:flex;gap:12px;margin-top:20px;">
+        <a href="betting.html" class="btn btn-gold">View Odds</a>
+        <a href="tickets.html" class="btn btn-primary">Get Tickets</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="stat-grid">
+    <div class="stat-box"><div class="val">[N]</div><div class="lbl">Wins</div></div>
+    <div class="stat-box"><div class="val">[N]</div><div class="lbl">Losses</div></div>
+    <div class="stat-box"><div class="val">[N]</div><div class="lbl">KO / TKO</div></div>
+    <div class="stat-box"><div class="val">[N]</div><div class="lbl">Submissions</div></div>
+  </div>
+
+  <section>
+    <div class="section-head">
+      <div class="section-title" style="font-size:24px;">Upcoming Bout</div>
+    </div>
+    <div class="bout-row">
+      <div class="bout-order">MAIN<br>EVENT</div>
+      <div class="matchup-line">
+        <div class="fighter-block">
+          <div class="thumb"></div>
+          <div><span class="fname">Fighter Name</span><div class="frecord">Lightweight</div></div>
+        </div>
+        <div class="vs-badge">VS</div>
+        <div class="fighter-block right">
+          <div><span class="fname">Opponent Name</span><div class="frecord">Lightweight</div></div>
+          <div class="thumb"></div>
+        </div>
+      </div>
+      <div class="odds-fighter"><div class="price">1.85</div></div>
+    </div>
+  </section>
+</div>
+
+<div id="footer-mount"></div>
+<div id="modal-mount"></div>
+<div class="sticky-mobile-cta">
+  <a href="tickets.html" class="btn btn-primary" style="flex:1;text-align:center;">Tickets</a>
+  <a href="betting.html" class="btn btn-gold" style="flex:1;text-align:center;">Bet</a>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-storage-compat.js"></script>
+<script src="js/firebase-config.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/partials.js"></script>
+<script src="js/main.js"></script>
+<script>
+  // TODO: read ?id= from URL, fetch matching doc from Firestore `fighters`
+  // collection, and populate this page instead of static placeholder text.
+  const params = new URLSearchParams(window.location.search);
+  console.log("Loading fighter:", params.get("id"));
+</script>
+</body>
+</html>

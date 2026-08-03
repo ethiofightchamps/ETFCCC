@@ -1,0 +1,38 @@
+rules_version = '2';
+
+// ── ETFC STORAGE SECURITY RULES ─────────────────────────────────────────
+// Deploy with: firebase deploy --only storage
+
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return isSignedIn() && request.auth.token.admin == true;
+    }
+
+    // Payment screenshots — a signed-in user can upload their own proof of
+    // payment, but can never read back other users' screenshots. Only
+    // admin can read any screenshot (needed for order review).
+    match /payment-screenshots/{userId}/{fileName} {
+      allow read: if (isSignedIn() && request.auth.uid == userId) || isAdmin();
+      allow write: if isSignedIn()
+        && request.auth.uid == userId
+        && request.resource.size < 5 * 1024 * 1024
+        && request.resource.contentType.matches('image/.*');
+    }
+
+    // Fighter photos, event graphics — public read, admin-only write.
+    match /public-assets/{fileName} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Get Tickets — ETFC</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div id="nav-mount" data-active="tickets"></div>
+
+<div class="container" style="padding-top:48px;">
+  <div class="section-eyebrow">Fight Night Seating</div>
+  <div class="section-title" style="font-size:38px;margin-bottom:24px;">Choose Your Seats</div>
+
+  <!-- STEP 1: SEAT SELECTION -->
+  <div id="seatStep">
+    <div class="grid-2" style="grid-template-columns: 2fr 1fr; align-items:start;">
+      <div>
+        <div class="venue-map">
+          <div id="seatMapMount"></div>
+          <div class="seat-legend">
+            <div class="item"><span class="swatch" style="background:rgba(176,141,62,0.25);border:1px solid var(--gold);"></span>Ringside</div>
+            <div class="item"><span class="swatch" style="background:rgba(179,20,28,0.25);border:1px solid var(--crimson);"></span>VIP</div>
+            <div class="item"><span class="swatch" style="background:rgba(232,228,220,0.08);border:1px solid var(--border);"></span>General Admission</div>
+            <div class="item"><span class="swatch" style="background:var(--success);"></span>Selected</div>
+            <div class="item"><span class="swatch" style="background:#1a1a1a;opacity:0.4;"></span>Sold</div>
+          </div>
+        </div>
+      </div>
+      <div class="selection-panel">
+        <h3>Your Seats</h3>
+        <div id="selectionPanelBody"></div>
+        <div id="selectionTotal" class="selection-total" style="display:none;"></div>
+        <button id="checkoutBtn" class="btn btn-primary btn-block mt-24" onclick="proceedToCheckout()" disabled>
+          Continue to Checkout
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 2: CHECKOUT / BANK TRANSFER -->
+  <div id="checkoutStep" style="display:none;max-width:520px;">
+    <h2 style="font-family:var(--font-display);font-size:28px;text-transform:uppercase;margin-bottom:8px;">
+      Complete Your Payment
+    </h2>
+    <p class="text-dim" style="margin-bottom:24px;">
+      Transfer the total amount to the account below, then upload your payment screenshot.
+      Your ticket confirms once ETFC verifies the transfer — usually within a few hours.
+    </p>
+
+    <div class="bank-box mt-24">
+      <div class="row"><span>Bank</span><span>[Bank Name]</span></div>
+      <div class="row"><span>Account Name</span><span>[ETFC Account Name]</span></div>
+      <div class="row"><span>Account Number</span><span>[Account Number]</span></div>
+      <div class="row"><span>Reference Code</span><span id="refCode">ETFC-XXXXXX</span></div>
+    </div>
+
+    <div class="field mt-24">
+      <label>Full Name</label>
+      <input type="text" placeholder="As it should appear on your ticket">
+    </div>
+
+    <div class="field">
+      <label>Upload Payment Screenshot</label>
+      <div class="upload-box" onclick="document.getElementById('screenshotInput').click()">
+        &#128247; Tap to upload proof of payment
+        <input type="file" id="screenshotInput" accept="image/*" style="display:none;">
+      </div>
+    </div>
+
+    <button class="btn btn-primary btn-block mt-24" onclick="submitOrder()">Submit Order</button>
+  </div>
+
+  <!-- STEP 3: PENDING CONFIRMATION -->
+  <div id="pendingStep" style="display:none;max-width:520px;text-align:center;">
+    <div style="font-size:48px;margin-bottom:16px;">&#9203;</div>
+    <h2 style="font-family:var(--font-display);font-size:28px;text-transform:uppercase;">Order Submitted</h2>
+    <p class="text-dim mt-24">
+      <span class="status-pill pending">Pending Verification</span>
+    </p>
+    <p class="text-dim mt-24">
+      ETFC is reviewing your payment. Your QR e-ticket will appear in
+      <a href="dashboard.html" style="color:var(--gold-bright);">My Tickets</a> once approved.
+    </p>
+  </div>
+</div>
+
+<div id="footer-mount"></div>
+<div id="modal-mount"></div>
+
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-storage-compat.js"></script>
+<script src="js/firebase-config.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/partials.js"></script>
+<script src="js/main.js"></script>
+<script src="js/seatmap.js"></script>
+<script>
+  document.getElementById("refCode").textContent =
+    "ETFC-" + Math.random().toString(36).slice(2, 8).toUpperCase();
+
+  function submitOrder() {
+    // TODO: upload screenshot to Firebase Storage, write order doc to
+    // Firestore `orders` collection with status: "pending", tied to
+    // selectedSeats from seatmap.js and the authenticated user's uid.
+    document.getElementById("checkoutStep").style.display = "none";
+    document.getElementById("pendingStep").style.display = "block";
+  }
+</script>
+</body>
+</html>

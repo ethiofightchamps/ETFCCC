@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Betting — ETFC</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div id="nav-mount" data-active="betting"></div>
+
+<div class="container" style="padding-top:48px;">
+  <div class="section-eyebrow">Fixed Odds</div>
+  <div class="section-title" style="font-size:38px;margin-bottom:8px;">Fight Night Betting</div>
+
+  <!-- BETTING_ENABLED FLAG — driven by Firestore `config.bettingEnabled` in production -->
+  <div id="bettingLockedBanner" class="betting-strip mt-24" style="justify-content:center;">
+    <span class="badge-locked">&#128274; Betting opens once ETFC's license is confirmed — expected [date]. Odds shown below for preview only.</span>
+  </div>
+
+  <section>
+    <div class="bout-row">
+      <div class="bout-order">MAIN<br>EVENT</div>
+      <div class="matchup-line">
+        <div class="fighter-block">
+          <div class="thumb"></div>
+          <div><span class="fname">Fighter A</span><div class="frecord">Lightweight</div></div>
+        </div>
+        <div class="vs-badge">VS</div>
+        <div class="fighter-block right">
+          <div><span class="fname">Fighter B</span><div class="frecord">Lightweight</div></div>
+          <div class="thumb"></div>
+        </div>
+      </div>
+      <div style="display:flex;gap:10px;align-items:center;">
+        <div class="odds-fighter"><div class="price">1.85</div></div>
+        <button class="btn btn-gold btn-sm" onclick="openBetSlip('Fighter A', '1.85')" disabled>Bet</button>
+        <div class="odds-fighter"><div class="price">2.05</div></div>
+        <button class="btn btn-gold btn-sm" onclick="openBetSlip('Fighter B', '2.05')" disabled>Bet</button>
+      </div>
+    </div>
+
+    <div class="bout-row">
+      <div class="bout-order">CO<br>MAIN</div>
+      <div class="matchup-line">
+        <div class="fighter-block">
+          <div class="thumb"></div>
+          <div><span class="fname">Fighter C</span><div class="frecord">Welterweight</div></div>
+        </div>
+        <div class="vs-badge">VS</div>
+        <div class="fighter-block right">
+          <div><span class="fname">Fighter D</span><div class="frecord">Welterweight</div></div>
+          <div class="thumb"></div>
+        </div>
+      </div>
+      <div style="display:flex;gap:10px;align-items:center;">
+        <div class="odds-fighter"><div class="price">1.60</div></div>
+        <button class="btn btn-gold btn-sm" disabled>Bet</button>
+        <div class="odds-fighter"><div class="price">2.40</div></div>
+        <button class="btn btn-gold btn-sm" disabled>Bet</button>
+      </div>
+    </div>
+  </section>
+
+  <p class="text-dim" style="font-size:12px;margin-top:12px;">
+    &#9888; Bet buttons are disabled until <code>config.bettingEnabled</code> is flipped to true in Firestore — no redeploy needed at launch time.
+  </p>
+</div>
+
+<!-- BET SLIP MODAL (inactive until betting is live) -->
+<div class="modal-overlay" id="betSlipModal">
+  <div class="modal">
+    <span class="modal-close" onclick="document.getElementById('betSlipModal').classList.remove('open')">&times;</span>
+    <h3>Place Your Bet</h3>
+    <p class="sub" id="betSlipFighter">Fighter A @ 1.85</p>
+    <div class="field">
+      <label>Stake (ETB)</label>
+      <input type="number" id="betAmount" placeholder="100" oninput="calcPayout()">
+    </div>
+    <div class="bank-box">
+      <div class="row"><span>Potential Payout</span><span id="payoutPreview">0 ETB</span></div>
+    </div>
+    <button class="btn btn-primary btn-block mt-24">Continue to Payment</button>
+  </div>
+</div>
+
+<div id="footer-mount"></div>
+<div id="modal-mount"></div>
+
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-storage-compat.js"></script>
+<script src="js/firebase-config.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/partials.js"></script>
+<script src="js/main.js"></script>
+<script>
+  let currentOdds = 1;
+  function openBetSlip(fighter, odds) {
+    requireAuth("placeBet", () => {
+      currentOdds = parseFloat(odds);
+      document.getElementById("betSlipFighter").textContent = `${fighter} @ ${odds}`;
+      document.getElementById("betSlipModal").classList.add("open");
+    });
+  }
+  function calcPayout() {
+    const stake = Number(document.getElementById("betAmount").value) || 0;
+    document.getElementById("payoutPreview").textContent =
+      (stake * currentOdds).toLocaleString() + " ETB";
+  }
+</script>
+</body>
+</html>

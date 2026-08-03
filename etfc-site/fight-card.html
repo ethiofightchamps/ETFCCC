@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fight Card — ETFC</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div id="nav-mount" data-active="fight-card"></div>
+
+<div class="container" style="padding-top:48px;">
+  <div class="section-eyebrow">[Event Name TBD] &middot; [Date TBD]</div>
+  <div class="section-title" style="font-size:44px;margin-bottom:8px;">Full Fight Card</div>
+  <p class="text-dim">[Venue, Addis Ababa] — Main Card starts [Time TBD]</p>
+
+  <section>
+    <div class="bout-row">
+      <div class="bout-order">MAIN<br>EVENT</div>
+      <div class="matchup-line">
+        <div class="fighter-block">
+          <div class="thumb"></div>
+          <div><a href="fighter.html?id=fighter-a" class="fname">Fighter A</a><div class="frecord">[W-L-D] &middot; Lightweight</div></div>
+        </div>
+        <div class="vs-badge">VS</div>
+        <div class="fighter-block right">
+          <div><a href="fighter.html?id=fighter-b" class="fname">Fighter B</a><div class="frecord">[W-L-D] &middot; Lightweight</div></div>
+          <div class="thumb"></div>
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;">
+        <a href="betting.html" class="btn btn-gold btn-sm">Odds</a>
+        <a href="tickets.html" class="btn btn-primary btn-sm">Tickets</a>
+      </div>
+    </div>
+
+    <div class="bout-row">
+      <div class="bout-order">CO<br>MAIN</div>
+      <div class="matchup-line">
+        <div class="fighter-block">
+          <div class="thumb"></div>
+          <div><a href="fighter.html?id=fighter-c" class="fname">Fighter C</a><div class="frecord">[W-L-D] &middot; Welterweight</div></div>
+        </div>
+        <div class="vs-badge">VS</div>
+        <div class="fighter-block right">
+          <div><a href="fighter.html?id=fighter-d" class="fname">Fighter D</a><div class="frecord">[W-L-D] &middot; Welterweight</div></div>
+          <div class="thumb"></div>
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;">
+        <a href="betting.html" class="btn btn-gold btn-sm">Odds</a>
+        <a href="tickets.html" class="btn btn-primary btn-sm">Tickets</a>
+      </div>
+    </div>
+
+    <div class="bout-row">
+      <div class="bout-order">03</div>
+      <div class="matchup-line">
+        <div class="fighter-block">
+          <div class="thumb"></div>
+          <div><a href="fighter.html?id=fighter-e" class="fname">Fighter E</a><div class="frecord">[W-L-D] &middot; Featherweight</div></div>
+        </div>
+        <div class="vs-badge">VS</div>
+        <div class="fighter-block right">
+          <div><a href="fighter.html?id=fighter-f" class="fname">Fighter F</a><div class="frecord">[W-L-D] &middot; Featherweight</div></div>
+          <div class="thumb"></div>
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;">
+        <a href="betting.html" class="btn btn-gold btn-sm">Odds</a>
+        <a href="tickets.html" class="btn btn-primary btn-sm">Tickets</a>
+      </div>
+    </div>
+
+    <div class="bout-row">
+      <div class="bout-order">04</div>
+      <div class="matchup-line">
+        <div class="fighter-block">
+          <div class="thumb"></div>
+          <div><a href="fighter.html?id=fighter-g" class="fname">Fighter G</a><div class="frecord">[W-L-D] &middot; Bantamweight</div></div>
+        </div>
+        <div class="vs-badge">VS</div>
+        <div class="fighter-block right">
+          <div><a href="fighter.html?id=fighter-h" class="fname">Fighter H</a><div class="frecord">[W-L-D] &middot; Bantamweight</div></div>
+          <div class="thumb"></div>
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;">
+        <a href="betting.html" class="btn btn-gold btn-sm">Odds</a>
+        <a href="tickets.html" class="btn btn-primary btn-sm">Tickets</a>
+      </div>
+    </div>
+  </section>
+
+  <p class="text-dim" style="font-size:12px;margin-top:20px;">
+    &#9888; This card is placeholder content. Replace bout order, fighters, weight classes, and records with ETFC's confirmed roster.
+  </p>
+</div>
+
+<div id="footer-mount"></div>
+<div id="modal-mount"></div>
+<div class="sticky-mobile-cta">
+  <a href="tickets.html" class="btn btn-primary" style="flex:1;text-align:center;">Tickets</a>
+  <a href="betting.html" class="btn btn-gold" style="flex:1;text-align:center;">Bet</a>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-storage-compat.js"></script>
+<script src="js/firebase-config.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/partials.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>
