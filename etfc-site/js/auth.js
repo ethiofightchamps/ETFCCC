@@ -85,11 +85,19 @@ async function sendEmailOtp(e) {
 
   pendingSignup = { name, phone, email };
 
-  // TODO: call a backend/Cloud Function to generate a 6-digit code, store it
-  // server-side (with expiry), and email it via Resend — never generate or
-  // verify OTPs purely client-side. Example shape:
-  //   await fetch("/api/send-otp", { method: "POST", body: JSON.stringify({ email }) });
-  console.log("[stub] Sending email OTP →", email);
+  try {
+    const res = await fetch("/api/send-otp", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name, phone, email }),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || "Could not send verification code.");
+  } catch (err) {
+    console.error("sendEmailOtp failed:", err);
+    alert(err.message || "Could not send verification code. Try again.");
+    return;
+  }
 
   document.getElementById("otpEmailTarget").textContent = email;
   showStep("authStepOtp");
@@ -100,12 +108,23 @@ async function verifyEmailOtp() {
   if (digits.length !== 6) return alert("Enter the full 6-digit code.");
   if (!pendingSignup) return alert("Session expired — please start over.");
 
-  // TODO: verify against the server-stored code, e.g.:
-  //   const res = await fetch("/api/verify-otp", { method: "POST", body: JSON.stringify({ email: pendingSignup.email, code: digits }) });
-  //   if (!res.ok) return alert("Incorrect or expired code.");
-  console.log("[stub] verifying email OTP:", digits);
+  try {
+    const res = await fetch("/api/verify-otp", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email: pendingSignup.email, code: digits }),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || "Incorrect or expired code.");
 
-  completeSignIn({ ...pendingSignup, method: "email" });
+    await auth.signInWithCustomToken(data.token);
+    completeSignIn({ name: data.name, phone: data.phone, email: data.email, method: "email" });
+  } catch (err) {
+    console.error("verifyEmailOtp failed:", err);
+    alert(err.message || "Incorrect or expired code.");
+    return;
+  }
+
   pendingSignup = null;
 }
 

@@ -1,0 +1,14 @@
+{
+  "name": "etfc-functions",
+  "description": "Cloud Functions for ETFC — email OTP send/verify",
+  "engines": {
+    "node": "20"
+  },
+  "main": "index.js",
+  "dependencies": {
+    "firebase-admin": "^12.5.0",
+    "firebase-functions": "^6.0.1",
+    "resend": "^4.0.1"
+  },
+  "private": true
+}

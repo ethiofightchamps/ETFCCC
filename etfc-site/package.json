@@ -1,0 +1,8 @@
+{
+  "name": "etfc-site",
+  "private": true,
+  "dependencies": {
+    "firebase-admin": "^12.5.0",
+    "resend": "^4.0.1"
+  }
+}
