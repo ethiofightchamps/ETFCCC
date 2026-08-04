@@ -42,14 +42,19 @@ Redeploy on Vercel after adding/changing any of these.
   `auth.currentUser.getIdToken()` and verify it server-side with `admin.auth().verifyIdToken()`
 - No QR code image generation yet on approval — `ticketCode` is stored, but nothing
   renders it as a scannable QR in the user dashboard yet
-- **`js/seatmap.js` still shows a hardcoded placeholder seat layout and a hardcoded
-  `SOLD_SEATS` set — it does NOT yet read live seat status from Firestore.** Seat
-  locking on the backend (below) is fully live and correct; the visual map just
-  doesn't reflect it yet. A buyer could see a seat as green/available in the UI and
-  still get a 409 "seat taken" error on submit (handled gracefully, but not ideal —
-  worth wiring the map to read `seatMap` live next)
+- `js/seatmap.js` uses a placeholder venue layout (`SEAT_CONFIG`) — swap for ETFC's
+  real seating chart once they send it. Seat *status* (taken/available), however, is
+  now fully live — see below
 - `screenshotUrl` files are made public in Storage for simplicity — swap for signed
   URLs if screenshots need to stay private long-term
+
+## Live seat map
+`js/seatmap.js` now uses a Firestore real-time listener (`onSnapshot`) on the
+`seatMap` collection, not a hardcoded list. The moment any seat's status changes
+anywhere — someone else starts checkout, admin approves/rejects/releases — every
+visitor's seat grid updates automatically, no refresh needed. If a seat a visitor had
+selected gets taken by someone else first, it's silently dropped from their selection
+and the map re-renders.
 
 ## Betting odds (admin-editable, no code changes needed)
 - Odds live in Firestore's `fights` collection, not hardcoded in HTML anymore

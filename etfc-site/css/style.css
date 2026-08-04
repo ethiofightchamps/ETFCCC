@@ -81,8 +81,8 @@ a { color: inherit; text-decoration: none; }
   position: absolute; inset: 0; display: grid; grid-template-columns: 1fr 1fr;
 }
 .hero-bg .face { background-size: cover; background-position: top center; filter: contrast(1.05); }
-.hero-bg .face.left { background-image: url('images/fighter-a.jpg'); background-position: top right; }
-.hero-bg .face.right { background-image: url('images/fighter-b.jpg'); background-position: top left; }
+.hero-bg .face.left { background-image: url('../images/fighter-a.jpg'); background-position: top right; }
+.hero-bg .face.right { background-image: url('../images/fighter-b.jpg'); background-position: top left; }
 .hero-content {
   position: relative; z-index: 2; width: 100%; padding: 64px 24px 56px;
   max-width: 1200px; margin: 0 auto; text-align: center;
