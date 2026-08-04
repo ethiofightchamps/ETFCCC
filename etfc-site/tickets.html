@@ -59,18 +59,19 @@
 
     <div class="field mt-24">
       <label>Full Name</label>
-      <input type="text" placeholder="As it should appear on your ticket">
+      <input type="text" id="buyerNameInput" placeholder="As it should appear on your ticket">
     </div>
 
     <div class="field">
       <label>Upload Payment Screenshot</label>
       <div class="upload-box" onclick="document.getElementById('screenshotInput').click()">
-        &#128247; Tap to upload proof of payment
-        <input type="file" id="screenshotInput" accept="image/*" style="display:none;">
+        <span id="uploadLabel">&#128247; Tap to upload proof of payment</span>
+        <input type="file" id="screenshotInput" accept="image/*" style="display:none;" onchange="onScreenshotChosen(this)">
       </div>
     </div>
 
-    <button class="btn btn-primary btn-block mt-24" onclick="submitOrder()">Submit Order</button>
+    <p id="submitError" class="text-dim" style="color:var(--crimson-bright);display:none;margin-top:10px;"></p>
+    <button class="btn btn-primary btn-block mt-24" id="submitOrderBtn" onclick="submitOrder()">Submit Order</button>
   </div>
 
   <!-- STEP 3: PENDING CONFIRMATION -->
@@ -103,12 +104,68 @@
   document.getElementById("refCode").textContent =
     "ETFC-" + Math.random().toString(36).slice(2, 8).toUpperCase();
 
-  function submitOrder() {
-    // TODO: upload screenshot to Firebase Storage, write order doc to
-    // Firestore `orders` collection with status: "pending", tied to
-    // selectedSeats from seatmap.js and the authenticated user's uid.
-    document.getElementById("checkoutStep").style.display = "none";
-    document.getElementById("pendingStep").style.display = "block";
+  let chosenScreenshotBase64 = null;
+
+  function onScreenshotChosen(input) {
+    const file = input.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      chosenScreenshotBase64 = reader.result; // data:image/...;base64,....
+      document.getElementById("uploadLabel").textContent = `✓ ${file.name}`;
+    };
+    reader.readAsDataURL(file);
+  }
+
+  async function submitOrder() {
+    const errEl = document.getElementById("submitError");
+    const btn = document.getElementById("submitOrderBtn");
+    errEl.style.display = "none";
+
+    const buyerName = document.getElementById("buyerNameInput").value.trim();
+    const session = JSON.parse(localStorage.getItem("etfc_session") || "null");
+
+    if (!buyerName) return showSubmitError("Enter your full name.");
+    if (!chosenScreenshotBase64) return showSubmitError("Upload your payment screenshot.");
+    if (!session) return showSubmitError("Session expired — please sign in again.");
+    if (Object.keys(selectedSeats).length === 0) return showSubmitError("No seats selected.");
+
+    const seats = Object.keys(selectedSeats);
+    const totalAmount = Object.values(selectedSeats).reduce((sum, s) => sum + s.price, 0);
+
+    btn.setAttribute("disabled", "true");
+    btn.textContent = "Submitting…";
+
+    try {
+      const res = await fetch("/api/create-order", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          buyerName,
+          phone: session.phone || "",
+          email: session.email || "",
+          seats,
+          totalAmount,
+          screenshotBase64: chosenScreenshotBase64,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Could not submit order.");
+
+      document.getElementById("refCode").textContent = data.refCode;
+      document.getElementById("checkoutStep").style.display = "none";
+      document.getElementById("pendingStep").style.display = "block";
+    } catch (err) {
+      showSubmitError(err.message || "Network error — try again.");
+      btn.removeAttribute("disabled");
+      btn.textContent = "Submit Order";
+    }
+  }
+
+  function showSubmitError(msg) {
+    const errEl = document.getElementById("submitError");
+    errEl.textContent = msg;
+    errEl.style.display = "block";
   }
 </script>
 </body>

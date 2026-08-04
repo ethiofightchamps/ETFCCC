@@ -3,84 +3,151 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ETFC Admin</title>
+<title>ETFC Admin — Order Review</title>
 <link rel="stylesheet" href="../css/style.css">
 </head>
 <body>
 
 <div class="admin-shell">
-  <div class="admin-sidebar">
+  <div class="admin-sidebar" style="display:flex;flex-direction:column;">
     <div class="nav-logo" style="padding:0 24px 20px;font-size:22px;">ET<span>FC</span> <span style="font-size:12px;color:var(--bone-dim);">Admin</span></div>
-    <a href="#" class="active">Order Review</a>
-    <a href="#">Fights &amp; Fighters</a>
-    <a href="#">Seat Map Config</a>
-    <a href="#">Sales Dashboard</a>
-    <a href="#">Site Config</a>
-    <a href="#">Users</a>
+    <a href="#" class="active" onclick="loadOrders('pending');return false;">Pending Review</a>
+    <a href="#" onclick="loadOrders('confirmed');return false;">Confirmed</a>
+    <a href="#" onclick="loadOrders('rejected');return false;">Rejected</a>
+    <a href="#" onclick="loadOrders('all');return false;">All Orders</a>
+    <a href="#" style="margin-top:auto;color:var(--crimson-bright);" onclick="logout();return false;">Log Out</a>
   </div>
 
   <div class="admin-main">
-    <div class="section-title" style="font-size:28px;margin-bottom:24px;">Ticket Order Review</div>
+    <div class="section-title" style="font-size:28px;margin-bottom:24px;" id="pageTitle">Ticket Order Review</div>
 
     <div class="admin-stat-row">
-      <div class="stat-box"><div class="val">142</div><div class="lbl">Tickets Sold</div></div>
-      <div class="stat-box"><div class="val">18</div><div class="lbl">Pending Review</div></div>
-      <div class="stat-box"><div class="val">287K</div><div class="lbl">Revenue (ETB)</div></div>
-      <div class="stat-box"><div class="val">64%</div><div class="lbl">Capacity Sold</div></div>
+      <div class="stat-box"><div class="val" id="statCount">–</div><div class="lbl" id="statLabel">Orders</div></div>
+      <div class="stat-box"><div class="val" id="statRevenue">–</div><div class="lbl">Total (ETB)</div></div>
     </div>
 
-    <table class="admin-table">
+    <div id="loadingMsg" class="text-dim">Loading orders…</div>
+    <div id="errorMsg" class="text-dim" style="color:var(--crimson-bright);display:none;"></div>
+
+    <table class="admin-table" id="ordersTable" style="display:none;">
       <thead>
         <tr><th>Screenshot</th><th>Buyer</th><th>Seats</th><th>Amount</th><th>Ref Code</th><th>Status</th><th>Action</th></tr>
       </thead>
-      <tbody>
-        <tr>
-          <td><div class="thumb-sm"></div></td>
-          <td>[Buyer Name]<br><span class="text-dim" style="font-size:11px;">+251 9XX XXX XXX</span></td>
-          <td>Ringside A3, A4</td>
-          <td>7,000 ETB</td>
-          <td>ETFC-8K2J1</td>
-          <td><span class="status-pill pending">Pending</span></td>
-          <td style="display:flex;gap:6px;">
-            <button class="btn btn-primary btn-sm">Approve</button>
-            <button class="btn btn-outline btn-sm">Reject</button>
-          </td>
-        </tr>
-        <tr>
-          <td><div class="thumb-sm"></div></td>
-          <td>[Buyer Name]<br><span class="text-dim" style="font-size:11px;">+254 7XX XXX XXX</span></td>
-          <td>VIP B10</td>
-          <td>1,800 ETB</td>
-          <td>ETFC-3M9X2</td>
-          <td><span class="status-pill confirmed">Confirmed</span></td>
-          <td class="text-dim" style="font-size:12px;">QR sent</td>
-        </tr>
-      </tbody>
+      <tbody id="ordersBody"></tbody>
     </table>
 
-    <p class="text-dim" style="font-size:12px;margin-top:16px;">
-      &#9888; TODO: wire this table to a live Firestore query on the `orders` collection
-      (status == "pending"), and hook Approve/Reject to update the order doc + trigger
-      QR generation on approval.
-    </p>
-
-    <div class="section-head mt-24" style="margin-top:48px;">
-      <div class="section-title" style="font-size:20px;">Site Config</div>
-    </div>
-    <div class="tier-card" style="text-align:left;max-width:400px;">
-      <div style="display:flex;justify-content:space-between;align-items:center;">
-        <span>Betting Enabled</span>
-        <label style="position:relative;display:inline-block;width:44px;height:24px;">
-          <input type="checkbox" style="opacity:0;width:0;height:0;">
-          <span style="position:absolute;inset:0;background:var(--obsidian-3);border-radius:24px;"></span>
-        </label>
-      </div>
-      <p class="text-dim" style="font-size:12px;margin-top:10px;">
-        Flips `config.bettingEnabled` in Firestore. Takes effect site-wide immediately, no redeploy.
-      </p>
-    </div>
+    <div id="emptyMsg" class="text-dim" style="display:none;">No orders in this view.</div>
   </div>
 </div>
 
+<script>
+  const STATUS_LABELS = { pending: "Pending Review", confirmed: "Confirmed", rejected: "Rejected", all: "All Orders" };
+  let currentStatus = "pending";
+
+  async function loadOrders(status, evt) {
+    currentStatus = status;
+    document.getElementById("pageTitle").textContent = STATUS_LABELS[status];
+    document.getElementById("statLabel").textContent = STATUS_LABELS[status];
+    document.querySelectorAll(".admin-sidebar a").forEach((a) => a.classList.remove("active"));
+    const clicked = evt?.target || (window.event && window.event.target);
+    if (clicked) clicked.classList.add("active");
+
+    document.getElementById("loadingMsg").style.display = "block";
+    document.getElementById("errorMsg").style.display = "none";
+    document.getElementById("ordersTable").style.display = "none";
+    document.getElementById("emptyMsg").style.display = "none";
+
+    try {
+      const res = await fetch(`/api/admin-orders?status=${status}`);
+      if (res.status === 401) {
+        window.location.href = "login.html";
+        return;
+      }
+      const data = await res.json();
+      document.getElementById("loadingMsg").style.display = "none";
+
+      if (!res.ok) {
+        document.getElementById("errorMsg").textContent = data.error || "Failed to load orders.";
+        document.getElementById("errorMsg").style.display = "block";
+        return;
+      }
+
+      renderOrders(data.orders);
+    } catch (err) {
+      document.getElementById("loadingMsg").style.display = "none";
+      document.getElementById("errorMsg").textContent = "Network error loading orders.";
+      document.getElementById("errorMsg").style.display = "block";
+    }
+  }
+
+  function renderOrders(orders) {
+    const tbody = document.getElementById("ordersBody");
+    const table = document.getElementById("ordersTable");
+    const empty = document.getElementById("emptyMsg");
+    empty.style.display = "none";
+
+    document.getElementById("statCount").textContent = orders.length;
+    document.getElementById("statRevenue").textContent = orders
+      .reduce((sum, o) => sum + (o.totalAmount || 0), 0)
+      .toLocaleString();
+
+    if (orders.length === 0) {
+      empty.style.display = "block";
+      table.style.display = "none";
+      return;
+    }
+
+    tbody.innerHTML = orders.map((o) => `
+      <tr>
+        <td>${o.screenshotUrl
+          ? `<img class="thumb-sm" src="${o.screenshotUrl}" style="object-fit:cover;cursor:pointer;" onclick="window.open('${o.screenshotUrl}','_blank')">`
+          : `<div class="thumb-sm"></div>`}
+        </td>
+        <td>${o.buyerName}<br><span class="text-dim" style="font-size:11px;">${o.phone}</span></td>
+        <td>${(o.seats || []).join(", ") || "—"}</td>
+        <td>${(o.totalAmount || 0).toLocaleString()} ETB</td>
+        <td>${o.refCode || "—"}</td>
+        <td><span class="status-pill ${o.status}">${o.status}</span></td>
+        <td>
+          ${o.status === "pending" ? `
+            <div style="display:flex;gap:6px;">
+              <button class="btn btn-primary btn-sm" onclick="reviewOrder('${o.id}','approve',this)">Approve</button>
+              <button class="btn btn-outline btn-sm" onclick="reviewOrder('${o.id}','reject',this)">Reject</button>
+            </div>
+          ` : `<span class="text-dim" style="font-size:12px;">${o.status === "confirmed" ? "QR issued" : "—"}</span>`}
+        </td>
+      </tr>
+    `).join("");
+
+    table.style.display = "table";
+  }
+
+  async function reviewOrder(orderId, action, btn) {
+    const row = btn.closest("tr");
+    row.querySelectorAll("button").forEach((b) => b.setAttribute("disabled", "true"));
+    try {
+      const res = await fetch("/api/admin-order-action", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ orderId, action }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        alert(data.error || "Action failed.");
+      }
+      loadOrders(currentStatus);
+    } catch (err) {
+      alert("Network error — try again.");
+      loadOrders(currentStatus);
+    }
+  }
+
+  function logout() {
+    document.cookie = "etfc_admin_session=; Max-Age=0; Path=/;";
+    window.location.href = "login.html";
+  }
+
+  loadOrders("pending");
+</script>
 </body>
 </html>
