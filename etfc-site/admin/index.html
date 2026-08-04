@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ETFC Admin — Order Review</title>
 <link rel="stylesheet" href="../css/style.css">
+<script src="../js/main.js"></script>
 </head>
 <body>
 
@@ -133,11 +134,13 @@
       });
       const data = await res.json();
       if (!res.ok) {
-        alert(data.error || "Action failed.");
+        showToast(data.error || "Action failed.", "error");
+      } else {
+        showToast(action === "confirm" ? "Order confirmed." : "Order rejected.", "success");
       }
       loadOrders(currentStatus);
     } catch (err) {
-      alert("Network error — try again.");
+      showToast("Network error — try again.", "error");
       loadOrders(currentStatus);
     }
   }

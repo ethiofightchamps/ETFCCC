@@ -67,7 +67,7 @@ async function signInWithGoogle() {
     completeSignIn({ name: displayName, email, uid, method: "google" });
   } catch (err) {
     console.error("Google sign-in failed:", err);
-    alert("Google sign-in failed — please try again.");
+    showToast("Google sign-in failed — please try again.", "error");
   }
 }
 
@@ -79,9 +79,9 @@ async function sendEmailOtp(e) {
   const phone = document.getElementById("phoneInput").value.trim();
   const email = document.getElementById("emailInput").value.trim();
 
-  if (!name) return alert("Enter your full name.");
-  if (!phone) return alert("Enter your phone number.");
-  if (!email) return alert("Enter your email address.");
+  if (!name) return showToast("Enter your full name.", "error");
+  if (!phone) return showToast("Enter your phone number.", "error");
+  if (!email) return showToast("Enter your email address.", "error");
 
   pendingSignup = { name, phone, email };
 
@@ -95,18 +95,19 @@ async function sendEmailOtp(e) {
     if (!res.ok) throw new Error(data.error || "Could not send verification code.");
   } catch (err) {
     console.error("sendEmailOtp failed:", err);
-    alert(err.message || "Could not send verification code. Try again.");
+    showToast(err.message || "Could not send verification code. Try again.", "error");
     return;
   }
 
+  showToast("Verification code sent — check your email.", "success");
   document.getElementById("otpEmailTarget").textContent = email;
   showStep("authStepOtp");
 }
 
 async function verifyEmailOtp() {
   const digits = [...document.querySelectorAll("#authStepOtp input")].map((i) => i.value).join("");
-  if (digits.length !== 6) return alert("Enter the full 6-digit code.");
-  if (!pendingSignup) return alert("Session expired — please start over.");
+  if (digits.length !== 6) return showToast("Enter the full 6-digit code.", "error");
+  if (!pendingSignup) return showToast("Session expired — please start over.", "error");
 
   try {
     const res = await fetch("/api/verify-otp", {
@@ -119,9 +120,10 @@ async function verifyEmailOtp() {
 
     await auth.signInWithCustomToken(data.token);
     completeSignIn({ name: data.name, phone: data.phone, email: data.email, method: "email" });
+    showToast(`Welcome, ${data.name.split(" ")[0]}!`, "success");
   } catch (err) {
     console.error("verifyEmailOtp failed:", err);
-    alert(err.message || "Incorrect or expired code.");
+    showToast(err.message || "Incorrect or expired code.", "error");
     return;
   }
 
