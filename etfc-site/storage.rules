@@ -25,6 +25,15 @@ service firebase.storage {
         && request.resource.contentType.matches('image/.*');
     }
 
+    // Bet payment screenshots — same pattern as payment-screenshots above.
+    match /bet-screenshots/{userId}/{fileName} {
+      allow read: if (isSignedIn() && request.auth.uid == userId) || isAdmin();
+      allow write: if isSignedIn()
+        && request.auth.uid == userId
+        && request.resource.size < 5 * 1024 * 1024
+        && request.resource.contentType.matches('image/.*');
+    }
+
     // Fighter photos, event graphics — public read, admin-only write.
     match /public-assets/{fileName} {
       allow read: if true;

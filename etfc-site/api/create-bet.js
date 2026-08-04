@@ -1,22 +1,21 @@
 // POST /api/create-bet
-// { fightId, side: "A"|"B", stake, buyerName, phone, email, screenshotBase64 }
+// { fightId, side: "A"|"B", stake, buyerName, phone, email, screenshotUrl }
 //
-// Same pattern as create-order.js: uploads the payment screenshot to
-// Firebase Storage and writes a "pending" bet doc for the admin panel to
-// review. Runs server-side so the odds used for the payout are always the
-// REAL odds read from the `fights` collection at the moment of betting —
-// never trust a client-sent odds value, or someone could submit a fake
-// higher number and inflate their own payout.
+// Same fix as create-order.js: the payment screenshot uploads CLIENT-SIDE
+// straight to Firebase Storage (see betting.html) instead of being sent as
+// base64 through this endpoint — base64 routinely exceeds Vercel's 4.5MB
+// serverless function request-body limit, which was crashing this endpoint
+// with a generic Vercel error page before any of this code even ran.
 //
-// NOTE / TODO: like create-order.js, this doesn't yet verify a Firebase
-// Auth ID token — it trusts the buyer info the client sends. Before real
-// betting money is on the line, require `idToken` and verify it with
-// admin.auth().verifyIdToken() before writing the bet.
+// Real odds are still read server-side from the `fights` collection at bet
+// time — never trust a client-sent odds value, or someone could submit a
+// fake higher number and inflate their own payout.
+//
+// NOTE / TODO: doesn't yet verify a Firebase Auth ID token — see create-order.js.
 
 const admin = require("./_firebaseAdmin");
 
 const db = admin.firestore();
-const bucket = admin.storage().bucket();
 
 function generateRefCode() {
   return "ETFC-BET-" + Math.random().toString(36).slice(2, 8).toUpperCase();
@@ -27,7 +26,7 @@ module.exports = async (req, res) => {
     return res.status(405).json({ error: "Method not allowed" });
   }
 
-  const { fightId, side, stake, buyerName, phone, email, screenshotBase64 } = req.body || {};
+  const { fightId, side, stake, buyerName, phone, email, screenshotUrl } = req.body || {};
 
   if (!fightId || !["A", "B"].includes(side)) {
     return res.status(400).json({ error: "A valid fightId and side (A or B) are required." });
@@ -39,12 +38,14 @@ module.exports = async (req, res) => {
   if (!buyerName || !phone) {
     return res.status(400).json({ error: "Missing required buyer info." });
   }
-  if (!screenshotBase64) {
+  if (!screenshotUrl || typeof screenshotUrl !== "string") {
     return res.status(400).json({ error: "Payment screenshot is required." });
+  }
+  if (!screenshotUrl.includes("firebasestorage") && !screenshotUrl.includes("storage.googleapis.com")) {
+    return res.status(400).json({ error: "Invalid screenshot URL." });
   }
 
   try {
-    // Betting must be globally enabled — checked here too, not just in the UI.
     const configSnap = await db.collection("config").doc("site").get();
     if (!configSnap.exists || configSnap.data().bettingEnabled !== true) {
       return res.status(403).json({ error: "Betting is not open yet." });
@@ -65,14 +66,6 @@ module.exports = async (req, res) => {
     const potentialPayout = Math.round(stakeNum * odds * 100) / 100;
     const refCode = generateRefCode();
 
-    const buffer = Buffer.from(screenshotBase64.split(",").pop(), "base64");
-    const filePath = `bet-screenshots/${Date.now()}-${refCode}.jpg`;
-    const file = bucket.file(filePath);
-
-    await file.save(buffer, { metadata: { contentType: "image/jpeg" } });
-    await file.makePublic();
-    const screenshotUrl = `https://storage.googleapis.com/${bucket.name}/${filePath}`;
-
     const betRef = await db.collection("bets").add({
       buyerName,
       phone,
@@ -85,7 +78,7 @@ module.exports = async (req, res) => {
       potentialPayout,
       refCode,
       screenshotUrl,
-      status: "pending", // pending -> confirmed (payment verified, bet active) -> won / lost (after the fight)
+      status: "pending",
       createdAt: admin.firestore.FieldValue.serverTimestamp(),
     });
 

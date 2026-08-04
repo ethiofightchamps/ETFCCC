@@ -96,7 +96,7 @@
     btn.textContent = "Releasing…";
 
     try {
-      const res = await fetch("/api/admin-release-seat", {
+      const res = await fetch("/api/admin-seats", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ seatId }),

@@ -153,7 +153,7 @@
     const row = btn.closest("tr");
     row.querySelectorAll("button").forEach((b) => b.setAttribute("disabled", "true"));
     try {
-      const res = await fetch("/api/admin-bet-action", {
+      const res = await fetch("/api/admin-bets", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ betId, action }),

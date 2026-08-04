@@ -83,6 +83,7 @@ function isValidEmail(email) {
 async function signInWithGoogle() {
   try {
     const provider = new firebase.auth.GoogleAuthProvider();
+    provider.setCustomParameters({ prompt: "select_account" });
     const result = await auth.signInWithPopup(provider);
     const { displayName, email, uid } = result.user;
     completeSignIn({ name: displayName, email, uid, method: "google" });

@@ -117,10 +117,10 @@
     btn.textContent = "Saving…";
 
     try {
-      const res = await fetch("/api/admin-update-odds", {
+      const res = await fetch("/api/admin-fights", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ fightId, oddsA, oddsB }),
+        body: JSON.stringify({ action: "updateOdds", fightId, oddsA, oddsB }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Save failed.");
@@ -136,7 +136,7 @@
 
   async function seedFights() {
     try {
-      const res = await fetch("/api/admin-seed-fights", { method: "POST" });
+      const res = await fetch("/api/admin-fights", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "seed" }) });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Could not seed fights.");
       showToast("Fight card loaded.", "success");

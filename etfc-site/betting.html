@@ -191,14 +191,14 @@
   let currentFightId = null;
   let currentSide = null;
   let currentOdds = 1;
-  let chosenBetScreenshotBase64 = null;
+  let chosenBetFile = null;
 
   function openBetSlip(fightId, side, fighterName, odds) {
     requireAuth("placeBet", () => {
       currentFightId = fightId;
       currentSide = side;
       currentOdds = odds;
-      chosenBetScreenshotBase64 = null;
+      chosenBetFile = null;
 
       document.getElementById("betSlipForm").style.display = "block";
       document.getElementById("betSlipPending").style.display = "none";
@@ -229,12 +229,13 @@
   function onBetScreenshotChosen(input) {
     const file = input.files[0];
     if (!file) return;
-    const reader = new FileReader();
-    reader.onload = () => {
-      chosenBetScreenshotBase64 = reader.result;
-      document.getElementById("betUploadLabel").textContent = `\u2713 ${file.name}`;
-    };
-    reader.readAsDataURL(file);
+    if (file.size > 5 * 1024 * 1024) {
+      showBetSubmitError("Screenshot is over 5MB — please choose a smaller image.");
+      input.value = "";
+      return;
+    }
+    chosenBetFile = file;
+    document.getElementById("betUploadLabel").textContent = `\u2713 ${file.name}`;
   }
 
   function showBetSubmitError(msg) {
@@ -254,13 +255,25 @@
 
     if (stake <= 0) return showBetSubmitError("Enter a stake amount.");
     if (!buyerName) return showBetSubmitError("Enter your full name.");
-    if (!chosenBetScreenshotBase64) return showBetSubmitError("Upload your payment screenshot.");
+    if (!chosenBetFile) return showBetSubmitError("Upload your payment screenshot.");
     if (!session) return showBetSubmitError("Session expired — please sign in again.");
+    if (!auth.currentUser) return showBetSubmitError("Session expired — please sign in again.");
 
     btn.setAttribute("disabled", "true");
-    btn.textContent = "Submitting…";
+    btn.textContent = "Uploading screenshot…";
 
     try {
+      // Upload straight to Firebase Storage from the browser — same fix as
+      // tickets.html. Base64 through the API was crashing Vercel's 4.5MB
+      // request-body limit; this sidesteps it entirely.
+      const uid = auth.currentUser.uid;
+      const path = `bet-screenshots/${uid}/${Date.now()}-${chosenBetFile.name}`;
+      const storageRef = storage.ref().child(path);
+      await storageRef.put(chosenBetFile);
+      const screenshotUrl = await storageRef.getDownloadURL();
+
+      btn.textContent = "Submitting…";
+
       const res = await fetch("/api/create-bet", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -271,7 +284,7 @@
           buyerName,
           phone: session.phone || "",
           email: session.email || "",
-          screenshotBase64: chosenBetScreenshotBase64,
+          screenshotUrl,
         }),
       });
       const data = await res.json();
@@ -280,7 +293,7 @@
       document.getElementById("betSlipForm").style.display = "none";
       document.getElementById("betSlipPending").style.display = "block";
     } catch (err) {
-      showBetSubmitError(err.message || "Network error — try again.");
+      showBetSubmitError(err.message || "Upload failed — check your connection and try again.");
       btn.removeAttribute("disabled");
       btn.textContent = "Submit Bet";
     }
