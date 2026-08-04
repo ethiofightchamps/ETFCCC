@@ -57,7 +57,7 @@ module.exports = async (req, res) => {
     });
 
     await resend.emails.send({
-      from: "ETFC <onboarding@resend.dev>", // TODO: swap for a verified sending domain
+      from: "ETFC <noreply@ethiofightingchamps.com>",
       to: email,
       subject: `${code} is your ETFC verification code`,
       html: `<p>Your ETFC verification code is:</p><h2 style="letter-spacing:4px;">${code}</h2><p>This code expires in 10 minutes. If you didn't request this, you can ignore this email.</p>`,
