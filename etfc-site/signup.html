@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sign Up — ETFC</title>
+<script>(function(){var t=localStorage.getItem("etfc_theme")||"dark";document.documentElement.setAttribute("data-theme",t);})();</script>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div id="nav-mount" data-active=""></div>
+
+<div class="auth-page">
+  <div class="auth-card">
+
+    <div id="authStepChoice">
+      <h1>Create Account</h1>
+      <p class="sub">Sign up to buy tickets or place bets.</p>
+      <button class="btn btn-outline btn-block" onclick="signInWithGoogle()">
+        <span style="margin-right:8px;">&#128101;</span>Continue with Google
+      </button>
+      <div class="auth-divider"><span>or</span></div>
+      <button class="btn btn-primary btn-block" onclick="showManualSignup()">Continue with Email</button>
+      <p class="auth-switch">Already have an account? <a href="login.html">Log In</a></p>
+    </div>
+
+    <div id="authStepManual" style="display:none;">
+      <h3>Your Details</h3>
+      <p class="sub">We'll send a verification code to your email.</p>
+      <div class="field">
+        <label>Full Name</label>
+        <input type="text" id="nameInput" placeholder="Full Name">
+      </div>
+      <div class="field">
+        <label>Phone Number</label>
+        <input type="tel" id="phoneInput" placeholder="09XX XXX XXX">
+      </div>
+      <div class="field">
+        <label>Email Address</label>
+        <input type="email" id="emailInput" placeholder="you@example.com">
+      </div>
+      <button class="btn btn-primary btn-block" onclick="sendEmailOtp()">Send Verification Code</button>
+      <p class="auth-switch"><a href="#" onclick="backToChoice(event)">&larr; Back</a></p>
+    </div>
+
+    <div id="authStepOtp" style="display:none;">
+      <h3>Enter Code</h3>
+      <p class="sub">We sent a 6-digit code to <span id="otpEmailTarget"></span>.</p>
+      <div class="otp-boxes">
+        <input maxlength="1"><input maxlength="1"><input maxlength="1">
+        <input maxlength="1"><input maxlength="1"><input maxlength="1">
+      </div>
+      <button class="btn btn-primary btn-block" onclick="verifyEmailOtp()">Verify &amp; Continue</button>
+      <p class="auth-switch"><a href="#" onclick="sendEmailOtp(event)">Resend code</a></p>
+    </div>
+
+  </div>
+</div>
+
+<div id="footer-mount"></div>
+
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-storage-compat.js"></script>
+<script src="js/firebase-config.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/partials.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>

@@ -92,13 +92,38 @@ a { color: inherit; text-decoration: none; }
   border-radius: 3px; transition: background 0.15s;
 }
 .nav-cta:hover { background: var(--crimson-bright); }
-.nav-login {
-  width: 38px; height: 38px; border-radius: 50%; border: 1px solid var(--border);
-  display: flex; align-items: center; justify-content: center; font-size: 16px;
-  color: var(--bone-dim); cursor: pointer;
+.nav-link-auth {
+  font-size: 14px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;
+  color: var(--bone-dim); transition: color 0.15s;
 }
-.nav-login:hover { border-color: var(--gold); color: var(--gold); }
+.nav-link-auth:hover { color: var(--gold); }
+.nav-user { font-size: 13px; font-weight: 600; color: var(--bone-dim); }
 .nav-toggle { display: none; }
+
+/* ── AUTH PAGES (login.html / signup.html) ──────────────────────────── */
+.auth-page {
+  min-height: calc(100vh - 68px - 220px);
+  display: flex; align-items: center; justify-content: center;
+  padding: 60px 20px;
+}
+.auth-card {
+  width: 100%; max-width: 420px;
+  background: var(--obsidian-2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 40px 36px;
+}
+.auth-card h1 {
+  font-family: var(--font-display); font-size: 28px; text-transform: uppercase;
+  margin-bottom: 6px; color: var(--bone);
+}
+.auth-card h3 {
+  font-family: var(--font-display); font-size: 24px; text-transform: uppercase;
+  margin-bottom: 6px; color: var(--bone); letter-spacing: 0.5px;
+}
+.auth-card .sub { color: var(--bone-dim); font-size: 13px; margin-bottom: 28px; }
+.auth-switch { text-align: center; font-size: 13px; color: var(--bone-dim); margin-top: 22px; }
+.auth-switch a { color: var(--gold); font-weight: 600; }
 
 /* ---------- HERO ---------- */
 .hero {
@@ -140,6 +165,23 @@ a { color: inherit; text-decoration: none; }
 }
 .hero-meta span { color: var(--gold-bright); }
 .hero-ctas { display: flex; justify-content: center; gap: 14px; margin-top: 32px; flex-wrap: wrap; }
+
+/* Hero sits on a dark photo in both themes, so its text stays light even in light mode */
+[data-theme="light"] .hero-title,
+[data-theme="light"] .hero-sub,
+[data-theme="light"] .hero-meta,
+[data-theme="light"] .hero-label,
+[data-theme="light"] .countdown .num,
+[data-theme="light"] .countdown .lbl {
+  color: #e8e4dc;
+}
+[data-theme="light"] .hero-meta span,
+[data-theme="light"] .hero-label {
+  color: #d4af5f;
+}
+[data-theme="light"] .countdown .num {
+  background: rgba(13,13,13,0.55); border-color: rgba(255,255,255,0.15);
+}
 
 .btn {
   display: inline-block; padding: 15px 30px; font-weight: 700; font-size: 14px;

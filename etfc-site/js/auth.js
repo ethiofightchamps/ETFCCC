@@ -1,27 +1,19 @@
 // ── AUTH FLOW ────────────────────────────────────────────────────────────
-// Two ways in:
+// Login and sign up now live on their own pages (login.html / signup.html)
+// instead of a popup. Two ways in on each page:
 //   1. Continue with Google  → Firebase GoogleAuthProvider popup
 //   2. Continue with Email   → collect name + phone + email, then a 6-digit
 //                              code is emailed for verification.
-// No SMS/phone OTP anywhere. This file is a working SCAFFOLD — the actual
-// Google/Firebase calls and the email-send call are stubbed with TODOs.
+// The email-OTP send/verify logic below is UNCHANGED from the working
+// version — only the modal-open/close plumbing around it was replaced with
+// page navigation.
 
-let pendingAction = null; // e.g. { type: 'buyTicket', seatIds: [...] } — set before opening modal
 let pendingSignup = null; // { name, phone, email } — held between "send code" and "verify"
-
-function openAuthModal(action) {
-  pendingAction = action || null;
-  document.getElementById("authModal").classList.add("open");
-  showChoiceStep();
-}
-
-function closeAuthModal() {
-  document.getElementById("authModal").classList.remove("open");
-}
 
 function showStep(id) {
   ["authStepChoice", "authStepManual", "authStepOtp"].forEach((s) => {
-    document.getElementById(s).style.display = s === id ? "block" : "none";
+    const el = document.getElementById(s);
+    if (el) el.style.display = s === id ? "block" : "none";
   });
 }
 
@@ -38,24 +30,48 @@ function backToChoice(e) {
   showChoiceStep();
 }
 
-// Call this from any "Buy Ticket" / "Place Bet" button instead of navigating
-// directly — it checks auth state first and only prompts login if needed.
-function requireAuth(action, onAuthed) {
-  // TODO: replace with real check — e.g. `auth.currentUser`
+// Call this from any "Buy Ticket" / "Place Bet" button. If already signed
+// in, runs onAuthed() immediately. Otherwise remembers what page/action was
+// in progress and sends the user to login.html; they're bounced back after.
+function requireAuth(actionKey, onAuthed) {
   const isLoggedIn = !!localStorage.getItem("etfc_session");
   if (isLoggedIn) {
     onAuthed();
-  } else {
-    pendingAction = { action, onAuthed };
-    openAuthModal();
+    return;
   }
+  sessionStorage.setItem("etfc_pending_action", actionKey);
+  sessionStorage.setItem("etfc_return_to", window.location.pathname + window.location.search);
+  window.location.href = "login.html";
+}
+
+// Call on page load if that page has a requireAuth() action, so it resumes
+// automatically after a login.html → back redirect.
+function consumePendingAction(actionKey, onAuthed) {
+  const pending = sessionStorage.getItem("etfc_pending_action");
+  if (pending === actionKey && !!localStorage.getItem("etfc_session")) {
+    sessionStorage.removeItem("etfc_pending_action");
+    sessionStorage.removeItem("etfc_return_to");
+    onAuthed();
+  }
+}
+
+// After a successful sign-in, go back to wherever the user was trying to
+// go, or the homepage.
+function redirectAfterAuth() {
+  const returnTo = sessionStorage.getItem("etfc_return_to");
+  sessionStorage.removeItem("etfc_return_to");
+  window.location.href = returnTo || "index.html";
 }
 
 function completeSignIn(sessionData) {
   localStorage.setItem("etfc_session", JSON.stringify({ ...sessionData, ts: Date.now() }));
-  closeAuthModal();
-  if (pendingAction && pendingAction.onAuthed) pendingAction.onAuthed();
-  pendingAction = null;
+}
+
+function logOut(e) {
+  if (e) e.preventDefault();
+  localStorage.removeItem("etfc_session");
+  if (typeof auth !== "undefined" && auth.currentUser) auth.signOut();
+  window.location.href = "index.html";
 }
 
 // ── Google sign-in ─────────────────────────────────────────────────────
@@ -65,6 +81,7 @@ async function signInWithGoogle() {
     const result = await auth.signInWithPopup(provider);
     const { displayName, email, uid } = result.user;
     completeSignIn({ name: displayName, email, uid, method: "google" });
+    redirectAfterAuth();
   } catch (err) {
     console.error("Google sign-in failed:", err);
     showToast("Google sign-in failed — please try again.", "error");
@@ -128,6 +145,7 @@ async function verifyEmailOtp() {
   }
 
   pendingSignup = null;
+  redirectAfterAuth();
 }
 
 // Auto-advance between OTP digit boxes
