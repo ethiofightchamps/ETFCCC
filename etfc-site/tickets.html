@@ -150,6 +150,23 @@
         }),
       });
       const data = await res.json();
+
+      if (res.status === 409) {
+        // Someone else grabbed one of these seats between selection and
+        // submit — send them back to pick again instead of a dead-end error.
+        showSubmitError(data.error || "Some of your seats were just taken. Please choose different seats.");
+        setTimeout(() => {
+          document.getElementById("checkoutStep").style.display = "none";
+          document.getElementById("seatStep").style.display = "block";
+          selectedSeats = {};
+          renderSeatMap();
+          renderSelectionPanel();
+        }, 2500);
+        btn.removeAttribute("disabled");
+        btn.textContent = "Submit Order";
+        return;
+      }
+
       if (!res.ok) throw new Error(data.error || "Could not submit order.");
 
       document.getElementById("refCode").textContent = data.refCode;

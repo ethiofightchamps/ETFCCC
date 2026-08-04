@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ETFC Admin — Seat Management</title>
+<link rel="stylesheet" href="../css/style.css">
+<script src="../js/main.js"></script>
+</head>
+<body>
+
+<div class="admin-shell">
+  <div class="admin-sidebar" style="display:flex;flex-direction:column;">
+    <div class="nav-logo" style="padding:0 24px 20px;font-size:22px;">ET<span>FC</span> <span style="font-size:12px;color:var(--bone-dim);">Admin</span></div>
+    <a href="index.html">Order Review</a>
+    <a href="odds.html">Betting Odds</a>
+    <a href="seats.html" class="active" style="border-top:1px solid var(--border);margin-top:8px;padding-top:20px;">Seat Management</a>
+    <a href="#" style="margin-top:auto;color:var(--crimson-bright);" onclick="logout();return false;">Log Out</a>
+  </div>
+
+  <div class="admin-main">
+    <div class="section-title" style="font-size:28px;margin-bottom:8px;">Seat Management</div>
+    <p class="text-dim" style="margin-bottom:24px;">
+      Every seat currently locked (pending checkout) or sold. Release a seat to free it
+      immediately — this revokes the whole order it belongs to, so use it for mistakes
+      like an accidentally-approved fraudulent order, not partial changes.
+    </p>
+
+    <div id="loadingMsg" class="text-dim">Loading seats…</div>
+    <div id="errorMsg" class="text-dim" style="color:var(--crimson-bright);display:none;"></div>
+    <div id="emptyMsg" class="text-dim" style="display:none;">No seats are currently locked or sold.</div>
+
+    <table class="admin-table" id="seatsTable" style="display:none;">
+      <thead>
+        <tr><th>Seat</th><th>Status</th><th>Buyer</th><th>Order Status</th><th>Action</th></tr>
+      </thead>
+      <tbody id="seatsBody"></tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+  async function loadSeats() {
+    document.getElementById("loadingMsg").style.display = "block";
+    document.getElementById("errorMsg").style.display = "none";
+    document.getElementById("emptyMsg").style.display = "none";
+    document.getElementById("seatsTable").style.display = "none";
+
+    try {
+      const res = await fetch("/api/admin-seats");
+      if (res.status === 401) { window.location.href = "login.html"; return; }
+      const data = await res.json();
+      document.getElementById("loadingMsg").style.display = "none";
+
+      if (!res.ok) {
+        document.getElementById("errorMsg").textContent = data.error || "Failed to load seats.";
+        document.getElementById("errorMsg").style.display = "block";
+        return;
+      }
+
+      renderSeats(data.seats);
+    } catch (err) {
+      document.getElementById("loadingMsg").style.display = "none";
+      document.getElementById("errorMsg").textContent = "Network error loading seats.";
+      document.getElementById("errorMsg").style.display = "block";
+    }
+  }
+
+  function renderSeats(seats) {
+    const table = document.getElementById("seatsTable");
+    const empty = document.getElementById("emptyMsg");
+
+    if (seats.length === 0) {
+      empty.style.display = "block";
+      return;
+    }
+
+    document.getElementById("seatsBody").innerHTML = seats.map((s) => `
+      <tr data-seat-id="${s.seatId}">
+        <td>${s.seatId}</td>
+        <td><span class="status-pill ${s.status === 'sold' ? 'confirmed' : 'pending'}">${s.status}</span></td>
+        <td>${s.buyerName}<br><span class="text-dim" style="font-size:11px;">${s.phone}</span></td>
+        <td><span class="status-pill ${s.orderStatus === 'confirmed' ? 'confirmed' : 'pending'}">${s.orderStatus}</span></td>
+        <td><button class="btn btn-outline btn-sm" onclick="releaseSeat('${s.seatId}', this)">Release</button></td>
+      </tr>
+    `).join("");
+
+    table.style.display = "table";
+  }
+
+  async function releaseSeat(seatId, btn) {
+    if (!confirm(`Release ${seatId}? This revokes the entire order it belongs to and frees all its seats.`)) return;
+
+    btn.setAttribute("disabled", "true");
+    btn.textContent = "Releasing…";
+
+    try {
+      const res = await fetch("/api/admin-release-seat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ seatId }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Could not release seat.");
+      showToast(`${seatId} released.`, "success");
+      loadSeats();
+    } catch (err) {
+      showToast(err.message, "error");
+      btn.removeAttribute("disabled");
+      btn.textContent = "Release";
+    }
+  }
+
+  function logout() {
+    document.cookie = "etfc_admin_session=; Max-Age=0; Path=/;";
+    window.location.href = "login.html";
+  }
+
+  loadSeats();
+</script>
+</body>
+</html>
