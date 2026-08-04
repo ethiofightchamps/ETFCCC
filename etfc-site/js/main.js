@@ -23,6 +23,25 @@ function tickCountdown() {
 setInterval(tickCountdown, 1000);
 document.addEventListener("DOMContentLoaded", tickCountdown);
 
+// ── LIGHT / DARK MODE ─────────────────────────────────────────────────────
+// Applied immediately in each page's <head> (see theme-init inline script)
+// to avoid a flash of the wrong theme; these two functions handle the
+// toggle button + keeping it in sync after the nav renders.
+function toggleTheme() {
+  const isLight = document.documentElement.getAttribute("data-theme") === "light";
+  const next = isLight ? "dark" : "light";
+  document.documentElement.setAttribute("data-theme", next);
+  localStorage.setItem("etfc_theme", next);
+  updateThemeIcon();
+}
+
+function updateThemeIcon() {
+  const btn = document.getElementById("themeToggleBtn");
+  if (!btn) return;
+  const isLight = document.documentElement.getAttribute("data-theme") === "light";
+  btn.innerHTML = isLight ? "&#9728;" : "&#9789;"; // sun : moon
+}
+
 // ── TOAST NOTIFICATIONS ───────────────────────────────────────────────────
 // Usage: showToast("Code sent!", "success") | showToast("Wrong code.", "error")
 // Replaces plain browser alert() popups everywhere on the site.

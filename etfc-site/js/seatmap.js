@@ -1,13 +1,6 @@
 // ── SEAT MAP ─────────────────────────────────────────────────────────────
 // PLACEHOLDER layout — replace SEAT_CONFIG with ETFC's real venue chart
 // (rows, sections, capacity per section) once they send it.
-//
-// Seat STATUS (pending/sold/available) is read LIVE from Firestore's
-// `seatMap` collection via a real-time listener (onSnapshot) — this is what
-// makes the grid grey out instantly for every visitor the moment someone
-// else locks or buys a seat, without anyone needing to refresh the page.
-// The actual locking logic lives server-side in api/create-order.js — this
-// file only ever displays state, it never decides who "wins" a seat.
 
 const SEAT_CONFIG = [
   { section: "Ringside", tier: "ringside", price: 3500, rows: 2, seatsPerRow: 12 },
@@ -15,9 +8,11 @@ const SEAT_CONFIG = [
   { section: "General Admission", tier: "ga", price: 600, rows: 6, seatsPerRow: 20 },
 ];
 
+// TODO: replace with a live read from Firestore `seatMap` collection,
+// so sold/locked seats reflect real purchase state.
+const SOLD_SEATS = new Set(["Ringside-A-3", "Ringside-A-4", "VIP-B-10", "GA-C-1"]);
+
 let selectedSeats = {}; // { seatId: { section, tier, price, label } }
-let liveSeatStatus = {}; // { seatId: "pending" | "sold" }  — populated by the listener below
-let seatListenerUnsubscribe = null;
 
 function renderSeatMap() {
   const mount = document.getElementById("seatMapMount");
@@ -33,19 +28,16 @@ function renderSeatMap() {
       html += `<div class="seat-row">`;
       for (let s = 1; s <= sec.seatsPerRow; s++) {
         const seatId = `${sec.section}-${rowLetter}-${s}`;
-        const liveStatus = liveSeatStatus[seatId]; // undefined = available
-        const taken = liveStatus === "pending" || liveStatus === "sold";
-        const isSelected = !!selectedSeats[seatId];
-
+        const sold = SOLD_SEATS.has(seatId);
         html += `<div
-          class="seat tier-${sec.tier} ${taken ? "sold" : ""} ${isSelected ? "selected" : ""}"
+          class="seat tier-${sec.tier} ${sold ? "sold" : ""}"
           data-seat-id="${seatId}"
           data-section="${sec.section}"
           data-tier="${sec.tier}"
           data-price="${sec.price}"
           data-label="${sec.section} ${rowLetter}${s}"
-          title="${sec.section} ${rowLetter}${s} — ${sec.price} ETB${taken ? " (taken)" : ""}"
-          onclick="${taken ? "" : `toggleSeat(this)`}"
+          title="${sec.section} ${rowLetter}${s} — ${sec.price} ETB"
+          onclick="${sold ? "" : `toggleSeat(this)`}"
         ></div>`;
       }
       html += `</div>`;
@@ -56,58 +48,24 @@ function renderSeatMap() {
   mount.innerHTML = html;
 }
 
-// Real-time listener — fires immediately with current state, then again
-// every time any seat's status changes anywhere (another buyer checking
-// out, admin approving/rejecting/releasing). Re-renders the map each time.
-function startSeatListener() {
-  if (typeof db === "undefined") {
-    console.error("Firestore `db` not available — check firebase-config.js load order.");
-    return;
-  }
-  if (seatListenerUnsubscribe) return; // already listening
-
-  seatListenerUnsubscribe = db.collection("seatMap").onSnapshot(
-    (snapshot) => {
-      const next = {};
-      snapshot.forEach((doc) => {
-        const data = doc.data();
-        if (data.status === "pending" || data.status === "sold") {
-          next[doc.id] = data.status;
-        }
-      });
-      liveSeatStatus = next;
-
-      // If a seat the user had selected just got taken by someone else
-      // (race condition), drop it from their selection automatically.
-      Object.keys(selectedSeats).forEach((seatId) => {
-        if (liveSeatStatus[seatId]) delete selectedSeats[seatId];
-      });
-
-      renderSeatMap();
-      renderSelectionPanel();
-    },
-    (err) => {
-      console.error("Seat map live listener failed:", err);
-    }
-  );
-}
-
 function toggleSeat(el) {
   const seatId = el.dataset.seatId;
 
-  if (liveSeatStatus[seatId]) return; // safety net — taken seats aren't clickable anyway
-
   if (selectedSeats[seatId]) {
     delete selectedSeats[seatId];
+    el.classList.remove("selected");
   } else {
+    // TODO: before locking client-side, run a Firestore transaction that
+    // checks the seat is still unsold and writes a short-lived "locked" flag
+    // so two buyers can't select the same seat simultaneously.
     selectedSeats[seatId] = {
       section: el.dataset.section,
       tier: el.dataset.tier,
       price: Number(el.dataset.price),
       label: el.dataset.label,
     };
+    el.classList.add("selected");
   }
-  renderSeatMap();
   renderSelectionPanel();
 }
 
@@ -141,12 +99,11 @@ function renderSelectionPanel() {
 function proceedToCheckout() {
   if (Object.keys(selectedSeats).length === 0) return;
   requireAuth("buyTicket", () => {
+    // TODO: write a pending order doc to Firestore `orders` collection with
+    // the selected seatIds, then reveal the bank-transfer + upload step.
     document.getElementById("seatStep").style.display = "none";
     document.getElementById("checkoutStep").style.display = "block";
   });
 }
 
-document.addEventListener("DOMContentLoaded", () => {
-  renderSeatMap(); // instant paint with "all available" so the grid isn't blank
-  startSeatListener(); // then swap in live status as soon as Firestore responds
-});
+document.addEventListener("DOMContentLoaded", renderSeatMap);

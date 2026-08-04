@@ -18,6 +18,7 @@ function renderNav(activePage) {
       <a href="index.html" class="nav-logo">ET<span>FC</span></a>
       <div class="nav-links">${linksHtml}</div>
       <div style="display:flex;align-items:center;gap:14px;">
+        <div class="theme-toggle" onclick="toggleTheme()" title="Toggle light/dark mode" id="themeToggleBtn"></div>
         <div class="nav-login" onclick="openAuthModal()" title="Login / Sign up">&#128100;</div>
         <a href="tickets.html" class="nav-cta">Get Tickets</a>
       </div>
@@ -104,4 +105,5 @@ document.addEventListener("DOMContentLoaded", () => {
   if (navMount) navMount.outerHTML = renderNav(navMount.dataset.active || "");
   if (footerMount) footerMount.outerHTML = renderFooter();
   if (modalMount) modalMount.outerHTML = renderAuthModal();
+  if (typeof updateThemeIcon === "function") updateThemeIcon();
 });

@@ -42,43 +42,10 @@ Redeploy on Vercel after adding/changing any of these.
   `auth.currentUser.getIdToken()` and verify it server-side with `admin.auth().verifyIdToken()`
 - No QR code image generation yet on approval — `ticketCode` is stored, but nothing
   renders it as a scannable QR in the user dashboard yet
-- `js/seatmap.js` uses a placeholder venue layout (`SEAT_CONFIG`) — swap for ETFC's
-  real seating chart once they send it. Seat *status* (taken/available), however, is
-  now fully live — see below
+- Seat map uses placeholder layout (`js/seatmap.js` → `SEAT_CONFIG`) — swap for
+  ETFC's real venue chart
 - `screenshotUrl` files are made public in Storage for simplicity — swap for signed
   URLs if screenshots need to stay private long-term
-
-## Live seat map
-`js/seatmap.js` now uses a Firestore real-time listener (`onSnapshot`) on the
-`seatMap` collection, not a hardcoded list. The moment any seat's status changes
-anywhere — someone else starts checkout, admin approves/rejects/releases — every
-visitor's seat grid updates automatically, no refresh needed. If a seat a visitor had
-selected gets taken by someone else first, it's silently dropped from their selection
-and the map re-renders.
-
-## Betting odds (admin-editable, no code changes needed)
-- Odds live in Firestore's `fights` collection, not hardcoded in HTML anymore
-- First time only: go to `/admin/odds.html` → click **"Load ETFC's Fight Card"** to
-  seed the real roster (Sedo vs Jonny main event + full MMA/Boxing/Muaythai card)
-- After that, edit any fighter's odds directly on that page — Save updates Firestore,
-  goes live on `betting.html` immediately (it reads the same collection client-side,
-  already allowed by `firestore.rules`)
-- The seed button is idempotent — it won't run again once fights exist, so it's safe
-  to leave live on the page
-
-## Seat locking & release
-- `api/create-order.js` now claims seats inside a Firestore **transaction** — if two
-  people try to buy the same seat at once, only one succeeds; the other gets a clean
-  409 error and `tickets.html` sends them back to reselect automatically
-- Seats move `available → pending` (on checkout submit) `→ sold` (on admin approve)
-  `→ available` again (on admin reject)
-- **`/admin/seats.html`** — new page listing every pending/sold seat with the buyer's
-  name and order status. **Release** button frees the seat immediately. Releasing any
-  seat on a multi-seat order revokes the WHOLE order (all its seats), not just one —
-  this is meant for "undo this booking entirely" (e.g. an approved order turns out to
-  be a scammer), not partial edits
-- Revoked orders get `status: "revoked"` in Firestore, distinct from `"rejected"`
-  (never-approved) so you can tell the two apart in order history
 
 ## Deploy
 ```
