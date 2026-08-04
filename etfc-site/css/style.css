@@ -353,6 +353,8 @@ section { padding: 64px 0; }
 .status-pill.pending { background: rgba(176,141,62,0.2); color: var(--gold-bright); }
 .status-pill.confirmed { background: rgba(63,143,95,0.2); color: #6fbf8e; }
 .status-pill.rejected { background: rgba(179,20,28,0.2); color: var(--crimson-bright); }
+.status-pill.won { background: rgba(63,143,95,0.2); color: #6fbf8e; }
+.status-pill.lost { background: rgba(179,20,28,0.2); color: var(--crimson-bright); }
 
 /* ---------- ADMIN ---------- */
 .admin-shell { display: grid; grid-template-columns: 220px 1fr; min-height: 100vh; }

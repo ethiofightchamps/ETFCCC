@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ETFC Admin — Bet Review</title>
+<script>(function(){var t=localStorage.getItem("etfc_theme")||"light";document.documentElement.setAttribute("data-theme",t);})();</script>
+<link rel="stylesheet" href="../css/style.css">
+<script src="../js/main.js"></script>
+</head>
+<body>
+
+<div class="admin-shell">
+  <div class="admin-sidebar" style="display:flex;flex-direction:column;">
+    <div class="nav-logo" style="padding:0 24px 20px;font-size:22px;">ET<span>FC</span> <span style="font-size:12px;color:var(--bone-dim);">Admin</span></div>
+    <a href="index.html">Order Review</a>
+    <a href="odds.html">Betting Odds</a>
+    <a href="bets.html" class="active" style="border-top:1px solid var(--border);margin-top:8px;padding-top:20px;">Bet Review</a>
+    <a href="seats.html">Seat Management</a>
+    <a href="#" style="margin-top:auto;color:var(--crimson-bright);" onclick="logout();return false;">Log Out</a>
+  </div>
+
+  <div class="admin-main">
+    <div class="section-title" style="font-size:28px;margin-bottom:8px;" id="pageTitle">Pending Bets</div>
+    <p class="text-dim" style="margin-bottom:24px;">
+      Approve once the transfer checks out. After the fight, mark each confirmed bet Won or Lost.
+    </p>
+
+    <div style="display:flex;gap:8px;margin-bottom:16px;">
+      <a href="#" class="btn btn-outline btn-sm active" onclick="loadBets('pending');return false;">Pending</a>
+      <a href="#" class="btn btn-outline btn-sm" onclick="loadBets('confirmed');return false;">Confirmed</a>
+      <a href="#" class="btn btn-outline btn-sm" onclick="loadBets('won');return false;">Won</a>
+      <a href="#" class="btn btn-outline btn-sm" onclick="loadBets('lost');return false;">Lost</a>
+      <a href="#" class="btn btn-outline btn-sm" onclick="loadBets('rejected');return false;">Rejected</a>
+      <a href="#" class="btn btn-outline btn-sm" onclick="loadBets('all');return false;">All</a>
+    </div>
+
+    <div class="admin-stat-row">
+      <div class="stat-box"><div class="val" id="statCount">–</div><div class="lbl">Bets</div></div>
+      <div class="stat-box"><div class="val" id="statStaked">–</div><div class="lbl">Total Staked (ETB)</div></div>
+      <div class="stat-box"><div class="val" id="statPayout">–</div><div class="lbl">Potential Payout (ETB)</div></div>
+    </div>
+
+    <div id="loadingMsg" class="text-dim">Loading bets…</div>
+    <div id="errorMsg" class="text-dim" style="color:var(--crimson-bright);display:none;"></div>
+
+    <table class="admin-table" id="betsTable" style="display:none;">
+      <thead>
+        <tr><th>Screenshot</th><th>Bettor</th><th>Pick</th><th>Odds</th><th>Stake</th><th>Payout</th><th>Ref Code</th><th>Status</th><th>Action</th></tr>
+      </thead>
+      <tbody id="betsBody"></tbody>
+    </table>
+
+    <div id="emptyMsg" class="text-dim" style="display:none;">No bets in this view.</div>
+  </div>
+</div>
+
+<script>
+  const STATUS_LABELS = { pending: "Pending Bets", confirmed: "Confirmed Bets", won: "Won Bets", lost: "Lost Bets", rejected: "Rejected Bets", all: "All Bets" };
+  let currentStatus = "pending";
+
+  async function loadBets(status, evt) {
+    currentStatus = status;
+    document.getElementById("pageTitle").textContent = STATUS_LABELS[status];
+    document.querySelectorAll(".admin-main a.btn").forEach((a) => a.classList.remove("active"));
+    const clicked = evt?.target || (window.event && window.event.target);
+    if (clicked) clicked.classList.add("active");
+
+    document.getElementById("loadingMsg").style.display = "block";
+    document.getElementById("errorMsg").style.display = "none";
+    document.getElementById("betsTable").style.display = "none";
+    document.getElementById("emptyMsg").style.display = "none";
+
+    try {
+      const res = await fetch(`/api/admin-bets?status=${status}`);
+      if (res.status === 401) { window.location.href = "login.html"; return; }
+      const data = await res.json();
+      document.getElementById("loadingMsg").style.display = "none";
+
+      if (!res.ok) {
+        document.getElementById("errorMsg").textContent = data.error || "Failed to load bets.";
+        document.getElementById("errorMsg").style.display = "block";
+        return;
+      }
+
+      renderBets(data.bets);
+    } catch (err) {
+      document.getElementById("loadingMsg").style.display = "none";
+      document.getElementById("errorMsg").textContent = "Network error loading bets.";
+      document.getElementById("errorMsg").style.display = "block";
+    }
+  }
+
+  function actionButtons(b) {
+    if (b.status === "pending") {
+      return `
+        <div style="display:flex;gap:6px;">
+          <button class="btn btn-primary btn-sm" onclick="reviewBet('${b.id}','approve',this)">Approve</button>
+          <button class="btn btn-outline btn-sm" onclick="reviewBet('${b.id}','reject',this)">Reject</button>
+        </div>`;
+    }
+    if (b.status === "confirmed") {
+      return `
+        <div style="display:flex;gap:6px;">
+          <button class="btn btn-primary btn-sm" onclick="reviewBet('${b.id}','won',this)">Mark Won</button>
+          <button class="btn btn-outline btn-sm" onclick="reviewBet('${b.id}','lost',this)">Mark Lost</button>
+        </div>`;
+    }
+    return `<span class="text-dim" style="font-size:12px;">—</span>`;
+  }
+
+  function renderBets(bets) {
+    const tbody = document.getElementById("betsBody");
+    const table = document.getElementById("betsTable");
+    const empty = document.getElementById("emptyMsg");
+    empty.style.display = "none";
+
+    document.getElementById("statCount").textContent = bets.length;
+    document.getElementById("statStaked").textContent = bets
+      .reduce((sum, b) => sum + (b.stake || 0), 0)
+      .toLocaleString();
+    document.getElementById("statPayout").textContent = bets
+      .reduce((sum, b) => sum + (b.potentialPayout || 0), 0)
+      .toLocaleString();
+
+    if (bets.length === 0) {
+      empty.style.display = "block";
+      table.style.display = "none";
+      return;
+    }
+
+    tbody.innerHTML = bets.map((b) => `
+      <tr>
+        <td>${b.screenshotUrl
+          ? `<img class="thumb-sm" src="${b.screenshotUrl}" style="object-fit:cover;cursor:pointer;" onclick="window.open('${b.screenshotUrl}','_blank')">`
+          : `<div class="thumb-sm"></div>`}
+        </td>
+        <td>${b.buyerName}<br><span class="text-dim" style="font-size:11px;">${b.phone}</span></td>
+        <td>${b.fighterName}</td>
+        <td>${(b.odds || 0).toFixed(2)}</td>
+        <td>${(b.stake || 0).toLocaleString()} ETB</td>
+        <td>${(b.potentialPayout || 0).toLocaleString()} ETB</td>
+        <td>${b.refCode || "—"}</td>
+        <td><span class="status-pill ${b.status}">${b.status}</span></td>
+        <td>${actionButtons(b)}</td>
+      </tr>
+    `).join("");
+
+    table.style.display = "table";
+  }
+
+  async function reviewBet(betId, action, btn) {
+    const row = btn.closest("tr");
+    row.querySelectorAll("button").forEach((b) => b.setAttribute("disabled", "true"));
+    try {
+      const res = await fetch("/api/admin-bet-action", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ betId, action }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        showToast(data.error || "Action failed.", "error");
+      } else {
+        showToast(`Bet marked ${data.status}.`, "success");
+      }
+      loadBets(currentStatus);
+    } catch (err) {
+      showToast("Network error — try again.", "error");
+      loadBets(currentStatus);
+    }
+  }
+
+  function logout() {
+    document.cookie = "etfc_admin_session=; Max-Age=0; Path=/;";
+    window.location.href = "login.html";
+  }
+
+  loadBets("pending");
+</script>
+</body>
+</html>

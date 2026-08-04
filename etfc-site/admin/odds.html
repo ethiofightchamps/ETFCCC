@@ -14,6 +14,7 @@
     <div class="nav-logo" style="padding:0 24px 20px;font-size:22px;">ET<span>FC</span> <span style="font-size:12px;color:var(--bone-dim);">Admin</span></div>
     <a href="index.html">Order Review</a>
     <a href="odds.html" class="active" style="border-top:1px solid var(--border);margin-top:8px;padding-top:20px;">Betting Odds</a>
+    <a href="bets.html">Bet Review</a>
     <a href="seats.html">Seat Management</a>
     <a href="#" style="margin-top:auto;color:var(--crimson-bright);" onclick="logout();return false;">Log Out</a>
   </div>
@@ -23,6 +24,14 @@
     <p class="text-dim" style="margin-bottom:24px;">
       Edit odds here — changes go live on the site immediately, no redeploy needed.
     </p>
+
+    <div class="bank-box mt-24" style="display:flex;align-items:center;justify-content:space-between;max-width:420px;">
+      <div>
+        <div style="font-weight:600;">Betting Status</div>
+        <div class="text-dim" style="font-size:12px;" id="bettingStatusLabel">Checking…</div>
+      </div>
+      <button class="btn btn-primary btn-sm" id="bettingToggleBtn" onclick="toggleBetting()" disabled>…</button>
+    </div>
 
     <div id="seedPrompt" style="display:none;" class="tier-card" style="text-align:left;">
       <p>No fights loaded yet.</p>
@@ -142,6 +151,51 @@
     window.location.href = "login.html";
   }
 
+  let bettingEnabled = false;
+
+  async function loadBettingStatus() {
+    try {
+      const res = await fetch("/api/admin-toggle-betting");
+      if (res.status === 401) { window.location.href = "login.html"; return; }
+      const data = await res.json();
+      bettingEnabled = !!data.bettingEnabled;
+      renderBettingStatus();
+    } catch (err) {
+      document.getElementById("bettingStatusLabel").textContent = "Could not load status.";
+    }
+  }
+
+  function renderBettingStatus() {
+    const label = document.getElementById("bettingStatusLabel");
+    const btn = document.getElementById("bettingToggleBtn");
+    label.textContent = bettingEnabled
+      ? "Live — bet buttons are active on the site."
+      : "Closed — bet buttons are locked on the site.";
+    btn.textContent = bettingEnabled ? "Turn Off" : "Turn On";
+    btn.removeAttribute("disabled");
+  }
+
+  async function toggleBetting() {
+    const btn = document.getElementById("bettingToggleBtn");
+    btn.setAttribute("disabled", "true");
+    try {
+      const res = await fetch("/api/admin-toggle-betting", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ enabled: !bettingEnabled }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Could not update betting status.");
+      bettingEnabled = data.bettingEnabled;
+      showToast(bettingEnabled ? "Betting is now live." : "Betting is now closed.", "success");
+      renderBettingStatus();
+    } catch (err) {
+      showToast(err.message, "error");
+      btn.removeAttribute("disabled");
+    }
+  }
+
+  loadBettingStatus();
   loadFights();
 </script>
 </body>
