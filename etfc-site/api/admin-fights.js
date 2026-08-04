@@ -15,8 +15,14 @@ module.exports = async (req, res) => {
   }
 
   try {
-    const snap = await db.collection("fights").orderBy("discipline").orderBy("order").get();
-    const fights = snap.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+    // No .orderBy() chain here on purpose — Firestore requires a manually
+    // created composite index for ordering by two different fields, which
+    // doesn't exist yet and would fail every request. Sorting in JS avoids
+    // needing that index at all.
+    const snap = await db.collection("fights").get();
+    const fights = snap.docs
+      .map((doc) => ({ id: doc.id, ...doc.data() }))
+      .sort((a, b) => (a.discipline > b.discipline ? 1 : a.discipline < b.discipline ? -1 : a.order - b.order));
     return res.status(200).json({ fights });
   } catch (err) {
     console.error("admin-fights failed:", err);
