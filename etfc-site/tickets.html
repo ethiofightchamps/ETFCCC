@@ -64,6 +64,11 @@
     </div>
 
     <div class="field">
+      <label>Phone Number</label>
+      <input type="tel" id="buyerPhoneInput" placeholder="e.g. 0912345678">
+    </div>
+
+    <div class="field">
       <label>Upload Payment Screenshot</label>
       <div class="upload-box" onclick="document.getElementById('screenshotInput').click()">
         <span id="uploadLabel">&#128247; Tap to upload proof of payment</span>
@@ -124,9 +129,11 @@
     errEl.style.display = "none";
 
     const buyerName = document.getElementById("buyerNameInput").value.trim();
+    const buyerPhone = document.getElementById("buyerPhoneInput").value.trim();
     const session = JSON.parse(localStorage.getItem("etfc_session") || "null");
 
     if (!buyerName) return showSubmitError("Enter your full name.");
+    if (!buyerPhone) return showSubmitError("Enter your phone number.");
     if (!chosenFile) return showSubmitError("Upload your payment screenshot.");
     if (!session) return showSubmitError("Session expired — please sign in again.");
     if (Object.keys(selectedSeats).length === 0) return showSubmitError("No seats selected.");
@@ -157,7 +164,7 @@
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           buyerName,
-          phone: session.phone || "",
+          phone: buyerPhone,
           email: session.email || "",
           seats,
           totalAmount,

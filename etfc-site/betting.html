@@ -57,6 +57,11 @@
       </div>
 
       <div class="field">
+        <label>Phone Number</label>
+        <input type="tel" id="betBuyerPhoneInput" placeholder="e.g. 0912345678">
+      </div>
+
+      <div class="field">
         <label>Upload Payment Screenshot</label>
         <div class="upload-box" onclick="document.getElementById('betScreenshotInput').click()">
           <span id="betUploadLabel">&#128247; Tap to upload proof of payment</span>
@@ -211,6 +216,7 @@
 
       const session = JSON.parse(localStorage.getItem("etfc_session") || "null");
       if (session?.name) document.getElementById("betBuyerNameInput").value = session.name;
+      document.getElementById("betBuyerPhoneInput").value = session?.phone || "";
 
       document.getElementById("betSlipModal").classList.add("open");
     });
@@ -251,10 +257,12 @@
 
     const stake = Number(document.getElementById("betAmount").value) || 0;
     const buyerName = document.getElementById("betBuyerNameInput").value.trim();
+    const buyerPhone = document.getElementById("betBuyerPhoneInput").value.trim();
     const session = JSON.parse(localStorage.getItem("etfc_session") || "null");
 
     if (stake <= 0) return showBetSubmitError("Enter a stake amount.");
     if (!buyerName) return showBetSubmitError("Enter your full name.");
+    if (!buyerPhone) return showBetSubmitError("Enter your phone number.");
     if (!chosenBetFile) return showBetSubmitError("Upload your payment screenshot.");
     if (!session) return showBetSubmitError("Session expired — please sign in again.");
     if (!auth.currentUser) return showBetSubmitError("Session expired — please sign in again.");
@@ -282,7 +290,7 @@
           side: currentSide,
           stake,
           buyerName,
-          phone: session.phone || "",
+          phone: buyerPhone,
           email: session.email || "",
           screenshotUrl,
         }),

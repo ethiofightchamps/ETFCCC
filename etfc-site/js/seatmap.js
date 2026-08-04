@@ -101,6 +101,13 @@ function proceedToCheckout() {
   requireAuth("buyTicket", () => {
     // TODO: write a pending order doc to Firestore `orders` collection with
     // the selected seatIds, then reveal the bank-transfer + upload step.
+    const session = JSON.parse(localStorage.getItem("etfc_session") || "null");
+    if (session) {
+      const nameInput = document.getElementById("buyerNameInput");
+      const phoneInput = document.getElementById("buyerPhoneInput");
+      if (nameInput && !nameInput.value && session.name) nameInput.value = session.name;
+      if (phoneInput && !phoneInput.value && session.phone) phoneInput.value = session.phone;
+    }
     document.getElementById("seatStep").style.display = "none";
     document.getElementById("checkoutStep").style.display = "block";
   });
