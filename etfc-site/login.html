@@ -21,17 +21,17 @@
         <span style="margin-right:8px;">&#128101;</span>Continue with Google
       </button>
       <div class="auth-divider"><span>or</span></div>
-      <button class="btn btn-primary btn-block" onclick="showLoginStep()">Log In with Email</button>
-      <p class="auth-switch">New here? <a href="signup.html">Create an Account</a></p>
-    </div>
-
-    <div id="authStepLogin" class="auth-step" style="display:none;">
-      <h3>Log In</h3>
-      <p class="sub">Enter your email and password.</p>
       <div class="field">
         <label>Email Address</label>
         <input type="email" id="loginEmailInput" placeholder="you@example.com" autocomplete="email">
       </div>
+      <button class="btn btn-primary btn-block" onclick="continueLoginWithEmail(event)">Continue</button>
+      <p class="auth-switch">New here? <a href="signup.html">Create an Account</a></p>
+    </div>
+
+    <div id="authStepLogin" class="auth-step" style="display:none;">
+      <h3>Enter Password</h3>
+      <p class="sub">Logging in as <strong id="loginEmailDisplay"></strong></p>
       <div class="field">
         <label>Password</label>
         <input type="password" id="loginPasswordInput" placeholder="Password" autocomplete="current-password">
