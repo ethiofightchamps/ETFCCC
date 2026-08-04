@@ -20,51 +20,189 @@
   </div>
 
   <section>
+    <div class="section-head"><div class="section-title" style="font-size:20px;">Main Event &middot; MMA</div></div>
     <div class="bout-row">
       <div class="bout-order">MAIN<br>EVENT</div>
       <div class="matchup-line">
         <div class="fighter-block">
-          <div class="thumb"></div>
-          <div><span class="fname">Fighter A</span><div class="frecord">Lightweight</div></div>
+          <div class="thumb" style="background-image:url('images/fighter-a.jpg');background-size:cover;"></div>
+          <div><span class="fname">Sedo</span><div class="frecord">Heavyweight</div></div>
         </div>
         <div class="vs-badge">VS</div>
         <div class="fighter-block right">
-          <div><span class="fname">Fighter B</span><div class="frecord">Lightweight</div></div>
-          <div class="thumb"></div>
+          <div><span class="fname">Jonny</span><div class="frecord">Heavyweight</div></div>
+          <div class="thumb" style="background-image:url('images/fighter-b.jpg');background-size:cover;"></div>
         </div>
       </div>
       <div style="display:flex;gap:10px;align-items:center;">
         <div class="odds-fighter"><div class="price">1.85</div></div>
-        <button class="btn btn-gold btn-sm" onclick="openBetSlip('Fighter A', '1.85')" disabled>Bet</button>
+        <button class="btn btn-gold btn-sm" onclick="openBetSlip('Sedo', '1.85')" disabled>Bet</button>
         <div class="odds-fighter"><div class="price">2.05</div></div>
-        <button class="btn btn-gold btn-sm" onclick="openBetSlip('Fighter B', '2.05')" disabled>Bet</button>
+        <button class="btn btn-gold btn-sm" onclick="openBetSlip('Jonny', '2.05')" disabled>Bet</button>
       </div>
     </div>
 
     <div class="bout-row">
-      <div class="bout-order">CO<br>MAIN</div>
+      <div class="bout-order">02</div>
       <div class="matchup-line">
-        <div class="fighter-block">
-          <div class="thumb"></div>
-          <div><span class="fname">Fighter C</span><div class="frecord">Welterweight</div></div>
-        </div>
+        <div class="fighter-block"><div class="thumb"></div><div><span class="fname">Boyka</span><div class="frecord">Heavyweight</div></div></div>
         <div class="vs-badge">VS</div>
-        <div class="fighter-block right">
-          <div><span class="fname">Fighter D</span><div class="frecord">Welterweight</div></div>
-          <div class="thumb"></div>
-        </div>
+        <div class="fighter-block right"><div><span class="fname">Endris</span><div class="frecord">Heavyweight</div></div><div class="thumb"></div></div>
       </div>
       <div style="display:flex;gap:10px;align-items:center;">
-        <div class="odds-fighter"><div class="price">1.60</div></div>
-        <button class="btn btn-gold btn-sm" disabled>Bet</button>
-        <div class="odds-fighter"><div class="price">2.40</div></div>
-        <button class="btn btn-gold btn-sm" disabled>Bet</button>
+        <div class="odds-fighter"><div class="price">1.75</div></div>
+        <button class="btn btn-gold btn-sm" onclick="openBetSlip('Boyka', '1.75')" disabled>Bet</button>
+        <div class="odds-fighter"><div class="price">2.10</div></div>
+        <button class="btn btn-gold btn-sm" onclick="openBetSlip('Endris', '2.10')" disabled>Bet</button>
+      </div>
+    </div>
+
+    <div class="bout-row">
+      <div class="bout-order">03</div>
+      <div class="matchup-line">
+        <div class="fighter-block"><div class="thumb"></div><div><span class="fname">Nikatehkina</span><div class="frecord">75 KG</div></div></div>
+        <div class="vs-badge">VS</div>
+        <div class="fighter-block right"><div><span class="fname">Robel <span class="text-dim" style="font-size:11px;">(Sky-Limit)</span></span><div class="frecord">75 KG</div></div><div class="thumb"></div></div>
+      </div>
+      <div style="display:flex;gap:10px;align-items:center;">
+        <div class="odds-fighter"><div class="price">1.90</div></div>
+        <button class="btn btn-gold btn-sm" onclick="openBetSlip('Nikatehkina', '1.90')" disabled>Bet</button>
+        <div class="odds-fighter"><div class="price">1.95</div></div>
+        <button class="btn btn-gold btn-sm" onclick="openBetSlip('Robel', '1.95')" disabled>Bet</button>
+      </div>
+    </div>
+
+    <div class="bout-row">
+      <div class="bout-order">04</div>
+      <div class="matchup-line">
+        <div class="fighter-block"><div class="thumb"></div><div><span class="fname">Titan</span><div class="frecord">75 KG</div></div></div>
+        <div class="vs-badge">VS</div>
+        <div class="fighter-block right"><div><span class="fname">Coach Kal</span><div class="frecord">75 KG</div></div><div class="thumb"></div></div>
+      </div>
+      <div style="display:flex;gap:10px;align-items:center;">
+        <div class="odds-fighter"><div class="price">2.20</div></div>
+        <button class="btn btn-gold btn-sm" onclick="openBetSlip('Titan', '2.20')" disabled>Bet</button>
+        <div class="odds-fighter"><div class="price">1.65</div></div>
+        <button class="btn btn-gold btn-sm" onclick="openBetSlip('Coach Kal', '1.65')" disabled>Bet</button>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="section-head"><div class="section-title" style="font-size:20px;">Boxing</div></div>
+
+    <div class="bout-row">
+      <div class="bout-order">01</div>
+      <div class="matchup-line">
+        <div class="fighter-block"><div class="thumb"></div><div><span class="fname">Abrhamalem</span><div class="frecord">63.5 KG</div></div></div>
+        <div class="vs-badge">VS</div>
+        <div class="fighter-block right"><div><span class="fname">Tyson <span class="text-dim" style="font-size:11px;">(Haymanot Desalegn)</span></span><div class="frecord">63.5 KG</div></div><div class="thumb"></div></div>
+      </div>
+      <div style="display:flex;gap:10px;align-items:center;">
+        <div class="odds-fighter"><div class="price">1.80</div></div>
+        <button class="btn btn-gold btn-sm" onclick="openBetSlip('Abrhamalem', '1.80')" disabled>Bet</button>
+        <div class="odds-fighter"><div class="price">2.00</div></div>
+        <button class="btn btn-gold btn-sm" onclick="openBetSlip('Tyson', '2.00')" disabled>Bet</button>
+      </div>
+    </div>
+
+    <div class="bout-row">
+      <div class="bout-order">02</div>
+      <div class="matchup-line">
+        <div class="fighter-block"><div class="thumb"></div><div><span class="fname">Surafel Cheri</span><div class="frecord">54 KG</div></div></div>
+        <div class="vs-badge">VS</div>
+        <div class="fighter-block right"><div><span class="fname">Desalegn</span><div class="frecord">54 KG</div></div><div class="thumb"></div></div>
+      </div>
+      <div style="display:flex;gap:10px;align-items:center;">
+        <div class="odds-fighter"><div class="price">1.70</div></div>
+        <button class="btn btn-gold btn-sm" onclick="openBetSlip('Surafel Cheri', '1.70')" disabled>Bet</button>
+        <div class="odds-fighter"><div class="price">2.15</div></div>
+        <button class="btn btn-gold btn-sm" onclick="openBetSlip('Desalegn', '2.15')" disabled>Bet</button>
+      </div>
+    </div>
+
+    <div class="bout-row">
+      <div class="bout-order">03</div>
+      <div class="matchup-line">
+        <div class="fighter-block"><div class="thumb"></div><div><span class="fname">Esubalew</span><div class="frecord">Lightweight</div></div></div>
+        <div class="vs-badge">VS</div>
+        <div class="fighter-block right"><div><span class="fname">Biniyam</span><div class="frecord">Lightweight</div></div><div class="thumb"></div></div>
+      </div>
+      <div style="display:flex;gap:10px;align-items:center;">
+        <div class="odds-fighter"><div class="price">1.95</div></div>
+        <button class="btn btn-gold btn-sm" onclick="openBetSlip('Esubalew', '1.95')" disabled>Bet</button>
+        <div class="odds-fighter"><div class="price">1.85</div></div>
+        <button class="btn btn-gold btn-sm" onclick="openBetSlip('Biniyam', '1.85')" disabled>Bet</button>
+      </div>
+    </div>
+
+    <div class="bout-row">
+      <div class="bout-order">04</div>
+      <div class="matchup-line">
+        <div class="fighter-block"><div class="thumb"></div><div><span class="fname">Abenezer</span><div class="frecord">71 KG</div></div></div>
+        <div class="vs-badge">VS</div>
+        <div class="fighter-block right"><div><span class="fname">Mesfin Biru</span><div class="frecord">71 KG</div></div><div class="thumb"></div></div>
+      </div>
+      <div style="display:flex;gap:10px;align-items:center;">
+        <div class="odds-fighter"><div class="price">2.05</div></div>
+        <button class="btn btn-gold btn-sm" onclick="openBetSlip('Abenezer', '2.05')" disabled>Bet</button>
+        <div class="odds-fighter"><div class="price">1.75</div></div>
+        <button class="btn btn-gold btn-sm" onclick="openBetSlip('Mesfin Biru', '1.75')" disabled>Bet</button>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="section-head"><div class="section-title" style="font-size:20px;">Muaythai</div></div>
+
+    <div class="bout-row">
+      <div class="bout-order">01</div>
+      <div class="matchup-line">
+        <div class="fighter-block"><div class="thumb"></div><div><span class="fname">Rebik Sani</span><div class="frecord">67 KG</div></div></div>
+        <div class="vs-badge">VS</div>
+        <div class="fighter-block right"><div><span class="fname">Sky Okony</span><div class="frecord">67 KG</div></div><div class="thumb"></div></div>
+      </div>
+      <div style="display:flex;gap:10px;align-items:center;">
+        <div class="odds-fighter"><div class="price">1.90</div></div>
+        <button class="btn btn-gold btn-sm" onclick="openBetSlip('Rebik Sani', '1.90')" disabled>Bet</button>
+        <div class="odds-fighter"><div class="price">1.90</div></div>
+        <button class="btn btn-gold btn-sm" onclick="openBetSlip('Sky Okony', '1.90')" disabled>Bet</button>
+      </div>
+    </div>
+
+    <div class="bout-row">
+      <div class="bout-order">02</div>
+      <div class="matchup-line">
+        <div class="fighter-block"><div class="thumb"></div><div><span class="fname">Frezer</span><div class="frecord">63 KG</div></div></div>
+        <div class="vs-badge">VS</div>
+        <div class="fighter-block right"><div><span class="fname">Habtamu</span><div class="frecord">63 KG</div></div><div class="thumb"></div></div>
+      </div>
+      <div style="display:flex;gap:10px;align-items:center;">
+        <div class="odds-fighter"><div class="price">1.80</div></div>
+        <button class="btn btn-gold btn-sm" onclick="openBetSlip('Frezer', '1.80')" disabled>Bet</button>
+        <div class="odds-fighter"><div class="price">2.00</div></div>
+        <button class="btn btn-gold btn-sm" onclick="openBetSlip('Habtamu', '2.00')" disabled>Bet</button>
+      </div>
+    </div>
+
+    <div class="bout-row">
+      <div class="bout-order">03</div>
+      <div class="matchup-line">
+        <div class="fighter-block"><div class="thumb"></div><div><span class="fname">Zahara</span><div class="frecord">54 KG</div></div></div>
+        <div class="vs-badge">VS</div>
+        <div class="fighter-block right"><div><span class="fname">Yabsira</span><div class="frecord">54 KG</div></div><div class="thumb"></div></div>
+      </div>
+      <div style="display:flex;gap:10px;align-items:center;">
+        <div class="odds-fighter"><div class="price">2.10</div></div>
+        <button class="btn btn-gold btn-sm" onclick="openBetSlip('Zahara', '2.10')" disabled>Bet</button>
+        <div class="odds-fighter"><div class="price">1.70</div></div>
+        <button class="btn btn-gold btn-sm" onclick="openBetSlip('Yabsira', '1.70')" disabled>Bet</button>
       </div>
     </div>
   </section>
 
   <p class="text-dim" style="font-size:12px;margin-top:12px;">
-    &#9888; Bet buttons are disabled until <code>config.bettingEnabled</code> is flipped to true in Firestore — no redeploy needed at launch time.
+    &#9888; Odds shown are placeholder values — replace once ETFC sets real fixed odds. Bet buttons are disabled until <code>config.bettingEnabled</code> is flipped to true in Firestore — no redeploy needed at launch time.
   </p>
 </div>
 
@@ -73,7 +211,7 @@
   <div class="modal">
     <span class="modal-close" onclick="document.getElementById('betSlipModal').classList.remove('open')">&times;</span>
     <h3>Place Your Bet</h3>
-    <p class="sub" id="betSlipFighter">Fighter A @ 1.85</p>
+    <p class="sub" id="betSlipFighter">Sedo @ 1.85</p>
     <div class="field">
       <label>Stake (ETB)</label>
       <input type="number" id="betAmount" placeholder="100" oninput="calcPayout()">
