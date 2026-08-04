@@ -1,28 +1,28 @@
 // ── AUTH FLOW ────────────────────────────────────────────────────────────
-// Login and sign up now live on their own pages (login.html / signup.html)
-// instead of a popup. Two ways in on each page:
-//   1. Continue with Google  → Firebase GoogleAuthProvider popup
-//   2. Continue with Email   → collect name + phone + email, then a 6-digit
-//                              code is emailed for verification.
-// The email-OTP send/verify logic below is UNCHANGED from the working
-// version — only the modal-open/close plumbing around it was replaced with
-// page navigation.
+// Login and sign up live on their own pages (login.html / signup.html).
+//
+// Login page: Google popup, or a direct email + password box using
+// Firebase's real email/password sign-in.
+//
+// Signup page: Google popup, or a 4-step email wizard —
+//   1. Name + Email
+//   2. Phone Number
+//   3. Password + Confirm
+//   4. 6-digit email verification code
+// The password is only held in memory client-side (pendingSignup) and is
+// sent to the server for the first time in the final /api/verify-otp call,
+// once the code is confirmed — it's never written to Firestore.
 
-let pendingSignup = null; // { name, phone, email } — held between "send code" and "verify"
+let pendingSignup = null; // { name, phone, email, password } — held between steps
 
 function showStep(id) {
-  ["authStepChoice", "authStepManual", "authStepOtp"].forEach((s) => {
-    const el = document.getElementById(s);
-    if (el) el.style.display = s === id ? "block" : "none";
+  document.querySelectorAll(".auth-step").forEach((el) => {
+    el.style.display = el.id === id ? "block" : "none";
   });
 }
 
 function showChoiceStep() {
   showStep("authStepChoice");
-}
-
-function showManualSignup() {
-  showStep("authStepManual");
 }
 
 function backToChoice(e) {
@@ -74,6 +74,10 @@ function logOut(e) {
   window.location.href = "index.html";
 }
 
+function isValidEmail(email) {
+  return typeof email === "string" && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
+
 // ── Google sign-in ─────────────────────────────────────────────────────
 async function signInWithGoogle() {
   try {
@@ -88,19 +92,104 @@ async function signInWithGoogle() {
   }
 }
 
-// ── Manual signup → email OTP ─────────────────────────────────────────
-async function sendEmailOtp(e) {
+// ── Login page: email + password ───────────────────────────────────────
+function showLoginStep() {
+  showStep("authStepLogin");
+}
+
+async function loginWithEmail(e) {
   if (e) e.preventDefault();
 
+  const email = document.getElementById("loginEmailInput").value.trim();
+  const password = document.getElementById("loginPasswordInput").value;
+
+  if (!isValidEmail(email)) return showToast("Enter a valid email address.", "error");
+  if (!password) return showToast("Enter your password.", "error");
+
+  try {
+    const result = await auth.signInWithEmailAndPassword(email, password);
+    const uid = result.user.uid;
+
+    let name = result.user.displayName || email;
+    let phone = "";
+    try {
+      const profile = await db.collection("users").doc(uid).get();
+      if (profile.exists) {
+        name = profile.data().name || name;
+        phone = profile.data().phone || "";
+      }
+    } catch (profileErr) {
+      console.warn("Could not load user profile:", profileErr);
+    }
+
+    completeSignIn({ name, phone, email, uid, method: "password" });
+    showToast(`Welcome back, ${name.split(" ")[0]}!`, "success");
+    redirectAfterAuth();
+  } catch (err) {
+    console.error("Email/password login failed:", err);
+    let message = "Incorrect email or password.";
+    if (err.code === "auth/user-not-found") message = "No account found with that email.";
+    if (err.code === "auth/too-many-requests") message = "Too many attempts — try again later.";
+    if (err.code === "auth/invalid-email") message = "That email address looks invalid.";
+    showToast(message, "error");
+  }
+}
+
+async function sendPasswordReset(e) {
+  if (e) e.preventDefault();
+  const email = document.getElementById("loginEmailInput").value.trim();
+  if (!isValidEmail(email)) return showToast("Enter your email above first, then tap this.", "error");
+
+  try {
+    await auth.sendPasswordResetEmail(email);
+    showToast("Password reset email sent — check your inbox.", "success");
+  } catch (err) {
+    console.error("Password reset failed:", err);
+    showToast("Could not send reset email. Try again.", "error");
+  }
+}
+
+// ── Signup page: 4-step email wizard ───────────────────────────────────
+function showSignupEmailStep() {
+  showStep("authStepEmail");
+}
+
+function goToPhoneStep(e) {
+  if (e) e.preventDefault();
   const name = document.getElementById("nameInput").value.trim();
-  const phone = document.getElementById("phoneInput").value.trim();
   const email = document.getElementById("emailInput").value.trim();
 
   if (!name) return showToast("Enter your full name.", "error");
-  if (!phone) return showToast("Enter your phone number.", "error");
-  if (!email) return showToast("Enter your email address.", "error");
+  if (!isValidEmail(email)) return showToast("Enter a valid email address.", "error");
 
-  pendingSignup = { name, phone, email };
+  pendingSignup = { ...(pendingSignup || {}), name, email };
+  showStep("authStepPhone");
+}
+
+function goToPasswordStep(e) {
+  if (e) e.preventDefault();
+  const phone = document.getElementById("phoneInput").value.trim();
+
+  if (!phone) return showToast("Enter your phone number.", "error");
+  if (!pendingSignup) return showToast("Session expired — please start over.", "error");
+
+  pendingSignup.phone = phone;
+  showStep("authStepPassword");
+}
+
+async function submitSignupPassword(e) {
+  if (e) e.preventDefault();
+  if (!pendingSignup) return showToast("Session expired — please start over.", "error");
+
+  const password = document.getElementById("passwordInput").value;
+  const confirm = document.getElementById("passwordConfirmInput").value;
+
+  if (!password || password.length < 6) return showToast("Password must be at least 6 characters.", "error");
+  if (password !== confirm) return showToast("Passwords don't match.", "error");
+
+  pendingSignup.password = password;
+
+  const { name, phone, email } = pendingSignup;
 
   try {
     const res = await fetch("/api/send-otp", {
@@ -111,7 +200,7 @@ async function sendEmailOtp(e) {
     const data = await res.json();
     if (!res.ok) throw new Error(data.error || "Could not send verification code.");
   } catch (err) {
-    console.error("sendEmailOtp failed:", err);
+    console.error("send-otp failed:", err);
     showToast(err.message || "Could not send verification code. Try again.", "error");
     return;
   }
@@ -130,7 +219,11 @@ async function verifyEmailOtp() {
     const res = await fetch("/api/verify-otp", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email: pendingSignup.email, code: digits }),
+      body: JSON.stringify({
+        email: pendingSignup.email,
+        code: digits,
+        password: pendingSignup.password,
+      }),
     });
     const data = await res.json();
     if (!res.ok) throw new Error(data.error || "Incorrect or expired code.");
