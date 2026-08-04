@@ -60,10 +60,20 @@ module.exports = async (req, res) => {
 
       return res.status(200).json({ ok: true, status: "confirmed", ticketCode });
     } else {
-      await orderRef.update({
-        status: "rejected",
-        reviewedAt: admin.firestore.FieldValue.serverTimestamp(),
+      // Reject: release every seat this order was holding, so they go
+      // back to "available" instead of staying stuck as "pending" forever.
+      await db.runTransaction(async (tx) => {
+        const seatIds = order.seats || [];
+        for (const seatId of seatIds) {
+          const seatRef = db.collection("seatMap").doc(seatId);
+          tx.set(seatRef, { status: "available", orderId: admin.firestore.FieldValue.delete() }, { merge: true });
+        }
+        tx.update(orderRef, {
+          status: "rejected",
+          reviewedAt: admin.firestore.FieldValue.serverTimestamp(),
+        });
       });
+
       return res.status(200).json({ ok: true, status: "rejected" });
     }
   } catch (err) {

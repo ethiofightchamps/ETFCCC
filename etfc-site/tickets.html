@@ -104,17 +104,18 @@
   document.getElementById("refCode").textContent =
     "ETFC-" + Math.random().toString(36).slice(2, 8).toUpperCase();
 
-  let chosenScreenshotBase64 = null;
+  let chosenFile = null;
 
   function onScreenshotChosen(input) {
     const file = input.files[0];
     if (!file) return;
-    const reader = new FileReader();
-    reader.onload = () => {
-      chosenScreenshotBase64 = reader.result; // data:image/...;base64,....
-      document.getElementById("uploadLabel").textContent = `✓ ${file.name}`;
-    };
-    reader.readAsDataURL(file);
+    if (file.size > 5 * 1024 * 1024) {
+      showSubmitError("Screenshot is over 5MB — please choose a smaller image.");
+      input.value = "";
+      return;
+    }
+    chosenFile = file;
+    document.getElementById("uploadLabel").textContent = `✓ ${file.name}`;
   }
 
   async function submitOrder() {
@@ -126,17 +127,31 @@
     const session = JSON.parse(localStorage.getItem("etfc_session") || "null");
 
     if (!buyerName) return showSubmitError("Enter your full name.");
-    if (!chosenScreenshotBase64) return showSubmitError("Upload your payment screenshot.");
+    if (!chosenFile) return showSubmitError("Upload your payment screenshot.");
     if (!session) return showSubmitError("Session expired — please sign in again.");
     if (Object.keys(selectedSeats).length === 0) return showSubmitError("No seats selected.");
+    if (!auth.currentUser) return showSubmitError("Session expired — please sign in again.");
 
     const seats = Object.keys(selectedSeats);
     const totalAmount = Object.values(selectedSeats).reduce((sum, s) => sum + s.price, 0);
 
     btn.setAttribute("disabled", "true");
-    btn.textContent = "Submitting…";
+    btn.textContent = "Uploading screenshot…";
 
     try {
+      // Upload straight to Firebase Storage from the browser — NOT through
+      // the Vercel API. A base64-encoded photo can easily exceed Vercel's
+      // 4.5MB serverless function request-body limit; going client → Storage
+      // directly avoids that ceiling entirely (Storage's own limit here is
+      // 5MB raw, enforced above and in storage.rules).
+      const uid = auth.currentUser.uid;
+      const path = `payment-screenshots/${uid}/${Date.now()}-${chosenFile.name}`;
+      const storageRef = storage.ref().child(path);
+      await storageRef.put(chosenFile);
+      const screenshotUrl = await storageRef.getDownloadURL();
+
+      btn.textContent = "Submitting…";
+
       const res = await fetch("/api/create-order", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -146,17 +161,32 @@
           email: session.email || "",
           seats,
           totalAmount,
-          screenshotBase64: chosenScreenshotBase64,
+          screenshotUrl,
         }),
       });
       const data = await res.json();
+
+      if (res.status === 409) {
+        showSubmitError(data.error || "Some of your seats were just taken. Please choose different seats.");
+        setTimeout(() => {
+          document.getElementById("checkoutStep").style.display = "none";
+          document.getElementById("seatStep").style.display = "block";
+          selectedSeats = {};
+          if (typeof renderSeatMap === "function") renderSeatMap();
+          renderSelectionPanel();
+        }, 2500);
+        btn.removeAttribute("disabled");
+        btn.textContent = "Submit Order";
+        return;
+      }
+
       if (!res.ok) throw new Error(data.error || "Could not submit order.");
 
       document.getElementById("refCode").textContent = data.refCode;
       document.getElementById("checkoutStep").style.display = "none";
       document.getElementById("pendingStep").style.display = "block";
     } catch (err) {
-      showSubmitError(err.message || "Network error — try again.");
+      showSubmitError(err.message || "Upload failed — check your connection and try again.");
       btn.removeAttribute("disabled");
       btn.textContent = "Submit Order";
     }
