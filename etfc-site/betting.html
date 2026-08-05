@@ -15,16 +15,12 @@
   <div class="section-eyebrow">Fixed Odds</div>
   <div class="section-title" style="font-size:38px;margin-bottom:8px;">Fight Night Betting</div>
 
-  <div id="bettingLockedBanner" class="betting-strip mt-24" style="justify-content:center;display:none;">
-    <span class="badge-locked">&#128274; Betting opens once ETFC's license is confirmed. Odds shown below for preview only.</span>
-  </div>
-
   <div id="loadingMsg" class="text-dim mt-24">Loading fight card…</div>
   <div id="errorMsg" class="text-dim" style="color:var(--crimson-bright);display:none;margin-top:24px;"></div>
 
   <div id="fightsMount"></div>
 
-  <p class="text-dim" id="footNote" style="font-size:12px;margin-top:12px;"></p>
+  <p class="text-dim" id="footNote" style="font-size:12px;margin-top:12px;">Odds can move until a bet is submitted — the odds locked in are whatever was live the moment you hit Submit Bet.</p>
 </div>
 
 <!-- BET SLIP MODAL -->
@@ -109,21 +105,10 @@
   const DISCIPLINE_LABELS = { mma: "MMA", boxing: "Boxing", muaythai: "Muaythai" };
   const DISCIPLINE_ORDER = ["mma", "boxing", "muaythai"];
 
-  let bettingEnabled = false;
-
-  // ── Load fights + betting flag from Firestore (public read, per firestore.rules) ──
+  // ── Load fights from Firestore (public read, per firestore.rules) ──
   async function loadBettingPage() {
     try {
-      const [configSnap, fightsSnap] = await Promise.all([
-        db.collection("config").doc("site").get(),
-        db.collection("fights").get(),
-      ]);
-
-      bettingEnabled = configSnap.exists ? !!configSnap.data().bettingEnabled : false;
-      document.getElementById("bettingLockedBanner").style.display = bettingEnabled ? "none" : "flex";
-      document.getElementById("footNote").textContent = bettingEnabled
-        ? "Odds can move until a bet is submitted — the odds locked in are whatever was live the moment you hit Submit Bet."
-        : "Odds shown below for preview only. Bet buttons unlock once ETFC's license is confirmed.";
+      const fightsSnap = await db.collection("fights").get();
 
       document.getElementById("loadingMsg").style.display = "none";
 
@@ -176,7 +161,6 @@
     const boutLabel = f.mainEvent ? "MAIN<br>EVENT" : String(f.order).padStart(2, "0");
     const thumbA = f.photoA ? ` style="background-image:url('${f.photoA}');background-size:cover;"` : "";
     const thumbB = f.photoB ? ` style="background-image:url('${f.photoB}');background-size:cover;"` : "";
-    const disabledAttr = bettingEnabled ? "" : "disabled";
 
     return `
       <div class="bout-row">
@@ -194,9 +178,9 @@
         </div>
         <div style="display:flex;gap:10px;align-items:center;">
           <div class="odds-fighter"><div class="price">${Number(f.oddsA).toFixed(2)}</div></div>
-          <button class="btn btn-gold btn-sm bet-btn" data-fight-id="${f.id}" data-side="A" data-fighter="${f.fighterA}" data-odds="${f.oddsA}" data-discipline="${f.discipline}" data-order="${f.order}" ${disabledAttr}>Bet</button>
+          <button class="btn btn-gold btn-sm bet-btn" data-fight-id="${f.id}" data-side="A" data-fighter="${f.fighterA}" data-odds="${f.oddsA}" data-discipline="${f.discipline}" data-order="${f.order}">Bet</button>
           <div class="odds-fighter"><div class="price">${Number(f.oddsB).toFixed(2)}</div></div>
-          <button class="btn btn-gold btn-sm bet-btn" data-fight-id="${f.id}" data-side="B" data-fighter="${f.fighterB}" data-odds="${f.oddsB}" data-discipline="${f.discipline}" data-order="${f.order}" ${disabledAttr}>Bet</button>
+          <button class="btn btn-gold btn-sm bet-btn" data-fight-id="${f.id}" data-side="B" data-fighter="${f.fighterB}" data-odds="${f.oddsB}" data-discipline="${f.discipline}" data-order="${f.order}">Bet</button>
         </div>
       </div>
     `;
