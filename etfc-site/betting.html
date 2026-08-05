@@ -262,6 +262,7 @@
     if (stake <= 0) return showBetSubmitError("Enter a stake amount.");
     if (!buyerName) return showBetSubmitError("Enter your full name.");
     if (!buyerPhone) return showBetSubmitError("Enter your phone number.");
+    if (!/^(09|07)\d{8}$/.test(buyerPhone)) return showBetSubmitError("Enter a valid Ethiopian phone number (e.g. 0912345678).");
     if (!chosenBetFile) return showBetSubmitError("Upload your payment screenshot.");
     if (!session) return showBetSubmitError("Session expired — please sign in again.");
     if (!auth.currentUser) return showBetSubmitError("Session expired — please sign in again.");

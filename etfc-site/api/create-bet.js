@@ -47,6 +47,15 @@ module.exports = async (req, res) => {
   }
 
   try {
+    // Reject if this exact screenshot was already used
+    const dupSnap = await db.collection("bets")
+      .where("screenshotUrl", "==", screenshotUrl)
+      .limit(1)
+      .get();
+    if (!dupSnap.empty) {
+      return res.status(400).json({ error: "This payment screenshot has already been used. Upload a new one." });
+    }
+
     const configSnap = await db.collection("config").doc("site").get();
     if (!configSnap.exists || configSnap.data().bettingEnabled !== true) {
       return res.status(403).json({ error: "Betting is not open yet." });

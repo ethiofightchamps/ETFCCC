@@ -46,6 +46,15 @@ module.exports = async (req, res) => {
   }
 
   try {
+    // Reject if this exact screenshot was already submitted
+    const dupSnap = await db.collection("orders")
+      .where("screenshotUrl", "==", screenshotUrl)
+      .limit(1)
+      .get();
+    if (!dupSnap.empty) {
+      return res.status(400).json({ error: "This payment screenshot has already been used. Upload a new one." });
+    }
+
     const refCode = generateRefCode();
     const orderRef = db.collection("orders").doc();
 

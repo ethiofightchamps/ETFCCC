@@ -133,6 +133,7 @@
 
     if (!buyerName) return showSubmitError("Enter your full name.");
     if (!buyerPhone) return showSubmitError("Enter your phone number.");
+    if (!/^(09|07)\d{8}$/.test(buyerPhone)) return showSubmitError("Enter a valid Ethiopian phone number (e.g. 0912345678).");
     if (!chosenFile) return showSubmitError("Upload your payment screenshot.");
     if (!session) return showSubmitError("Session expired — please sign in again.");
     if (Object.keys(selectedSeats).length === 0) return showSubmitError("No seats selected.");
