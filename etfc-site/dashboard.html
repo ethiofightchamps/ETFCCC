@@ -12,7 +12,10 @@
 <div id="nav-mount" data-active=""></div>
 
 <div class="container" style="padding-top:48px;">
-  <div class="section-title" style="font-size:34px;margin-bottom:24px;">My Account</div>
+  <div class="section-title" style="font-size:34px;margin-bottom:8px;">My Account</div>
+  <p class="text-dim" style="margin-bottom:24px;">
+    <button onclick="loadDashboard(firebase.auth().currentUser)" class="btn btn-sm" style="font-size:12px;padding:4px 12px;">↻ Refresh</button>
+  </p>
 
   <div class="section-head"><div class="section-title" style="font-size:20px;">My Tickets</div></div>
   <div id="ticketsContainer"><p class="text-dim">Loading your tickets…</p></div>
@@ -36,6 +39,7 @@
 
     // ── My Tickets ──────────────────────────────────────────────────────────
     try {
+      // Try email first, fall back to showing all orders where email matches
       const ordersSnap = await db.collection("orders")
         .where("email", "==", user.email)
         .orderBy("createdAt", "desc")
@@ -44,13 +48,19 @@
       const ticketsEl = document.getElementById("ticketsContainer");
       if (ordersSnap.empty) {
         ticketsEl.innerHTML = '<p class="text-dim">No tickets yet — <a href="tickets.html" style="color:var(--gold-bright);">get tickets</a>.</p>';
+        // Clear any stale pending order so tickets page resets
+        localStorage.removeItem("etfc_pending_order");
       } else {
+        // If any order is confirmed, clear the pending order flag so tickets.html resets
+        const hasConfirmed = ordersSnap.docs.some(d => d.data().status === "confirmed");
+        if (hasConfirmed) localStorage.removeItem("etfc_pending_order");
+
         ticketsEl.innerHTML = '<div class="grid-2">' +
           ordersSnap.docs.map(doc => {
             const o = doc.data();
             const seats = (o.seats || []).join(", ") || "—";
             const statusClass = o.status === "confirmed" ? "confirmed" : o.status === "rejected" ? "rejected" : "pending";
-            const statusLabel = o.status === "confirmed" ? "Confirmed" : o.status === "rejected" ? "Rejected" : "Pending";
+            const statusLabel = o.status === "confirmed" ? "✅ Confirmed" : o.status === "rejected" ? "❌ Rejected" : "⏳ Pending";
             const ticketCodeLine = o.status === "confirmed" && o.ticketCode
               ? `<p style="margin-top:8px;font-size:13px;font-family:monospace;color:var(--gold-bright);">🎟 ${o.ticketCode}</p>`
               : "";
@@ -67,7 +77,7 @@
       }
     } catch (err) {
       document.getElementById("ticketsContainer").innerHTML =
-        '<p style="color:var(--crimson-bright);">Could not load tickets.</p>';
+        '<p style="color:var(--crimson-bright);">Could not load tickets. Try refreshing.</p>';
       console.error("tickets load failed:", err);
     }
 

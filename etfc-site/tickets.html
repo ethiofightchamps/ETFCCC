@@ -108,6 +108,15 @@
   document.getElementById("refCode").textContent =
     "ETFC-" + Math.random().toString(36).slice(2, 8).toUpperCase();
 
+  // If user already submitted an order this session, show pending screen immediately
+  const savedOrder = JSON.parse(localStorage.getItem("etfc_pending_order") || "null");
+  if (savedOrder && savedOrder.refCode) {
+    document.getElementById("refCode").textContent = savedOrder.refCode;
+    document.getElementById("seatStep").style.display = "none";
+    document.getElementById("checkoutStep").style.display = "none";
+    document.getElementById("pendingStep").style.display = "block";
+  }
+
   let chosenFile = null;
 
   function onScreenshotChosen(input) {
@@ -190,6 +199,9 @@
       }
 
       if (!res.ok) throw new Error(data.error || "Could not submit order.");
+
+      // Save so reload doesn't lose the pending state
+      localStorage.setItem("etfc_pending_order", JSON.stringify({ refCode: data.refCode, ts: Date.now() }));
 
       document.getElementById("refCode").textContent = data.refCode;
       document.getElementById("checkoutStep").style.display = "none";
