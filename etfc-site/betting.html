@@ -29,19 +29,30 @@
 
 <!-- BET SLIP MODAL -->
 <div class="modal-overlay" id="betSlipModal">
-  <div class="modal">
+  <div class="modal" style="max-width:520px;">
     <span class="modal-close" onclick="closeBetSlip()">&times;</span>
 
     <div id="betSlipForm">
       <h3>Place Your Bet</h3>
-      <p class="sub" id="betSlipFighter">Sedo @ 1.85</p>
+      
+      <!-- Accumulator legs list -->
+      <div id="betSlipLegs" class="bet-legs" style="margin-bottom:16px;"></div>
+      <div class="bet-legs-summary" id="betLegsSummary" style="display:none;">
+        <div class="row"><span>Combined Odds</span><span id="combinedOddsDisplay">0.00</span></div>
+        <div class="row"><span>Gross Payout</span><span id="grossPayoutDisplay">0 ETB</span></div>
+        <div class="row" style="color:var(--crimson-bright);"><span>Withholding Tax (15%)</span><span id="taxDisplay">0 ETB</span></div>
+        <div class="row" style="font-weight:700;color:var(--gold-bright);"><span>Net Payout</span><span id="netPayoutDisplay">0 ETB</span></div>
+      </div>
 
       <div class="field">
         <label>Stake (ETB)</label>
-        <input type="number" id="betAmount" placeholder="100" oninput="calcPayout()">
+        <input type="number" id="betAmount" placeholder="100" oninput="calcPayout()" min="1">
+        <div id="minStakeHint" class="text-dim" style="font-size:11px;margin-top:4px;display:none;"></div>
       </div>
-      <div class="bank-box">
-        <div class="row"><span>Potential Payout</span><span id="payoutPreview">0 ETB</span></div>
+      <div class="bank-box mt-24" id="payoutBreakdown" style="display:none;">
+        <div class="row"><span>Gross</span><span id="grossPayout">0 ETB</span></div>
+        <div class="row" style="color:var(--crimson-bright);"><span>Tax (15%)</span><span id="taxAmount">0 ETB</span></div>
+        <div class="row" style="font-weight:700;color:var(--gold-bright);"><span>Net</span><span id="netPayout">0 ETB</span></div>
       </div>
 
       <div class="bank-box mt-24">
@@ -156,7 +167,7 @@
     // Wire up bet buttons via data-attributes (avoids string-escaping fighter names in onclick)
     mount.querySelectorAll(".bet-btn").forEach((btn) => {
       btn.addEventListener("click", () => {
-        openBetSlip(btn.dataset.fightId, btn.dataset.side, btn.dataset.fighter, parseFloat(btn.dataset.odds));
+        openBetSlip(btn.dataset.fightId, btn.dataset.side, btn.dataset.fighter, parseFloat(btn.dataset.odds), btn.dataset.discipline, btn.dataset.order);
       });
     });
   }
@@ -183,35 +194,28 @@
         </div>
         <div style="display:flex;gap:10px;align-items:center;">
           <div class="odds-fighter"><div class="price">${Number(f.oddsA).toFixed(2)}</div></div>
-          <button class="btn btn-gold btn-sm bet-btn" data-fight-id="${f.id}" data-side="A" data-fighter="${f.fighterA}" data-odds="${f.oddsA}" ${disabledAttr}>Bet</button>
+          <button class="btn btn-gold btn-sm bet-btn" data-fight-id="${f.id}" data-side="A" data-fighter="${f.fighterA}" data-odds="${f.oddsA}" data-discipline="${f.discipline}" data-order="${f.order}" ${disabledAttr}>Bet</button>
           <div class="odds-fighter"><div class="price">${Number(f.oddsB).toFixed(2)}</div></div>
-          <button class="btn btn-gold btn-sm bet-btn" data-fight-id="${f.id}" data-side="B" data-fighter="${f.fighterB}" data-odds="${f.oddsB}" ${disabledAttr}>Bet</button>
+          <button class="btn btn-gold btn-sm bet-btn" data-fight-id="${f.id}" data-side="B" data-fighter="${f.fighterB}" data-odds="${f.oddsB}" data-discipline="${f.discipline}" data-order="${f.order}" ${disabledAttr}>Bet</button>
         </div>
       </div>
     `;
   }
 
-  // ── Bet slip modal ──────────────────────────────────────────────────────
-  let currentFightId = null;
-  let currentSide = null;
-  let currentOdds = 1;
+  // ── Bet slip modal (Accumulator) ──────────────────────────────────────────
+  let betLegs = []; // array of { fightId, side, fighterName, odds, discipline, order }
   let chosenBetFile = null;
+  let minStake = 1;
 
-  function openBetSlip(fightId, side, fighterName, odds) {
+  function openBetSlip(fightId, side, fighterName, odds, discipline, order) {
     requireAuth("placeBet", () => {
-      currentFightId = fightId;
-      currentSide = side;
-      currentOdds = odds;
-      chosenBetFile = null;
+      // Check if this leg already exists
+      const exists = betLegs.find(l => l.fightId === fightId && l.side === side);
+      if (exists) return; // already added
 
-      document.getElementById("betSlipForm").style.display = "block";
-      document.getElementById("betSlipPending").style.display = "none";
-      document.getElementById("betSlipFighter").textContent = `${fighterName} @ ${odds.toFixed(2)}`;
-      document.getElementById("betAmount").value = "";
-      document.getElementById("payoutPreview").textContent = "0 ETB";
-      document.getElementById("betUploadLabel").textContent = "\u{1F4F7} Tap to upload proof of payment";
-      document.getElementById("betRefCode").textContent = "ETFC-BET-" + Math.random().toString(36).slice(2, 8).toUpperCase();
-      document.getElementById("betSubmitError").style.display = "none";
+      betLegs.push({ fightId, side, fighterName, odds, discipline, order });
+      chosenBetFile = null;
+      refreshBetSlip();
 
       const session = JSON.parse(localStorage.getItem("etfc_session") || "null");
       if (session?.name) document.getElementById("betBuyerNameInput").value = session.name;
@@ -225,10 +229,69 @@
     document.getElementById("betSlipModal").classList.remove("open");
   }
 
-  function calcPayout() {
+  function removeLeg(index) {
+    betLegs.splice(index, 1);
+    refreshBetSlip();
+  }
+
+  function refreshBetSlip() {
+    const legsEl = document.getElementById("betSlipLegs");
+    const summaryEl = document.getElementById("betLegsSummary");
+    const payoutBreakdown = document.getElementById("payoutBreakdown");
+    const amountInput = document.getElementById("betAmount");
+    const minStakeHint = document.getElementById("minStakeHint");
+
+    if (betLegs.length === 0) {
+      legsEl.innerHTML = `<p class="text-dim" style="font-size:13px;">Tap "Bet" on any fight to add it to your slip.</p>`;
+      summaryEl.style.display = "none";
+      payoutBreakdown.style.display = "none";
+      amountInput.value = "";
+      minStakeHint.style.display = "none";
+      return;
+    }
+
+    // Render legs list
+    legsEl.innerHTML = betLegs.map((leg, idx) => `
+      <div class="bet-leg-item" style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border);">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <span class="text-dim" style="font-family:var(--font-mono);font-size:11px;">${leg.discipline.toUpperCase()} ${leg.order}</span>
+          <span style="font-weight:600;">${leg.fighterName}</span>
+          <span class="text-dim" style="font-family:var(--font-mono);color:var(--gold-bright);">@ ${Number(leg.odds).toFixed(2)}</span>
+        </div>
+        <button class="btn btn-outline btn-sm" onclick="removeLeg(${idx})" style="padding:4px 10px;font-size:11px;">Remove</button>
+      </div>
+    `).join("");
+
+    summaryEl.style.display = "block";
+    updatePayoutDisplay();
+  }
+
+  function getCombinedOdds() {
+    return betLegs.reduce((acc, leg) => acc * Number(leg.odds), 1);
+  }
+
+  function updatePayoutDisplay() {
     const stake = Number(document.getElementById("betAmount").value) || 0;
-    const payout = Math.round(stake * currentOdds * 100) / 100;
-    document.getElementById("payoutPreview").textContent = payout.toLocaleString() + " ETB";
+    const combinedOdds = getCombinedOdds();
+    const gross = Math.round(stake * combinedOdds * 100) / 100;
+    const tax = Math.round(gross * 0.15 * 100) / 100;
+    const net = Math.round((gross - tax) * 100) / 100;
+
+    document.getElementById("combinedOddsDisplay").textContent = combinedOdds.toFixed(2);
+    document.getElementById("grossPayoutDisplay").textContent = gross.toLocaleString() + " ETB";
+    document.getElementById("taxDisplay").textContent = tax.toLocaleString() + " ETB";
+    document.getElementById("netPayoutDisplay").textContent = net.toLocaleString() + " ETB";
+
+    document.getElementById("grossPayout").textContent = gross.toLocaleString() + " ETB";
+    document.getElementById("taxAmount").textContent = tax.toLocaleString() + " ETB";
+    document.getElementById("netPayout").textContent = net.toLocaleString() + " ETB";
+
+    document.getElementById("betLegsSummary").style.display = "block";
+    document.getElementById("payoutBreakdown").style.display = "block";
+  }
+
+  function calcPayout() {
+    updatePayoutDisplay();
   }
 
   function onBetScreenshotChosen(input) {
@@ -259,7 +322,8 @@
     const buyerPhone = document.getElementById("betBuyerPhoneInput").value.trim();
     const session = JSON.parse(localStorage.getItem("etfc_session") || "null");
 
-    if (stake <= 0) return showBetSubmitError("Enter a stake amount.");
+    if (betLegs.length === 0) return showBetSubmitError("Add at least one fight to your bet slip.");
+    if (stake < minStake) return showBetSubmitError(`Minimum stake is ${minStake} ETB.`);
     if (!buyerName) return showBetSubmitError("Enter your full name.");
     if (!buyerPhone) return showBetSubmitError("Enter your phone number.");
     if (!/^(09|07)\d{8}$/.test(buyerPhone)) return showBetSubmitError("Enter a valid Ethiopian phone number (e.g. 0912345678).");
@@ -286,22 +350,34 @@
 
       btn.textContent = "Submitting…";
 
+      const combinedOdds = getCombinedOdds();
+      const grossPayout = Math.round(stake * combinedOdds * 100) / 100;
+      const taxAmount = Math.round(grossPayout * 0.15 * 100) / 100;
+      const netPayout = Math.round((grossPayout - taxAmount) * 100) / 100;
+
       const res = await fetch("/api/create-bet", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          fightId: currentFightId,
-          side: currentSide,
+          legs: betLegs.map(l => ({ fightId: l.fightId, side: l.side, odds: l.odds, fighterName: l.fighterName })),
           stake,
           buyerName,
           phone: buyerPhone,
           email: session.email || "",
           userId: session.uid || "",
           screenshotUrl,
+          combinedOdds,
+          grossPayout,
+          taxAmount,
+          netPayout,
         }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Could not submit bet.");
+
+      // Clear bet slip on success
+      betLegs = [];
+      chosenBetFile = null;
 
       document.getElementById("betSlipForm").style.display = "none";
       document.getElementById("betSlipPending").style.display = "block";
@@ -312,7 +388,24 @@
     }
   }
 
+  // Load min stake from config on page load
+  async function loadMinStake() {
+    try {
+      const snap = await db.collection("config").doc("site").get();
+      if (snap.exists && snap.data().minStake) {
+        minStake = Number(snap.data().minStake);
+        const hint = document.getElementById("minStakeHint");
+        hint.textContent = `Minimum stake: ${minStake} ETB`;
+        hint.style.display = "block";
+        document.getElementById("betAmount").min = minStake;
+      }
+    } catch (err) {
+      console.warn("Could not load minStake:", err);
+    }
+  }
+
   loadBettingPage();
+  loadMinStake();
 </script>
 </body>
 </html>

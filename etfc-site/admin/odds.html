@@ -33,6 +33,14 @@
       <button class="btn btn-primary btn-sm" id="bettingToggleBtn" onclick="toggleBetting()" disabled>…</button>
     </div>
 
+    <div class="bank-box mt-24" style="display:flex;align-items:center;justify-content:space-between;max-width:420px;">
+      <div>
+        <div style="font-weight:600;">Min Stake (ETB)</div>
+        <div class="text-dim" style="font-size:12px;">Minimum bet amount for accumulators</div>
+      </div>
+      <input type="number" id="minStakeInput" value="1" min="1" step="1" style="width:90px;background:var(--obsidian);border:1px solid var(--border);color:var(--bone);padding:8px 10px;border-radius:4px;" onchange="saveMinStake()">
+    </div>
+
     <div id="seedPrompt" style="display:none;" class="tier-card" style="text-align:left;">
       <p>No fights loaded yet.</p>
       <button class="btn btn-primary btn-sm mt-24" onclick="seedFights()">Load ETFC's Fight Card</button>
@@ -195,7 +203,37 @@
     }
   }
 
+  async function loadMinStake() {
+    try {
+      const res = await fetch("/api/admin-toggle-betting");
+      if (res.status === 401) { window.location.href = "login.html"; return; }
+      const data = await res.json();
+      if (data.minStake) {
+        document.getElementById("minStakeInput").value = data.minStake;
+      }
+    } catch (err) {
+      console.warn("Could not load minStake:", err);
+    }
+  }
+
+  async function saveMinStake() {
+    const value = Number(document.getElementById("minStakeInput").value) || 1;
+    try {
+      const res = await fetch("/api/admin-toggle-betting", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ minStake: value }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Could not save min stake.");
+      showToast("Min stake updated.", "success");
+    } catch (err) {
+      showToast(err.message, "error");
+    }
+  }
+
   loadBettingStatus();
+  loadMinStake();
   loadFights();
 </script>
 </body>

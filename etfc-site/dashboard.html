@@ -383,14 +383,30 @@
         betsEl.innerHTML = docs.map(doc => {
           const b = doc.data();
           const s = b.status || "pending";
+
+          // Handle both old single-leg and new multi-leg format
+          const legs = b.legs || (b.fightId ? [{ fightId: b.fightId, side: b.side, odds: b.odds, fighterName: b.fighterName }] : []);
+          const legsHtml = legs.map((leg) => `
+            <div style="font-size:12px;margin-bottom:2px;">
+              <span style="font-weight:600;">${leg.fighterName}</span>
+              <span class="text-dim"> @ ${Number(leg.odds).toFixed(2)}</span>
+            </div>
+          `).join("");
+
+          const combinedOdds = b.combinedOdds || b.odds || 0;
+          const grossPayout = b.grossPayout || b.potentialPayout || 0;
+          const taxAmount = b.taxAmount || 0;
+          const netPayout = b.netPayout || grossPayout - taxAmount || grossPayout;
+
           return `<div class="ticket-card">
-            <div class="ticket-left">
-              <div class="ticket-seats">${b.fighterName || b.side || "—"}</div>
-              <div class="ticket-meta">Stake: ${(b.stake || 0).toLocaleString()} ETB &middot; Ref: ${b.refCode || "—"}</div>
+            <div class="ticket-left" style="min-width:0;">
+              <div style="font-size:12px;margin-bottom:4px;">${legsHtml || "<span class='text-dim'>—</span>"}</div>
+              <div class="ticket-meta">Stake: ${(b.stake || 0).toLocaleString()} ETB &middot; Odds: ${Number(combinedOdds).toFixed(2)} &middot; Ref: ${b.refCode || "—"}</div>
             </div>
             <div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px;">
               <span class="status-pill ${s}">${STATUS_ICON[s] || ""} ${STATUS_LABEL[s] || s}</span>
-              <span class="ticket-amount">${(b.potentialPayout || 0).toLocaleString()} ETB potential</span>
+              <span class="ticket-amount">Net: ${Number(netPayout).toLocaleString()} ETB</span>
+              <span class="text-dim" style="font-size:11px;">Gross: ${Number(grossPayout).toLocaleString()} ETB &middot; Tax: ${Number(taxAmount).toLocaleString()} ETB</span>
             </div>
           </div>`;
         }).join("");

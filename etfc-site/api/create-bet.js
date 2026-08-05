@@ -1,21 +1,14 @@
 // POST /api/create-bet
-// { fightId, side: "A"|"B", stake, buyerName, phone, email, screenshotUrl }
-//
-// Same fix as create-order.js: the payment screenshot uploads CLIENT-SIDE
-// straight to Firebase Storage (see betting.html) instead of being sent as
-// base64 through this endpoint — base64 routinely exceeds Vercel's 4.5MB
-// serverless function request-body limit, which was crashing this endpoint
-// with a generic Vercel error page before any of this code even ran.
-//
-// Real odds are still read server-side from the `fights` collection at bet
-// time — never trust a client-sent odds value, or someone could submit a
-// fake higher number and inflate their own payout.
-//
-// NOTE / TODO: doesn't yet verify a Firebase Auth ID token — see create-order.js.
+// { legs: [{ fightId, side, odds, fighterName }], stake, buyerName, phone, email, userId, screenshotUrl }
+// 
+// Accumulator bets: multiple legs, odds multiply, 15% withholding tax on gross payout.
+// Server re-reads ALL odds from Firestore at bet time — never trusts client-sent odds.
+// Validates minStake from config/site.
 
 const admin = require("./_firebaseAdmin");
 
 const db = admin.firestore();
+const TAX_RATE = 0.15;
 
 function generateRefCode() {
   return "ETFC-BET-" + Math.random().toString(36).slice(2, 8).toUpperCase();
@@ -26,11 +19,15 @@ module.exports = async (req, res) => {
     return res.status(405).json({ error: "Method not allowed" });
   }
 
-  const { fightId, side, stake, buyerName, phone, email, userId, screenshotUrl } = req.body || {};
+  const { legs, stake, buyerName, phone, email, userId, screenshotUrl } = req.body || {};
 
-  if (!fightId || !["A", "B"].includes(side)) {
-    return res.status(400).json({ error: "A valid fightId and side (A or B) are required." });
+  if (!Array.isArray(legs) || legs.length === 0) {
+    return res.status(400).json({ error: "At least one leg is required." });
   }
+  if (legs.length > 20) {
+    return res.status(400).json({ error: "Too many legs (max 20)." });
+  }
+
   const stakeNum = Number(stake);
   if (!Number.isFinite(stakeNum) || stakeNum <= 0) {
     return res.status(400).json({ error: "Enter a valid stake amount." });
@@ -56,24 +53,47 @@ module.exports = async (req, res) => {
       return res.status(400).json({ error: "This payment screenshot has already been used. Upload a new one." });
     }
 
+    // Load config for minStake and bettingEnabled
     const configSnap = await db.collection("config").doc("site").get();
-    if (!configSnap.exists || configSnap.data().bettingEnabled !== true) {
+    const config = configSnap.exists ? configSnap.data() : {};
+    if (config.bettingEnabled !== true) {
       return res.status(403).json({ error: "Betting is not open yet." });
     }
-
-    const fightSnap = await db.collection("fights").doc(fightId).get();
-    if (!fightSnap.exists) {
-      return res.status(404).json({ error: "Fight not found." });
-    }
-    const fight = fightSnap.data();
-
-    const odds = side === "A" ? Number(fight.oddsA) : Number(fight.oddsB);
-    const fighterName = side === "A" ? fight.fighterA : fight.fighterB;
-    if (!Number.isFinite(odds) || odds <= 1) {
-      return res.status(500).json({ error: "This fight doesn't have valid odds set yet." });
+    const minStake = Number(config.minStake) || 1;
+    if (stakeNum < minStake) {
+      return res.status(400).json({ error: `Minimum stake is ${minStake} ETB.` });
     }
 
-    const potentialPayout = Math.round(stakeNum * odds * 100) / 100;
+    // Re-read ALL odds server-side from Firestore for each leg
+    let combinedOdds = 1;
+    const validatedLegs = [];
+
+    for (const leg of legs) {
+      const { fightId, side, fighterName: clientFighterName } = leg;
+      if (!fightId || !["A", "B"].includes(side)) {
+        return res.status(400).json({ error: "Each leg must have fightId and side (A or B)." });
+      }
+
+      const fightSnap = await db.collection("fights").doc(fightId).get();
+      if (!fightSnap.exists) {
+        return res.status(404).json({ error: `Fight ${fightId} not found.` });
+      }
+      const fight = fightSnap.data();
+
+      const odds = side === "A" ? Number(fight.oddsA) : Number(fight.oddsB);
+      const fighterName = side === "A" ? fight.fighterA : fight.fighterB;
+
+      if (!Number.isFinite(odds) || odds <= 1) {
+        return res.status(500).json({ error: `Fight ${fightId} doesn't have valid odds set yet.` });
+      }
+
+      combinedOdds *= odds;
+      validatedLegs.push({ fightId, side, odds, fighterName });
+    }
+
+    const grossPayout = Math.round(stakeNum * combinedOdds * 100) / 100;
+    const taxAmount = Math.round(grossPayout * TAX_RATE * 100) / 100;
+    const netPayout = Math.round((grossPayout - taxAmount) * 100) / 100;
     const refCode = generateRefCode();
 
     const betRef = await db.collection("bets").add({
@@ -81,19 +101,19 @@ module.exports = async (req, res) => {
       phone,
       email: email || "",
       userId: userId || "",
-      fightId,
-      side,
-      fighterName,
-      odds,
+      legs: validatedLegs,
       stake: stakeNum,
-      potentialPayout,
+      combinedOdds: Math.round(combinedOdds * 100) / 100,
+      grossPayout,
+      taxAmount,
+      netPayout,
       refCode,
       screenshotUrl,
       status: "pending",
       createdAt: admin.firestore.FieldValue.serverTimestamp(),
     });
 
-    return res.status(200).json({ ok: true, betId: betRef.id, refCode, potentialPayout });
+    return res.status(200).json({ ok: true, betId: betRef.id, refCode, grossPayout, taxAmount, netPayout });
   } catch (err) {
     console.error("create-bet failed:", err);
     return res.status(500).json({ error: "Could not submit bet. Try again." });
