@@ -11,9 +11,29 @@
 
 <div id="nav-mount" data-active="betting"></div>
 
-<div class="container" style="padding-top:48px;">
-  <div class="section-eyebrow">Fixed Odds</div>
-  <div class="section-title" style="font-size:38px;margin-bottom:8px;">Fight Night Betting</div>
+<!-- Floating Bet Slip Indicator (Mobile) -->
+<div class="floating-bet-indicator" id="floatingBetIndicator" style="display:none;">
+  <div class="indicator-content">
+    <span class="indicator-icon">&#128214;</span>
+    <span class="indicator-text">Bet Slip (<span id="floatingLegCount">0</span>)</span>
+    <span class="indicator-chevron">&#9654;</span>
+  </div>
+</div>
+
+<div class="container" style="padding-top:48px;padding-bottom:100px;">
+  <div class="page-header">
+    <div>
+      <div class="section-eyebrow">Fixed Odds</div>
+      <div class="section-title" style="font-size:38px;margin-bottom:4px;">Fight Night Betting</div>
+    </div>
+    <div class="bet-slip-preview" id="betSlipPreview" style="display:none;">
+      <div class="preview-legs" id="previewLegs"></div>
+      <div class="preview-footer">
+        <span class="preview-odds">Odds: <span id="previewOdds">0.00</span></span>
+        <button class="btn btn-gold btn-sm" onclick="document.getElementById('betSlipModal').classList.add('open')">View Slip</button>
+      </div>
+    </div>
+  </div>
 
   <div id="loadingMsg" class="text-dim mt-24">Loading fight card…</div>
   <div id="errorMsg" class="text-dim" style="color:var(--crimson-bright);display:none;margin-top:24px;"></div>
@@ -25,69 +45,125 @@
 
 <!-- BET SLIP MODAL -->
 <div class="modal-overlay" id="betSlipModal">
-  <div class="modal" style="max-width:520px;">
-    <span class="modal-close" onclick="closeBetSlip()">&times;</span>
-
-    <div id="betSlipForm">
+  <div class="modal modal-bet-slip">
+    <div class="modal-header">
       <h3>Place Your Bet</h3>
+      <span class="modal-close" onclick="closeBetSlip()">&times;</span>
+    </div>
+    <div class="modal-body" id="betSlipForm">
       
       <!-- Accumulator legs list -->
-      <div id="betSlipLegs" class="bet-legs" style="margin-bottom:16px;"></div>
-      <div class="bet-legs-summary" id="betLegsSummary" style="display:none;">
-        <div class="row"><span>Combined Odds</span><span id="combinedOddsDisplay">0.00</span></div>
-        <div class="row"><span>Gross Payout</span><span id="grossPayoutDisplay">0 ETB</span></div>
-        <div class="row" style="color:var(--crimson-bright);"><span>Withholding Tax (15%)</span><span id="taxDisplay">0 ETB</span></div>
-        <div class="row" style="font-weight:700;color:var(--gold-bright);"><span>Net Payout</span><span id="netPayoutDisplay">0 ETB</span></div>
+      <div class="bet-section">
+        <div class="section-label">Selections</div>
+        <div id="betSlipLegs" class="bet-legs"></div>
       </div>
 
-      <div class="field">
-        <label>Stake (ETB)</label>
-        <input type="number" id="betAmount" placeholder="100" oninput="calcPayout()" min="1">
-        <div id="minStakeHint" class="text-dim" style="font-size:11px;margin-top:4px;display:none;"></div>
-      </div>
-      <div class="bank-box mt-24" id="payoutBreakdown" style="display:none;">
-        <div class="row"><span>Gross</span><span id="grossPayout">0 ETB</span></div>
-        <div class="row" style="color:var(--crimson-bright);"><span>Tax (15%)</span><span id="taxAmount">0 ETB</span></div>
-        <div class="row" style="font-weight:700;color:var(--gold-bright);"><span>Net</span><span id="netPayout">0 ETB</span></div>
-      </div>
-
-      <div class="bank-box mt-24">
-        <div class="row"><span>Bank</span><span>[Bank Name]</span></div>
-        <div class="row"><span>Account Name</span><span>[ETFC Account Name]</span></div>
-        <div class="row"><span>Account Number</span><span>[Account Number]</span></div>
-        <div class="row"><span>Reference Code</span><span id="betRefCode">ETFC-BET-XXXXXX</span></div>
-      </div>
-
-      <div class="field mt-24">
-        <label>Full Name</label>
-        <input type="text" id="betBuyerNameInput" placeholder="As it should appear on your bet slip">
-      </div>
-
-      <div class="field">
-        <label>Phone Number</label>
-        <input type="tel" id="betBuyerPhoneInput" placeholder="e.g. 0912345678">
+      <!-- Odds Summary Card -->
+      <div class="bet-section" id="betLegsSummary" style="display:none;">
+        <div class="odds-summary-card">
+          <div class="summary-row">
+            <span>Combined Odds</span>
+            <span id="combinedOddsDisplay" class="value highlight">0.00</span>
+          </div>
+          <div class="summary-divider"></div>
+          <div class="summary-row">
+            <span>Gross Payout</span>
+            <span id="grossPayoutDisplay" class="value">0 ETB</span>
+          </div>
+          <div class="summary-row tax-row">
+            <span>Withholding Tax (15%)</span>
+            <span id="taxDisplay" class="value tax">0 ETB</span>
+          </div>
+          <div class="summary-divider bold"></div>
+          <div class="summary-row total-row">
+            <span>Net Payout</span>
+            <span id="netPayoutDisplay" class="value total">0 ETB</span>
+          </div>
+        </div>
       </div>
 
-      <div class="field">
-        <label>Upload Payment Screenshot</label>
-        <div class="upload-box" onclick="document.getElementById('betScreenshotInput').click()">
-          <span id="betUploadLabel">&#128247; Tap to upload proof of payment</span>
+      <!-- Stake Input -->
+      <div class="bet-section">
+        <div class="section-label">Stake</div>
+        <div class="stake-input-wrapper">
+          <span class="currency">ETB</span>
+          <input type="number" id="betAmount" placeholder="Enter stake" oninput="calcPayout()" min="1" autocomplete="off">
+        </div>
+        <div id="minStakeHint" class="hint" style="display:none;"></div>
+      </div>
+
+      <!-- Payout Breakdown (expands on input) -->
+      <div class="bet-section" id="payoutBreakdown" style="display:none;">
+        <div class="breakdown-card">
+          <div class="breakdown-row">
+            <span>Gross</span>
+            <span id="grossPayout">0 ETB</span>
+          </div>
+          <div class="breakdown-row">
+            <span>Tax (15%)</span>
+            <span id="taxAmount" class="tax">0 ETB</span>
+          </div>
+          <div class="breakdown-row total">
+            <span>You Receive</span>
+            <span id="netPayout" class="total">0 ETB</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bank Details -->
+      <div class="bet-section">
+        <div class="section-label">Payment Details</div>
+        <div class="bank-details-card">
+          <div class="detail-row"><span>Bank</span><span>[Bank Name]</span></div>
+          <div class="detail-row"><span>Account Name</span><span>[ETFC Account Name]</span></div>
+          <div class="detail-row"><span>Account Number</span><span>[Account Number]</span></div>
+          <div class="detail-row highlight-row"><span>Reference Code</span><span id="betRefCode" class="ref-code">ETFC-BET-XXXXXX</span></div>
+        </div>
+        <p class="hint">Include the reference code in your transfer description.</p>
+      </div>
+
+      <!-- Personal Info -->
+      <div class="bet-section">
+        <div class="section-label">Your Details</div>
+        <div class="field">
+          <label>Full Name</label>
+          <input type="text" id="betBuyerNameInput" placeholder="As it should appear on your bet slip" autocomplete="name">
+        </div>
+        <div class="field">
+          <label>Phone Number</label>
+          <input type="tel" id="betBuyerPhoneInput" placeholder="e.g. 0912345678" autocomplete="tel">
+        </div>
+      </div>
+
+      <!-- Screenshot Upload -->
+      <div class="bet-section">
+        <div class="section-label">Proof of Payment</div>
+        <div class="upload-area" onclick="document.getElementById('betScreenshotInput').click()">
+          <div class="upload-icon">&#128247;</div>
+          <span id="betUploadLabel">Tap to upload payment screenshot</span>
+          <span class="upload-hint">Max 5MB • JPG/PNG</span>
           <input type="file" id="betScreenshotInput" accept="image/*" style="display:none;" onchange="onBetScreenshotChosen(this)">
         </div>
       </div>
 
-      <p id="betSubmitError" class="text-dim" style="color:var(--crimson-bright);display:none;margin-top:10px;"></p>
-      <button class="btn btn-primary btn-block mt-24" id="submitBetBtn" onclick="submitBet()">Submit Bet</button>
+      <p id="betSubmitError" class="error-msg" style="display:none;"></p>
+      
+      <!-- Sticky Submit Button -->
+      <div class="modal-footer">
+        <button class="btn btn-primary btn-block" id="submitBetBtn" onclick="submitBet()">Submit Bet</button>
+      </div>
     </div>
 
-    <div id="betSlipPending" style="display:none;text-align:center;">
-      <div style="font-size:48px;margin-bottom:16px;">&#9203;</div>
-      <h3>Bet Submitted</h3>
-      <p class="text-dim mt-24"><span class="status-pill pending">Pending Verification</span></p>
+    <!-- Success State -->
+    <div id="betSlipPending" class="modal-body success-state" style="display:none;">
+      <div class="success-icon">&#10003;</div>
+      <h3>Bet Submitted!</h3>
+      <span class="status-pill pending">Pending Verification</span>
       <p class="text-dim mt-24">
         ETFC is reviewing your payment. Your bet goes live once approved — check
         <a href="dashboard.html" style="color:var(--gold-bright);">My Account</a> for status.
       </p>
+      <button class="btn btn-outline btn-block mt-24" onclick="closeBetSlip()">Done</button>
     </div>
   </div>
 </div>
@@ -142,9 +218,11 @@
       const list = byDiscipline[discipline].sort((a, b) => a.order - b.order);
       const title = discipline === "mma" ? "Main Event &middot; MMA" : (DISCIPLINE_LABELS[discipline] || discipline);
       return `
-        <section>
+        <section class="discipline-section">
           <div class="section-head"><div class="section-title" style="font-size:20px;">${title}</div></div>
-          ${list.map((f) => boutRowHtml(f)).join("")}
+          <div class="bout-list">
+            ${list.map((f) => boutRowHtml(f)).join("")}
+          </div>
         </section>
       `;
     }).join("");
@@ -158,31 +236,47 @@
   }
 
   function boutRowHtml(f) {
-    const boutLabel = f.mainEvent ? "MAIN<br>EVENT" : String(f.order).padStart(2, "0");
+    const boutLabel = f.mainEvent ? "MAIN EVENT" : `BOUT ${String(f.order).padStart(2, "0")}`;
     const thumbA = f.photoA ? ` style="background-image:url('${f.photoA}');background-size:cover;"` : "";
     const thumbB = f.photoB ? ` style="background-image:url('${f.photoB}');background-size:cover;"` : "";
+    const disciplineTag = f.discipline.toUpperCase();
 
     return `
-      <div class="bout-row">
-        <div class="bout-order">${boutLabel}</div>
-        <div class="matchup-line">
-          <div class="fighter-block">
-            <div class="thumb"${thumbA}></div>
-            <div><span class="fname">${f.fighterA}</span><div class="frecord">${f.weightA || ""}</div></div>
+      <article class="bout-card" data-fight-id="${f.id}">
+        <div class="bout-header">
+          <span class="bout-badge ${f.mainEvent ? 'main-event' : ''}">${boutLabel}</span>
+          <span class="discipline-tag">${disciplineTag}</span>
+        </div>
+        <div class="matchup">
+          <div class="fighter-side">
+            <div class="fighter-thumb"${thumbA}></div>
+            <div class="fighter-info">
+              <span class="fighter-name">${f.fighterA}</span>
+              <span class="fighter-weight">${f.weightA || ""}</span>
+            </div>
           </div>
-          <div class="vs-badge">VS</div>
-          <div class="fighter-block right">
-            <div><span class="fname">${f.fighterB}</span><div class="frecord">${f.weightB || ""}</div></div>
-            <div class="thumb"${thumbB}></div>
+          <div class="vs-divider">VS</div>
+          <div class="fighter-side right">
+            <div class="fighter-info">
+              <span class="fighter-name">${f.fighterB}</span>
+              <span class="fighter-weight">${f.weightB || ""}</span>
+            </div>
+            <div class="fighter-thumb"${thumbB}></div>
           </div>
         </div>
-        <div style="display:flex;gap:10px;align-items:center;">
-          <div class="odds-fighter"><div class="price">${Number(f.oddsA).toFixed(2)}</div></div>
-          <button class="btn btn-gold btn-sm bet-btn" data-fight-id="${f.id}" data-side="A" data-fighter="${f.fighterA}" data-odds="${f.oddsA}" data-discipline="${f.discipline}" data-order="${f.order}">Bet</button>
-          <div class="odds-fighter"><div class="price">${Number(f.oddsB).toFixed(2)}</div></div>
-          <button class="btn btn-gold btn-sm bet-btn" data-fight-id="${f.id}" data-side="B" data-fighter="${f.fighterB}" data-odds="${f.oddsB}" data-discipline="${f.discipline}" data-order="${f.order}">Bet</button>
+        <div class="bout-odds">
+          <div class="odds-column">
+            <div class="odds-label">ODDS</div>
+            <div class="odds-value">${Number(f.oddsA).toFixed(2)}</div>
+          </div>
+          <button class="btn btn-gold bet-btn" data-fight-id="${f.id}" data-side="A" data-fighter="${f.fighterA}" data-odds="${f.oddsA}" data-discipline="${f.discipline}" data-order="${f.order}">Bet</button>
+          <div class="odds-column">
+            <div class="odds-label">ODDS</div>
+            <div class="odds-value">${Number(f.oddsB).toFixed(2)}</div>
+          </div>
+          <button class="btn btn-gold bet-btn" data-fight-id="${f.id}" data-side="B" data-fighter="${f.fighterB}" data-odds="${f.oddsB}" data-discipline="${f.discipline}" data-order="${f.order}">Bet</button>
         </div>
-      </div>
+      </article>
     `;
   }
 
@@ -213,6 +307,13 @@
     document.getElementById("betSlipModal").classList.remove("open");
   }
 
+  // Allow clicking preview/indicator to open modal
+  document.addEventListener("click", (e) => {
+    if (e.target.closest("#betSlipPreview") || e.target.closest("#floatingBetIndicator")) {
+      document.getElementById("betSlipModal").classList.add("open");
+    }
+  });
+
   function removeLeg(index) {
     betLegs.splice(index, 1);
     refreshBetSlip();
@@ -225,26 +326,52 @@
     const amountInput = document.getElementById("betAmount");
     const minStakeHint = document.getElementById("minStakeHint");
 
+    // Update floating indicator
+    const floatingIndicator = document.getElementById("floatingBetIndicator");
+    const floatingLegCount = document.getElementById("floatingLegCount");
+    const betSlipPreview = document.getElementById("betSlipPreview");
+    const previewLegs = document.getElementById("previewLegs");
+    const previewOdds = document.getElementById("previewOdds");
+
     if (betLegs.length === 0) {
-      legsEl.innerHTML = `<p class="text-dim" style="font-size:13px;">Tap "Bet" on any fight to add it to your slip.</p>`;
+      legsEl.innerHTML = `<p class="empty-legs">Tap "Bet" on any fight to add it to your slip.</p>`;
       summaryEl.style.display = "none";
       payoutBreakdown.style.display = "none";
       amountInput.value = "";
       minStakeHint.style.display = "none";
+      
+      if (floatingIndicator) floatingIndicator.style.display = "none";
+      if (betSlipPreview) betSlipPreview.style.display = "none";
       return;
     }
 
-    // Render legs list
+    // Show floating indicator on mobile
+    if (floatingIndicator) floatingIndicator.style.display = "flex";
+    if (floatingLegCount) floatingLegCount.textContent = betLegs.length;
+    if (betSlipPreview) betSlipPreview.style.display = "block";
+
+    // Render legs list in modal
     legsEl.innerHTML = betLegs.map((leg, idx) => `
-      <div class="bet-leg-item" style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border);">
-        <div style="display:flex;align-items:center;gap:10px;">
-          <span class="text-dim" style="font-family:var(--font-mono);font-size:11px;">${leg.discipline.toUpperCase()} ${leg.order}</span>
-          <span style="font-weight:600;">${leg.fighterName}</span>
-          <span class="text-dim" style="font-family:var(--font-mono);color:var(--gold-bright);">@ ${Number(leg.odds).toFixed(2)}</span>
+      <div class="bet-leg-item">
+        <div class="bet-leg-info">
+          <span class="bet-leg-badge">${leg.discipline.toUpperCase()} ${leg.order}</span>
+          <span class="bet-leg-name">${leg.fighterName}</span>
+          <span class="bet-leg-odds">@ ${Number(leg.odds).toFixed(2)}</span>
         </div>
-        <button class="btn btn-outline btn-sm" onclick="removeLeg(${idx})" style="padding:4px 10px;font-size:11px;">Remove</button>
+        <button class="btn btn-outline btn-sm remove-leg-btn" onclick="removeLeg(${idx})">Remove</button>
       </div>
     `).join("");
+
+    // Render preview legs (compact)
+    if (previewLegs) {
+      previewLegs.innerHTML = betLegs.map((leg) => `
+        <div class="preview-leg">
+          <span class="preview-leg-name">${leg.fighterName}</span>
+          <span class="preview-leg-odds">@ ${Number(leg.odds).toFixed(2)}</span>
+        </div>
+      `).join("");
+    }
+    if (previewOdds) previewOdds.textContent = getCombinedOdds().toFixed(2);
 
     summaryEl.style.display = "block";
     updatePayoutDisplay();
