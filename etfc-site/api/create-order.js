@@ -40,7 +40,8 @@ module.exports = async (req, res) => {
     return res.status(400).json({ error: "Payment screenshot is required." });
   }
   // Sanity check it's actually a Firebase Storage URL, not something arbitrary.
-  if (!screenshotUrl.includes("firebasestorage") && !screenshotUrl.includes("storage.googleapis.com")) {
+  const allowedHosts = ["firebasestorage", "storage.googleapis.com", "cloudinary.com"];
+  if (!allowedHosts.some(h => screenshotUrl.includes(h))) {
     return res.status(400).json({ error: "Invalid screenshot URL." });
   }
 
