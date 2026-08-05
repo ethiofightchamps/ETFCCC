@@ -20,13 +20,15 @@ async function listOrders(req, res) {
   const status = req.query.status || "pending";
 
   try {
-    let query = db.collection("orders").orderBy("createdAt", "desc");
+    let query = db.collection("orders");
     if (status !== "all") {
       query = query.where("status", "==", status);
     }
 
     const snap = await query.get();
-    const orders = snap.docs.map((doc) => {
+    const orders = snap.docs
+      .sort((a, b) => (b.data().createdAt?.toMillis?.() || 0) - (a.data().createdAt?.toMillis?.() || 0))
+      .map((doc) => {
       const d = doc.data();
       return {
         id: doc.id,
