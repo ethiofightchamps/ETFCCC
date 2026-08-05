@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Verify Ticket — ETFC</title>
+<script>(function(){var t=localStorage.getItem("etfc_theme")||"dark";document.documentElement.setAttribute("data-theme",t);})();</script>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div id="nav-mount" data-active=""></div>
+
+<div class="container" style="padding-top:48px;padding-bottom:64px;max-width:520px;text-align:center;">
+  <div id="verifyLoading" style="padding:60px 20px;">
+    <div style="font-size:48px;margin-bottom:16px;">&#9203;</div>
+    <p class="text-dim">Verifying ticket…</p>
+  </div>
+
+  <div id="verifySuccess" style="display:none;">
+    <div style="font-size:64px;margin-bottom:16px;">&#10003;</div>
+    <h2 style="font-family:var(--font-display);font-size:32px;text-transform:uppercase;">Valid Ticket</h2>
+    <div class="mt-24" style="text-align:left;background:var(--obsidian-2);border:1px solid var(--gold);border-radius:12px;padding:20px;">
+      <div class="row"><span>Ticket Code</span><span id="vTicketCode" style="color:var(--gold-bright);font-family:var(--font-mono);"></span></div>
+      <div class="row"><span>Event</span><span>ETFC Fight Night</span></div>
+      <div class="row"><span>Date</span><span id="vDate"></span></div>
+      <div class="row"><span>Venue</span><span>Millennium Hall, Addis Ababa</span></div>
+      <div class="row"><span>Seats</span><span id="vSeats"></span></div>
+      <div class="row"><span>Buyer</span><span id="vBuyer"></span></div>
+    </div>
+    <p class="text-dim mt-24" style="font-size:13px;">Show this screen at entry.</p>
+  </div>
+
+  <div id="verifyError" style="display:none;">
+    <div style="font-size:64px;margin-bottom:16px;color:var(--crimson-bright);">&#10007;</div>
+    <h2 style="font-family:var(--font-display);font-size:32px;text-transform:uppercase;color:var(--crimson-bright);">Invalid Ticket</h2>
+    <p class="text-dim mt-24" id="errorMessage">This ticket code was not found.</p>
+  </div>
+</div>
+
+<div id="footer-mount"></div>
+
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+<script src="js/firebase-config.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/partials.js"></script>
+<script src="js/main.js"></script>
+<script>
+  // Get ticket code from query param: /verify.html?code=ETFC-ABC123
+  const urlParams = new URLSearchParams(window.location.search);
+  const ticketCode = urlParams.get("code");
+
+  async function verifyTicket() {
+    if (!ticketCode || !ticketCode.startsWith("ETFC")) {
+      showError("Invalid ticket code format.");
+      return;
+    }
+
+    try {
+      const db = firebase.firestore();
+      const snap = await db.collection("orders")
+        .where("ticketCode", "==", ticketCode)
+        .limit(1)
+        .get();
+
+      document.getElementById("verifyLoading").style.display = "none";
+
+      if (snap.empty) {
+        showError("Ticket not found.");
+        return;
+      }
+
+      const order = snap.docs[0].data();
+      if (order.status !== "confirmed") {
+        showError(`Ticket is ${order.status} — not valid for entry.`);
+        return;
+      }
+
+      // Success
+      document.getElementById("verifySuccess").style.display = "block";
+      document.getElementById("vTicketCode").textContent = ticketCode;
+      document.getElementById("vDate").textContent = order.createdAt 
+        ? new Date(order.createdAt.toMillis()).toLocaleDateString("en-GB", {day:"numeric",month:"short",year:"numeric"})
+        : "—";
+      document.getElementById("vSeats").textContent = (order.seats || []).join(", ") || "—";
+      document.getElementById("vBuyer").textContent = order.buyerName || "—";
+
+    } catch (err) {
+      console.error("Verify failed:", err);
+      showError("Verification failed. Try again.");
+    }
+  }
+
+  function showError(msg) {
+    document.getElementById("verifyLoading").style.display = "none";
+    document.getElementById("verifyError").style.display = "block";
+    document.getElementById("errorMessage").textContent = msg;
+  }
+
+  verifyTicket();
+</script>
+</body>
+</html>
