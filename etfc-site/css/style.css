@@ -118,8 +118,33 @@ a { color: inherit; text-decoration: none; }
   letter-spacing: 0.5px; color: var(--bone-dim); border-bottom: 1px solid var(--border);
 }
 .nav-mobile-panel .btn { margin-top: 12px; }
-.nav-mobile-divider { display: none; }
-.nav-toggle { display: none; }
+.nav-mobile-divider {
+  height: 1px; background: var(--border); margin: 8px 0;
+}
+.nav-mobile-sublink {
+  padding-left: 16px !important;
+  font-size: 13px !important;
+  font-weight: 500 !important;
+  color: var(--bone-dim) !important;
+  text-transform: none !important;
+  letter-spacing: normal !important;
+  opacity: 0.8;
+}
+.nav-mobile-sublink.active {
+  color: var(--crimson-bright) !important;
+  opacity: 1;
+}
+.nav-mobile-auth {
+  display: inline-block;
+  padding: 12px 0 !important;
+}
+.nav-mobile-auth-btn {
+  width: 100%;
+  text-align: center;
+}
+@media (max-width: 860px) {
+  .nav-mobile-divider { display: block; }
+}
 
 /* ── AUTH PAGES (login.html / signup.html) ──────────────────────────── */
 .auth-page {

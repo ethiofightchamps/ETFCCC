@@ -31,6 +31,15 @@ function renderNav(activePage) {
     : `<a href="login.html" class="nav-link-auth">Log In</a>
        <a href="signup.html" class="btn btn-outline btn-sm">Sign Up</a>`;
 
+  // Mobile panel: include My Tickets under Tickets when logged in
+  const mobileLinksHtml = links.map(l => {
+    let html = `<a href="${l.href}" class="${activePage === l.key ? 'active' : ''}">${l.label}</a>`;
+    if (l.key === 'tickets' && session) {
+      html += `<a href="dashboard.html" class="nav-mobile-sublink${activePage === 'dashboard' ? ' active' : ''}">My Tickets</a>`;
+    }
+    return html;
+  }).join("");
+
   return `
   <nav class="nav">
     <div class="nav-inner">
@@ -48,9 +57,9 @@ function renderNav(activePage) {
       </div>
     </div>
     <div class="nav-mobile-panel" id="navMobilePanel">
-      ${linksHtml}
+      ${mobileLinksHtml}
       <div class="nav-mobile-divider"></div>
-      ${authHtml}
+      ${authHtml.replace('class="nav-link-auth"', 'class="nav-link-auth nav-mobile-auth"').replace('class="btn btn-outline btn-sm"', 'class="btn btn-outline btn-sm nav-mobile-auth-btn"')}
     </div>
   </nav>`;
 }
