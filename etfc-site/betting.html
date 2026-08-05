@@ -40,6 +40,12 @@
 
   <div id="fightsMount"></div>
 
+  <div class="section-header" style="margin-top:56px;">
+    <h2>My Bets</h2>
+    <button class="refresh-btn" onclick="loadMyBets()">↻ Refresh</button>
+  </div>
+  <div id="myBetsContainer"><p class="text-dim">Loading…</p></div>
+
   <p class="text-dim" id="footNote" style="font-size:12px;margin-top:12px;">Odds can move until a bet is submitted — the odds locked in are whatever was live the moment you hit Submit Bet.</p>
 </div>
 
@@ -545,6 +551,73 @@
       console.warn("Could not load minStake:", err);
     }
   }
+
+  // ── My Bets ────────────────────────────────────────────────────────────
+  const STATUS_ICON = { confirmed: "⏳", pending: "⏳", won: "✅", lost: "❌", rejected: "❌" };
+  const STATUS_LABEL = { confirmed: "Awaiting Fight", pending: "Pending Review", won: "Won", lost: "Lost", rejected: "Rejected" };
+
+  async function loadMyBets() {
+    const el = document.getElementById("myBetsContainer");
+    const user = auth.currentUser;
+
+    if (!user) {
+      el.innerHTML = `<div class="empty-state"><div class="empty-icon">🔒</div><p style="margin:0;">Sign in to view your bets.</p></div>`;
+      return;
+    }
+
+    el.innerHTML = `<p class="text-dim">Loading…</p>`;
+
+    try {
+      const snap = await db.collection("bets").where("userId", "==", user.uid).get();
+      let docs = snap.docs;
+      if (docs.length === 0 && user.email) {
+        const snapEmail = await db.collection("bets").where("email", "==", user.email).get();
+        docs = snapEmail.docs;
+      }
+      docs.sort((a, b) => (b.data().createdAt?.toMillis?.() || 0) - (a.data().createdAt?.toMillis?.() || 0));
+
+      if (docs.length === 0) {
+        el.innerHTML = `<div class="empty-state"><div class="empty-icon">🥊</div><p style="margin:0;">No bets placed yet — pick a fighter above to get started.</p></div>`;
+        return;
+      }
+
+      el.innerHTML = docs.map((doc) => {
+        const b = doc.data();
+        const s = b.status || "pending";
+
+        const legs = b.legs || (b.fightId ? [{ fightId: b.fightId, side: b.side, odds: b.odds, fighterName: b.fighterName }] : []);
+        const legsHtml = legs.map((leg) => `
+          <div class="bet-leg-row">
+            <span class="fighter">${leg.fighterName}</span>
+            <span class="odds"> @ ${Number(leg.odds).toFixed(2)}</span>
+          </div>
+        `).join("");
+
+        const combinedOdds = b.combinedOdds || b.odds || 0;
+        const grossPayout = b.grossPayout || b.potentialPayout || 0;
+        const taxAmount = b.taxAmount || 0;
+        const netPayout = b.netPayout || (grossPayout - taxAmount) || grossPayout;
+
+        return `
+          <div class="bet-card ${s}">
+            <div class="bet-card-legs">
+              ${legsHtml || `<span class="text-dim">—</span>`}
+              <div class="bet-card-meta">Stake: ${(b.stake || 0).toLocaleString()} ETB &middot; Combined Odds: ${Number(combinedOdds).toFixed(2)} &middot; Ref: ${b.refCode || "—"}</div>
+            </div>
+            <div class="bet-card-result">
+              <span class="status-pill ${s}">${STATUS_ICON[s] || ""} ${STATUS_LABEL[s] || s}</span>
+              <span class="bet-payout-net">${s === "lost" || s === "rejected" ? "—" : `Net: ${Number(netPayout).toLocaleString()} ETB`}</span>
+              ${s !== "lost" && s !== "rejected" ? `<span class="bet-payout-detail">Gross: ${Number(grossPayout).toLocaleString()} ETB &middot; Tax: ${Number(taxAmount).toLocaleString()} ETB</span>` : ""}
+            </div>
+          </div>`;
+      }).join("");
+    } catch (err) {
+      el.innerHTML = `<p style="color:var(--crimson-bright);">Could not load bets — ${err.message}</p>`;
+      console.error("bets:", err);
+    }
+  }
+
+  auth.onAuthStateChanged(() => loadMyBets());
 
   loadBettingPage();
   loadMinStake();

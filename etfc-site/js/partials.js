@@ -45,9 +45,33 @@ function renderNav(activePage) {
   </nav>`;
 }
 
+function renderSponsorsStrip() {
+  const sponsors = [
+    { name: "ETFC", img: "images/sponsors/etfc-logo.jpg" },
+    { name: "M-Pesa", img: "images/sponsors/mpesa.jpg" },
+    { name: "Gena TV", img: "images/sponsors/genatv.jpg" },
+    { name: "Sweat Box", img: "images/sponsors/sweatbox.jpg" },
+    { name: "Gofere", img: "images/sponsors/gofere.jpg" },
+  ];
+  const logosHtml = sponsors.map(s => `
+    <div class="sponsor-logo" title="${s.name}">
+      <img src="${s.img}" alt="${s.name}" loading="lazy">
+    </div>
+  `).join("");
+
+  return `
+  <div class="sponsors-strip">
+    <div class="container">
+      <div class="sponsors-label">Official Partners &amp; Sponsors</div>
+      <div class="sponsors-row">${logosHtml}</div>
+    </div>
+  </div>`;
+}
+
 function renderFooter() {
   return `
   <footer>
+    ${renderSponsorsStrip()}
     <div class="container foot-inner">
       <div class="nav-logo" style="font-size:20px;">ET<span>FC</span></div>
       <div class="foot-links">

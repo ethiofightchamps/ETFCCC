@@ -171,6 +171,32 @@
   }
   .ticket-footer-note { color: var(--gold-bright); opacity: 0.8; }
 
+  .ticket-sponsor-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 10px 24px;
+    background: rgba(0,0,0,0.15);
+    border-top: 1px dashed rgba(176,141,62,0.2);
+  }
+  .ticket-sponsor-label {
+    font-family: var(--font-mono);
+    font-size: 9px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--bone-dim);
+    margin-right: 4px;
+  }
+  .ticket-sponsor-row img {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    object-fit: cover;
+    filter: grayscale(60%);
+    opacity: 0.85;
+  }
+
   .empty-state {
     text-align: center;
     padding: 48px 24px;
@@ -231,10 +257,9 @@
   </div>
   <div id="ticketsContainer"><p class="text-dim">Loading…</p></div>
 
-  <div class="section-header">
-    <h2>Bets</h2>
-  </div>
-  <div id="betsContainer"><p class="text-dim">Loading…</p></div>
+  <p class="text-dim" style="font-size:12px;margin-top:32px;text-align:center;">
+    Looking for your bets? They've moved to the <a href="betting.html" style="color:var(--gold-bright);">Betting page</a>.
+  </p>
 </div>
 
 <div id="footer-mount"></div>
@@ -351,6 +376,13 @@
                   <div class="ticket-field-value code">${ticketCode}</div>
                 </div>
               </div>
+              <div class="ticket-sponsor-row">
+                <span class="ticket-sponsor-label">Presented by</span>
+                <img src="images/sponsors/mpesa.jpg" alt="M-Pesa">
+                <img src="images/sponsors/genatv.jpg" alt="Gena TV">
+                <img src="images/sponsors/sweatbox.jpg" alt="Sweat Box">
+                <img src="images/sponsors/gofere.jpg" alt="Gofere">
+              </div>
               <div class="ticket-footer">
                 <span>${o.buyerName || "Guest"}</span>
                 <span class="ticket-footer-note">Present QR at entry • Non-transferable</span>
@@ -361,59 +393,6 @@
     } catch (err) {
       ticketsEl.innerHTML = `<p style="color:var(--crimson-bright);">Could not load tickets — ${err.message}</p>`;
       console.error("tickets:", err);
-    }
-
-    // ── Bets ─────────────────────────────────────────────────────────────────
-    const betsEl = document.getElementById("betsContainer");
-    try {
-      const snap = await db.collection("bets")
-        .where("userId", "==", user.uid)
-        .get();
-
-      let docs = snap.docs;
-      if (docs.length === 0) {
-        const snapEmail = await db.collection("bets").where("email", "==", user.email).get();
-        docs = snapEmail.docs;
-      }
-      docs.sort((a, b) => (b.data().createdAt?.toMillis?.() || 0) - (a.data().createdAt?.toMillis?.() || 0));
-
-      if (docs.length === 0) {
-        betsEl.innerHTML = `<div class="empty-state"><div class="empty-icon">🥊</div><p style="margin:0;">No bets placed yet.</p></div>`;
-      } else {
-        betsEl.innerHTML = docs.map(doc => {
-          const b = doc.data();
-          const s = b.status || "pending";
-
-          // Handle both old single-leg and new multi-leg format
-          const legs = b.legs || (b.fightId ? [{ fightId: b.fightId, side: b.side, odds: b.odds, fighterName: b.fighterName }] : []);
-          const legsHtml = legs.map((leg) => `
-            <div style="font-size:12px;margin-bottom:2px;">
-              <span style="font-weight:600;">${leg.fighterName}</span>
-              <span class="text-dim"> @ ${Number(leg.odds).toFixed(2)}</span>
-            </div>
-          `).join("");
-
-          const combinedOdds = b.combinedOdds || b.odds || 0;
-          const grossPayout = b.grossPayout || b.potentialPayout || 0;
-          const taxAmount = b.taxAmount || 0;
-          const netPayout = b.netPayout || grossPayout - taxAmount || grossPayout;
-
-          return `<div class="ticket-card">
-            <div class="ticket-left" style="min-width:0;">
-              <div style="font-size:12px;margin-bottom:4px;">${legsHtml || "<span class='text-dim'>—</span>"}</div>
-              <div class="ticket-meta">Stake: ${(b.stake || 0).toLocaleString()} ETB &middot; Odds: ${Number(combinedOdds).toFixed(2)} &middot; Ref: ${b.refCode || "—"}</div>
-            </div>
-            <div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px;">
-              <span class="status-pill ${s}">${STATUS_ICON[s] || ""} ${STATUS_LABEL[s] || s}</span>
-              <span class="ticket-amount">Net: ${Number(netPayout).toLocaleString()} ETB</span>
-              <span class="text-dim" style="font-size:11px;">Gross: ${Number(grossPayout).toLocaleString()} ETB &middot; Tax: ${Number(taxAmount).toLocaleString()} ETB</span>
-            </div>
-          </div>`;
-        }).join("");
-      }
-    } catch (err) {
-      betsEl.innerHTML = `<p style="color:var(--crimson-bright);">Could not load bets — ${err.message}</p>`;
-      console.error("bets:", err);
     }
   }
 
