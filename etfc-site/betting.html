@@ -26,11 +26,14 @@
       <div class="section-eyebrow">Fixed Odds</div>
       <div class="section-title" style="font-size:38px;margin-bottom:4px;">Fight Night Betting</div>
     </div>
-    <div class="bet-slip-preview" id="betSlipPreview" style="display:none;">
-      <div class="preview-legs" id="previewLegs"></div>
-      <div class="preview-footer">
-        <span class="preview-odds">Odds: <span id="previewOdds">0.00</span></span>
-        <button class="btn btn-gold btn-sm" onclick="document.getElementById('betSlipModal').classList.add('open')">View Slip</button>
+    <div style="display:flex;align-items:center;gap:12px;">
+      <button class="btn btn-outline btn-sm" onclick="openMyBetsModal()">My Bets</button>
+      <div class="bet-slip-preview" id="betSlipPreview" style="display:none;">
+        <div class="preview-legs" id="previewLegs"></div>
+        <div class="preview-footer">
+          <span class="preview-odds">Odds: <span id="previewOdds">0.00</span></span>
+          <button class="btn btn-gold btn-sm" onclick="document.getElementById('betSlipModal').classList.add('open')">View Slip</button>
+        </div>
       </div>
     </div>
   </div>
@@ -40,13 +43,23 @@
 
   <div id="fightsMount"></div>
 
-  <div class="section-header" style="margin-top:56px;">
-    <h2>My Bets</h2>
-    <button class="refresh-btn" onclick="loadMyBets()">↻ Refresh</button>
-  </div>
-  <div id="myBetsContainer"><p class="text-dim">Loading…</p></div>
-
   <p class="text-dim" id="footNote" style="font-size:12px;margin-top:12px;">Odds can move until a bet is submitted — the odds locked in are whatever was live the moment you hit Submit Bet.</p>
+</div>
+
+<!-- MY BETS MODAL -->
+<div class="modal-overlay" id="myBetsModal">
+  <div class="modal modal-bet-slip" style="display:flex;flex-direction:column;max-height:85vh;overflow:hidden;">
+    <div class="modal-header">
+      <h3>My Bets</h3>
+      <span class="modal-close" onclick="document.getElementById('myBetsModal').classList.remove('open')">&times;</span>
+    </div>
+    <div class="modal-body" style="overflow-y:auto;flex:1;">
+      <div style="display:flex;justify-content:flex-end;margin-bottom:12px;">
+        <button class="refresh-btn" onclick="loadMyBets()">↻ Refresh</button>
+      </div>
+      <div id="myBetsContainer"><p class="text-dim">Loading…</p></div>
+    </div>
+  </div>
 </div>
 
 <!-- BET SLIP MODAL -->
@@ -615,6 +628,11 @@
       el.innerHTML = `<p style="color:var(--crimson-bright);">Could not load bets — ${err.message}</p>`;
       console.error("bets:", err);
     }
+  }
+
+  function openMyBetsModal() {
+    document.getElementById("myBetsModal").classList.add("open");
+    loadMyBets();
   }
 
   auth.onAuthStateChanged(() => loadMyBets());
