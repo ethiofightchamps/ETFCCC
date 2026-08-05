@@ -45,12 +45,12 @@
 
 <!-- BET SLIP MODAL -->
 <div class="modal-overlay" id="betSlipModal">
-  <div class="modal modal-bet-slip">
+  <div class="modal modal-bet-slip" style="display:flex;flex-direction:column;max-height:90vh;overflow:hidden;">
     <div class="modal-header">
       <h3>Place Your Bet</h3>
       <span class="modal-close" onclick="closeBetSlip()">&times;</span>
     </div>
-    <div class="modal-body" id="betSlipForm">
+    <div class="modal-body" id="betSlipForm" style="overflow-y:auto;flex:1;padding-bottom:80px;">
       
       <!-- Accumulator legs list -->
       <div class="bet-section">
@@ -148,11 +148,13 @@
 
       <p id="betSubmitError" class="error-msg" style="display:none;"></p>
       
-      <!-- Sticky Submit Button -->
-      <div class="modal-footer">
-        <button class="btn btn-primary btn-block" id="submitBetBtn" onclick="submitBet()">Submit Bet</button>
-      </div>
     </div>
+    <!-- Sticky Submit Button outside scroll area -->
+    <div class="modal-footer" style="position:sticky;bottom:0;padding:16px 24px;background:var(--obsidian-2,#111);border-top:1px solid var(--border);z-index:10;">
+      <button class="btn btn-primary btn-block" id="submitBetBtn" onclick="submitBet()">Submit Bet</button>
+      <p id="betSubmitError" class="error-msg" style="display:none;margin-top:8px;"></p>
+    </div>
+    <div style="display:none"><!-- end betSlipForm wrapper -->
 
     <!-- Success State -->
     <div id="betSlipPending" class="modal-body success-state" style="display:none;">
@@ -287,9 +289,18 @@
 
   function openBetSlip(fightId, side, fighterName, odds, discipline, order) {
     requireAuth("placeBet", () => {
-      // Check if this leg already exists
-      const exists = betLegs.find(l => l.fightId === fightId && l.side === side);
-      if (exists) return; // already added
+      // Block same fight same side duplicate
+      const exactDup = betLegs.find(l => l.fightId === fightId && l.side === side);
+      if (exactDup) {
+        document.getElementById("betSlipModal").classList.add("open");
+        return;
+      }
+      // Block betting both sides of the same fight
+      const oppositeSide = betLegs.find(l => l.fightId === fightId && l.side !== side);
+      if (oppositeSide) {
+        alert("You can't bet on both fighters in the same match.");
+        return;
+      }
 
       betLegs.push({ fightId, side, fighterName, odds, discipline, order });
       chosenBetFile = null;
@@ -305,6 +316,12 @@
 
   function closeBetSlip() {
     document.getElementById("betSlipModal").classList.remove("open");
+    // Reset file + error only, keep legs so user can come back to the slip
+    chosenBetFile = null;
+    document.getElementById("betUploadLabel").textContent = "Tap to upload payment screenshot";
+    document.getElementById("betScreenshotInput").value = "";
+    const errEl = document.getElementById("betSubmitError");
+    if (errEl) errEl.style.display = "none";
   }
 
   // Allow clicking preview/indicator to open modal

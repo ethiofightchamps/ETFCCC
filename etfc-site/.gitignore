@@ -1,0 +1,19 @@
+# Firebase service account — NEVER commit this
+service-account.json
+*.key.json
+
+# Dependencies
+node_modules/
+functions/node_modules/
+
+# Environment
+.env
+.env.local
+.env*.local
+
+# Vercel
+.vercel/
+
+# OS
+.DS_Store
+Thumbs.db
