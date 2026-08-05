@@ -41,7 +41,7 @@
     try {
       // Try email first, fall back to showing all orders where email matches
       const ordersSnap = await db.collection("orders")
-        .where("email", "==", user.email)
+        .where("userId", "==", user.uid)
         .orderBy("createdAt", "desc")
         .get();
 
@@ -84,7 +84,7 @@
     // ── My Bets ─────────────────────────────────────────────────────────────
     try {
       const betsSnap = await db.collection("bets")
-        .where("email", "==", user.email)
+        .where("userId", "==", user.uid)
         .orderBy("createdAt", "desc")
         .get();
 

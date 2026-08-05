@@ -26,7 +26,7 @@ module.exports = async (req, res) => {
     return res.status(405).json({ error: "Method not allowed" });
   }
 
-  const { fightId, side, stake, buyerName, phone, email, screenshotUrl } = req.body || {};
+  const { fightId, side, stake, buyerName, phone, email, userId, screenshotUrl } = req.body || {};
 
   if (!fightId || !["A", "B"].includes(side)) {
     return res.status(400).json({ error: "A valid fightId and side (A or B) are required." });
@@ -80,6 +80,7 @@ module.exports = async (req, res) => {
       buyerName,
       phone,
       email: email || "",
+      userId: userId || "",
       fightId,
       side,
       fighterName,

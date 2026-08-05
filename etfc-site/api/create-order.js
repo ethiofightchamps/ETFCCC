@@ -31,7 +31,7 @@ module.exports = async (req, res) => {
     return res.status(405).json({ error: "Method not allowed" });
   }
 
-  const { buyerName, phone, email, seats, totalAmount, screenshotUrl } = req.body || {};
+  const { buyerName, phone, email, userId, seats, totalAmount, screenshotUrl } = req.body || {};
 
   if (!buyerName || !phone || !Array.isArray(seats) || seats.length === 0 || !totalAmount) {
     return res.status(400).json({ error: "Missing required order fields." });
@@ -85,6 +85,7 @@ module.exports = async (req, res) => {
         buyerName,
         phone,
         email: email || "",
+        userId: userId || "",
         seats,
         totalAmount,
         refCode,
