@@ -1,53 +1,73 @@
-// ── SEAT MAP ─────────────────────────────────────────────────────────────
-// Real ETFC venue layout:
-//   Ringside  — 100 seats  — 40,000 ETB  (2 rows × 50)
-//   VIP       — 200 seats  — 9,000 ETB   (4 rows × 50)
-//   Middle    — 600 seats  — 2,000 ETB   (6 rows × 100 → rendered as 2 blocks of 50)
-//   Last Rows — 600 seats  — 1,500 ETB   (6 rows × 100 → rendered as 2 blocks of 50)
-// Total: 1,500 seats
+// ── SEAT MAP (Circular Arena Layout) ──────────────────────────────────────
+// Real ETFC venue layout — 1,500 seats in concentric rings around the ring:
+//   Ringside  — 100 seats  — 40,000 ETB  (2 rings × 50 seats)
+//   VIP       — 200 seats  — 9,000 ETB   (4 rings × 50 seats)
+//   Middle    — 600 seats  — 2,000 ETB   (6 rings × 100 seats)
+//   Last Rows — 600 seats  — 1,500 ETB   (6 rings × 100 seats)
 
 const SEAT_CONFIG = [
-  { section: "Ringside",  tier: "ringside", price: 40000, rows: 2, seatsPerRow: 50 },
-  { section: "VIP",       tier: "vip",      price: 9000,  rows: 4, seatsPerRow: 50 },
-  { section: "Middle",    tier: "ga",       price: 2000,  rows: 6, seatsPerRow: 100 },
-  { section: "Last Rows", tier: "ga",       price: 1500,  rows: 6, seatsPerRow: 100 },
+  { section: "Ringside",  tier: "ringside", price: 40000, rings: 2, seatsPerRing: 50, radiusStart: 110, radiusStep: 35 },
+  { section: "VIP",       tier: "vip",      price: 9000,  rings: 4, seatsPerRing: 50, radiusStart: 180, radiusStep: 35 },
+  { section: "Middle",    tier: "ga",       price: 2000,  rings: 6, seatsPerRing: 100, radiusStart: 320, radiusStep: 32 },
+  { section: "Last Rows", tier: "ga",       price: 1500,  rings: 6, seatsPerRing: 100, radiusStart: 512, radiusStep: 32 },
 ];
 
 const SOLD_SEATS = new Set();
-
 let selectedSeats = {};
 
 function renderSeatMap() {
   const mount = document.getElementById("seatMapMount");
   if (!mount) return;
 
-  let html = `<div class="ring">RING</div>`;
+  let html = `
+    <div class="arena">
+      <div class="ring-center">RING</div>
+  `;
 
   SEAT_CONFIG.forEach((sec) => {
-    html += `<div class="seat-section">
-      <div class="seat-section-label">${sec.section} — ${sec.price.toLocaleString()} ETB</div>`;
-    for (let r = 0; r < sec.rows; r++) {
+    html += `<div class="seat-section" data-section="${sec.section}">`;
+    html += `<div class="seat-section-label">${sec.section} — ${sec.price.toLocaleString()} ETB</div>`;
+    html += `<div class="seat-rings">`;
+
+    for (let r = 0; r < sec.rings; r++) {
+      const radius = sec.radiusStart + r * sec.radiusStep;
       const rowLetter = String.fromCharCode(65 + r);
-      html += `<div class="seat-row">`;
-      for (let s = 1; s <= sec.seatsPerRow; s++) {
-        const seatId = `${sec.section}-${rowLetter}-${s}`;
+      const seatsPerRing = sec.seatsPerRing;
+      const angleStep = 360 / seatsPerRing;
+      const startAngle = -90;
+
+      html += `<div class="seat-ring" style="--ring-radius: ${radius}px;">`;
+
+      for (let s = 0; s < seatsPerRing; s++) {
+        const angle = startAngle + s * angleStep;
+        const seatId = `${sec.section}-${rowLetter}-${s + 1}`;
         const sold = SOLD_SEATS.has(seatId);
+
+        const x = Math.cos(angle * Math.PI / 180) * radius;
+        const y = Math.sin(angle * Math.PI / 180) * radius;
+
+        const rotateDeg = angle + 90;
+
         html += `<div
           class="seat tier-${sec.tier} ${sold ? "sold" : ""}"
           data-seat-id="${seatId}"
           data-section="${sec.section}"
           data-tier="${sec.tier}"
           data-price="${sec.price}"
-          data-label="${sec.section} ${rowLetter}${s}"
-          title="${sec.section} ${rowLetter}${s} — ${sec.price.toLocaleString()} ETB"
+          data-label="${sec.section} ${rowLetter}${s + 1}"
+          title="${sec.section} ${rowLetter}${s + 1} — ${sec.price.toLocaleString()} ETB"
+          style="transform: translate(${x.toFixed(1)}px, ${y.toFixed(1)}px) rotate(${rotateDeg.toFixed(1)}deg);"
           onclick="${sold ? "" : `toggleSeat(this)`}"
         ></div>`;
       }
+
       html += `</div>`;
     }
-    html += `</div>`;
+
+    html += `</div></div>`;
   });
 
+  html += `</div>`;
   mount.innerHTML = html;
 }
 

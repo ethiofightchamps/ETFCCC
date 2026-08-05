@@ -274,24 +274,41 @@ section { padding: 64px 0; }
 .stat-box .val { font-family: var(--font-display); font-size: 26px; color: var(--gold-bright); }
 .stat-box .lbl { font-family: var(--font-mono); font-size: 10px; color: var(--bone-dim); text-transform: uppercase; letter-spacing: 1px; margin-top: 4px; }
 
-/* ---------- SEAT MAP ---------- */
-.venue-map { background: var(--obsidian-2); border: 1px solid var(--border); border-radius: 8px; padding: 32px; }
-.ring { width: 120px; height: 80px; background: var(--crimson); opacity: 0.85; margin: 0 auto 32px; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-family: var(--font-mono); font-size: 11px; letter-spacing: 2px; color: #fff; text-transform: uppercase; }
-.seat-section { margin-bottom: 24px; }
-.seat-section-label { font-family: var(--font-mono); font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: var(--bone-dim); margin-bottom: 10px; }
-.seat-row { display: flex; gap: 6px; justify-content: center; margin-bottom: 6px; flex-wrap: wrap; }
-.seat {
-  width: 26px; height: 26px; border-radius: 4px; background: var(--obsidian-3);
-  border: 1px solid var(--border); cursor: pointer; font-size: 0; transition: all 0.1s;
-}
-.seat.tier-ringside { background: rgba(176,141,62,0.25); border-color: var(--gold); }
-.seat.tier-vip { background: rgba(179,20,28,0.25); border-color: var(--crimson); }
-.seat.tier-ga { background: rgba(232,228,220,0.08); border-color: var(--border); }
-.seat.sold { background: #1a1a1a; border-color: #1a1a1a; cursor: not-allowed; opacity: 0.4; }
-.seat.selected { background: var(--success); border-color: var(--success); }
+/* ---------- SEAT MAP (Circular Arena) ---------- */
+.venue-map { background: var(--obsidian-2); border: 1px solid var(--border); border-radius: 8px; padding: 32px; overflow: hidden; }
+.arena { position: relative; width: 100%; aspect-ratio: 1; max-width: 720px; margin: 0 auto; background: radial-gradient(ellipse at center, var(--obsidian-3) 0%, var(--obsidian) 70%, #0a0a0a 100%); border-radius: 50%; border: 4px solid var(--crimson); box-shadow: inset 0 0 80px rgba(0,0,0,0.6), 0 0 40px rgba(179,20,28,0.15); }
+.ring-center { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 180px; height: 120px; background: linear-gradient(135deg, var(--crimson) 0%, #8b0f15 100%); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-family: var(--font-mono); font-size: 13px; letter-spacing: 3px; color: #fff; text-transform: uppercase; font-weight: 700; box-shadow: 0 8px 32px rgba(179,20,28,0.4), inset 0 2px 8px rgba(255,255,255,0.1); z-index: 10; border: 2px solid var(--gold-bright); }
+.seat-section { position: absolute; inset: 0; pointer-events: none; }
+.seat-section-label { position: absolute; top: 16px; left: 50%; transform: translateX(-50%); font-family: var(--font-mono); font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: var(--gold-bright); text-shadow: 0 1px 4px rgba(0,0,0,0.8); white-space: nowrap; z-index: 5; pointer-events: none; }
+.seat-rings { width: 100%; height: 100%; position: relative; }
+.seat-ring { position: absolute; top: 50%; left: 50%; width: 0; height: 0; transform: translate(-50%, -50%); pointer-events: auto; }
+.seat { position: absolute; top: 0; left: 0; width: 22px; height: 22px; border-radius: 3px; cursor: pointer; font-size: 0; transition: all 0.15s ease; transform-origin: center center; box-shadow: 0 2px 6px rgba(0,0,0,0.4); display: flex; align-items: center; justify-content: center; }
+.seat::after { content: ""; position: absolute; inset: 2px; border-radius: 2px; background: inherit; opacity: 0; transition: opacity 0.15s; }
+.seat:hover:not(.sold):not(.selected)::after { opacity: 1; }
+.seat.tier-ringside { background: linear-gradient(135deg, rgba(176,141,62,0.4) 0%, rgba(176,141,62,0.2) 100%); border: 2px solid var(--gold); }
+.seat.tier-ringside::after { background: linear-gradient(135deg, var(--gold-bright) 0%, var(--gold) 100%); }
+.seat.tier-vip { background: linear-gradient(135deg, rgba(179,20,28,0.4) 0%, rgba(179,20,28,0.2) 100%); border: 2px solid var(--crimson); }
+.seat.tier-vip::after { background: linear-gradient(135deg, var(--crimson-bright) 0%, var(--crimson) 100%); }
+.seat.tier-ga { background: linear-gradient(135deg, rgba(232,228,220,0.15) 0%, rgba(232,228,220,0.05) 100%); border: 1.5px solid var(--border); }
+.seat.tier-ga::after { background: linear-gradient(135deg, var(--bone) 0%, var(--bone-dim) 100%); }
+.seat.sold { background: #1a1a1a !important; border-color: #1a1a1a !important; cursor: not-allowed; opacity: 0.35; }
+.seat.sold::after { display: none; }
+.seat.selected { background: var(--success) !important; border-color: var(--success) !important; box-shadow: 0 0 0 3px var(--success), 0 4px 16px rgba(63,143,95,0.5); transform: translate(var(--tx, 0), var(--ty, 0)) rotate(var(--rot, 0)) scale(1.15) !important; z-index: 20; }
+.seat.selected::after { display: none; }
 .seat-legend { display: flex; gap: 20px; justify-content: center; margin-top: 20px; flex-wrap: wrap; }
 .seat-legend .item { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--bone-dim); }
-.seat-legend .swatch { width: 16px; height: 16px; border-radius: 3px; }
+.seat-legend .swatch { width: 16px; height: 16px; border-radius: 3px; border: 1px solid; }
+.seat-legend .swatch.ringside { background: rgba(176,141,62,0.25); border-color: var(--gold); }
+.seat-legend .swatch.vip { background: rgba(179,20,28,0.25); border-color: var(--crimson); }
+.seat-legend .swatch.ga { background: rgba(232,228,220,0.08); border-color: var(--border); }
+.seat-legend .swatch.selected { background: var(--success); border-color: var(--success); }
+.seat-legend .swatch.sold { background: #1a1a1a; border-color: #1a1a1a; opacity: 0.4; }
+
+@media (max-width: 760px) {
+  .ring-center { width: 120px; height: 80px; font-size: 10px; }
+  .seat { width: 16px; height: 16px; }
+  .seat::after { inset: 1px; }
+}
 
 .selection-panel {
   background: var(--obsidian-2); border: 1px solid var(--gold); border-radius: 8px;

@@ -8,47 +8,169 @@
 <link rel="stylesheet" href="css/style.css">
 <style>
   .ticket-card {
-    background: var(--card-bg);
+    background: var(--obsidian-2);
     border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 20px 24px;
-    margin-bottom: 16px;
+    border-radius: 16px;
+    overflow: hidden;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.25);
+  }
+  .ticket-card.confirmed {
+    border-color: var(--gold);
+    box-shadow: 0 8px 32px rgba(176,141,62,0.15);
+  }
+  .ticket-card.pending {
+    border-color: rgba(176,141,62,0.4);
+  }
+  .ticket-card.rejected {
+    opacity: 0.7;
+  }
+
+  .ticket-visual {
+    position: relative;
+    background: linear-gradient(135deg, var(--obsidian) 0%, var(--obsidian-2) 50%, #1a1508 100%);
+    border-bottom: 3px solid var(--gold);
+    padding: 24px;
+    min-height: 220px;
+    display: flex;
+    flex-direction: column;
+  }
+  [data-theme="light"] .ticket-visual {
+    background: linear-gradient(135deg, #1c1a16 0%, #2a251a 50%, #3d3420 100%);
+    border-bottom-color: var(--gold);
+  }
+
+  .ticket-top {
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
-    gap: 16px;
+    margin-bottom: 16px;
   }
-  .ticket-card .ticket-left { flex: 1; }
-  .ticket-card .ticket-seats {
+  .ticket-logo {
     font-family: var(--font-display);
-    font-size: 16px;
+    font-size: 28px;
+    letter-spacing: 2px;
+    color: var(--gold-bright);
+    text-shadow: 0 2px 8px rgba(176,141,62,0.4);
+  }
+  .ticket-logo span { color: var(--crimson-bright); }
+  .ticket-badge {
+    background: var(--crimson);
+    color: #fff;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border-radius: 3px;
     font-weight: 700;
-    letter-spacing: 0.03em;
-    margin-bottom: 6px;
   }
-  .ticket-card .ticket-meta {
-    font-size: 12px;
-    color: var(--text-dim);
-    margin-bottom: 6px;
+  .ticket-badge.pending { background: var(--gold); color: #1a1508; }
+  .ticket-badge.rejected { background: #444; color: #888; }
+
+  .ticket-main {
+    flex: 1;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: auto;
   }
-  .ticket-card .ticket-code {
-    font-family: monospace;
+  .ticket-event-info {
+    flex: 1;
+  }
+  .ticket-event-label {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--bone-dim);
+    margin-bottom: 4px;
+  }
+  .ticket-event-name {
+    font-family: var(--font-display);
+    font-size: 32px;
+    letter-spacing: 1px;
+    color: var(--bone);
+    text-transform: uppercase;
+    line-height: 1.1;
+  }
+  .ticket-event-date {
+    font-family: var(--font-mono);
     font-size: 13px;
     color: var(--gold-bright);
-    background: rgba(176,141,62,0.1);
-    border: 1px solid rgba(176,141,62,0.25);
-    border-radius: 6px;
-    padding: 4px 10px;
-    display: inline-block;
-    margin-top: 6px;
+    margin-top: 4px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
   }
-  .ticket-card .ticket-amount {
+  .ticket-event-date::before {
+    content: "";
+    width: 16px;
+    height: 1px;
+    background: var(--gold);
+    opacity: 0.5;
+  }
+
+  .ticket-qr-wrap {
+    width: 120px;
+    height: 120px;
+    background: #fff;
+    border-radius: 8px;
+    padding: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-left: 24px;
+  }
+  .ticket-qr-wrap canvas { width: 100%; height: 100%; }
+
+  .ticket-bottom {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0;
+    border-top: 1px dashed rgba(176,141,62,0.3);
+    padding: 16px 24px;
+    background: rgba(0,0,0,0.2);
+  }
+  .ticket-field {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 0 12px;
+  }
+  .ticket-field:not(:last-child) {
+    border-right: 1px dashed rgba(176,141,62,0.2);
+  }
+  .ticket-field-label {
+    font-family: var(--font-mono);
+    font-size: 9px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--bone-dim);
+  }
+  .ticket-field-value {
     font-family: var(--font-display);
     font-size: 18px;
-    font-weight: 700;
-    color: var(--gold-bright);
-    white-space: nowrap;
+    color: var(--bone);
+    letter-spacing: 0.5px;
   }
+  .ticket-field-value.seats { font-size: 16px; }
+  .ticket-field-value.code { font-family: var(--font-mono); font-size: 13px; color: var(--gold-bright); }
+
+  .ticket-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 24px;
+    background: rgba(0,0,0,0.3);
+    border-top: 1px solid rgba(255,255,255,0.03);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--bone-dim);
+  }
+  .ticket-footer-note { color: var(--gold-bright); opacity: 0.8; }
+
   .empty-state {
     text-align: center;
     padding: 48px 24px;
@@ -82,6 +204,14 @@
     transition: all 0.15s;
   }
   .refresh-btn:hover { border-color: var(--gold); color: var(--gold); }
+
+  @media (max-width: 520px) {
+    .ticket-main { flex-direction: column; align-items: flex-start; gap: 16px; }
+    .ticket-qr-wrap { width: 100px; height: 100px; margin-left: 0; }
+    .ticket-event-name { font-size: 24px; }
+    .ticket-bottom { grid-template-columns: 1fr; }
+    .ticket-field:not(:last-child) { border-right: none; border-bottom: 1px dashed rgba(176,141,62,0.2); padding-bottom: 12px; }
+  }
 </style>
 </head>
 <body>
@@ -116,9 +246,35 @@
 <script src="js/auth.js"></script>
 <script src="js/partials.js"></script>
 <script src="js/main.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
 <script>
   const STATUS_ICON = { confirmed: "✅", rejected: "❌", pending: "⏳" };
   const STATUS_LABEL = { confirmed: "Confirmed", rejected: "Rejected", pending: "Pending" };
+  const BADGE_LABEL = { confirmed: "E-TICKET", pending: "PENDING", rejected: "REJECTED" };
+  const BADGE_CLASS = { confirmed: "", pending: "pending", rejected: "rejected" };
+
+  const EVENT_DATE_STR = "August 24, 2026";
+  const EVENT_TIME_STR = "7:00 PM";
+  const VENUE_STR = "Millennium Hall, Addis Ababa";
+
+  function renderTicketQR(qrData, containerId) {
+    const el = document.getElementById(containerId);
+    if (!el) return;
+    el.innerHTML = "";
+    try {
+      new QRCode(el, {
+        text: qrData,
+        width: 104,
+        height: 104,
+        colorDark: "#0d0d0d",
+        colorLight: "#ffffff",
+        correctLevel: QRCode.CorrectLevel.M
+      });
+    } catch (e) {
+      console.warn("QR generation failed:", e);
+      el.innerHTML = `<div style="width:104px;height:104px;display:flex;align-items:center;justify-content:center;font-size:10px;color:#666;">QR Error</div>`;
+    }
+  }
 
   async function loadDashboard(user) {
     if (!user) return;
@@ -132,7 +288,6 @@
         .where("userId", "==", user.uid)
         .get();
 
-      // Also try email fallback for older orders saved before userId was added
       let docs = snap.docs;
       if (docs.length === 0) {
         const snapEmail = await db.collection("orders")
@@ -155,24 +310,52 @@
         const hasConfirmed = docs.some(d => d.data().status === "confirmed");
         if (hasConfirmed) localStorage.removeItem("etfc_pending_order");
 
-        ticketsEl.innerHTML = docs.map(doc => {
+        ticketsEl.innerHTML = docs.map((doc, idx) => {
           const o = doc.data();
           const seats = (o.seats || []).join(", ") || "—";
           const s = o.status || "pending";
-          const ticketCode = (s === "confirmed" && o.ticketCode)
-            ? `<div class="ticket-code">🎟 ${o.ticketCode}</div>` : "";
+          const ticketCode = o.ticketCode || o.refCode || "—";
           const date = o.createdAt ? new Date(o.createdAt.toMillis()).toLocaleDateString("en-GB", {day:"numeric",month:"short",year:"numeric"}) : "";
-          return `<div class="ticket-card">
-            <div class="ticket-left">
-              <div class="ticket-seats">${seats}</div>
-              <div class="ticket-meta">Ref: ${o.refCode || "—"}${date ? " &middot; " + date : ""}</div>
-              ${ticketCode}
-            </div>
-            <div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px;">
-              <span class="status-pill ${s}">${STATUS_ICON[s] || ""} ${STATUS_LABEL[s] || s}</span>
-              <span class="ticket-amount">${(o.totalAmount || 0).toLocaleString()} ETB</span>
-            </div>
-          </div>`;
+          const qrId = `qr-${doc.id}-${idx}`;
+          const qrData = `ETFC|${ticketCode}|${seats}|${o.buyerName || "Guest"}|${date}`;
+
+          setTimeout(() => renderTicketQR(qrData, qrId), 0);
+
+          return `
+            <div class="ticket-card ${s}">
+              <div class="ticket-visual">
+                <div class="ticket-top">
+                  <div class="ticket-logo">ET<span>FC</span></div>
+                  <span class="ticket-badge ${BADGE_CLASS[s]}">${BADGE_LABEL[s]}</span>
+                </div>
+                <div class="ticket-main">
+                  <div class="ticket-event-info">
+                    <div class="ticket-event-label">ETFC Fight Night</div>
+                    <div class="ticket-event-name">Millennium Hall</div>
+                    <div class="ticket-event-date">${EVENT_DATE_STR} &middot; ${EVENT_TIME_STR}</div>
+                  </div>
+                  <div class="ticket-qr-wrap" id="${qrId}"></div>
+                </div>
+              </div>
+              <div class="ticket-bottom">
+                <div class="ticket-field">
+                  <div class="ticket-field-label">Seats</div>
+                  <div class="ticket-field-value seats">${seats}</div>
+                </div>
+                <div class="ticket-field">
+                  <div class="ticket-field-label">Section</div>
+                  <div class="ticket-field-value">${(o.seats || [])[0]?.split("-")[0] || "—"}</div>
+                </div>
+                <div class="ticket-field">
+                  <div class="ticket-field-label">Ticket Code</div>
+                  <div class="ticket-field-value code">${ticketCode}</div>
+                </div>
+              </div>
+              <div class="ticket-footer">
+                <span>${o.buyerName || "Guest"}</span>
+                <span class="ticket-footer-note">Present QR at entry • Non-transferable</span>
+              </div>
+            </div>`;
         }).join("");
       }
     } catch (err) {
