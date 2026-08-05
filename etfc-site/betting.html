@@ -148,13 +148,12 @@
 
       <p id="betSubmitError" class="error-msg" style="display:none;"></p>
       
-    </div>
+    </div><!-- end modal-body betSlipForm -->
     <!-- Sticky Submit Button outside scroll area -->
     <div class="modal-footer" style="position:sticky;bottom:0;padding:16px 24px;background:var(--obsidian-2,#111);border-top:1px solid var(--border);z-index:10;">
+      <p id="betSubmitError" class="error-msg" style="display:none;margin-bottom:8px;color:var(--crimson-bright);"></p>
       <button class="btn btn-primary btn-block" id="submitBetBtn" onclick="submitBet()">Submit Bet</button>
-      <p id="betSubmitError" class="error-msg" style="display:none;margin-top:8px;"></p>
     </div>
-    <div style="display:none"><!-- end betSlipForm wrapper -->
 
     <!-- Success State -->
     <div id="betSlipPending" class="modal-body success-state" style="display:none;">
@@ -165,7 +164,7 @@
         ETFC is reviewing your payment. Your bet goes live once approved — check
         <a href="dashboard.html" style="color:var(--gold-bright);">My Account</a> for status.
       </p>
-      <button class="btn btn-outline btn-block mt-24" onclick="closeBetSlip()">Done</button>
+      <button class="btn btn-outline btn-block mt-24" onclick="closeBetSlip(true)">Done</button>
     </div>
   </div>
 </div>
@@ -314,14 +313,25 @@
     });
   }
 
-  function closeBetSlip() {
+  function closeBetSlip(clearAll = false) {
     document.getElementById("betSlipModal").classList.remove("open");
-    // Reset file + error only, keep legs so user can come back to the slip
+    // Always reset file + error
     chosenBetFile = null;
     document.getElementById("betUploadLabel").textContent = "Tap to upload payment screenshot";
     document.getElementById("betScreenshotInput").value = "";
     const errEl = document.getElementById("betSubmitError");
     if (errEl) errEl.style.display = "none";
+    // Reset submit button in case it was stuck
+    const btn = document.getElementById("submitBetBtn");
+    if (btn) { btn.removeAttribute("disabled"); btn.textContent = "Submit Bet"; }
+    // If coming from success state (Done button), clear everything
+    if (clearAll) {
+      betLegs = [];
+      refreshBetSlip();
+      document.getElementById("betSlipForm").style.display = "block";
+      document.getElementById("betSlipPending").style.display = "none";
+      document.getElementById("betAmount").value = "";
+    }
   }
 
   // Allow clicking preview/indicator to open modal
@@ -507,8 +517,12 @@
       betLegs = [];
       chosenBetFile = null;
 
+      betLegs = [];
+      chosenBetFile = null;
       document.getElementById("betSlipForm").style.display = "none";
       document.getElementById("betSlipPending").style.display = "block";
+      // Also reset the floating indicator
+      refreshBetSlip();
     } catch (err) {
       showBetSubmitError(err.message || "Upload failed — check your connection and try again.");
       btn.removeAttribute("disabled");
