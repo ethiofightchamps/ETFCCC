@@ -99,7 +99,6 @@
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-storage-compat.js"></script>
 <script src="js/firebase-config.js"></script>
 <script src="js/auth.js"></script>
 <script src="js/partials.js"></script>
@@ -146,16 +145,18 @@
     btn.textContent = "Uploading screenshot…";
 
     try {
-      // Upload straight to Firebase Storage from the browser — NOT through
-      // the Vercel API. A base64-encoded photo can easily exceed Vercel's
-      // 4.5MB serverless function request-body limit; going client → Storage
-      // directly avoids that ceiling entirely (Storage's own limit here is
-      // 5MB raw, enforced above and in storage.rules).
-      const uid = auth.currentUser.uid;
-      const path = `payment-screenshots/${uid}/${Date.now()}-${chosenFile.name}`;
-      const storageRef = storage.ref().child(path);
-      await storageRef.put(chosenFile);
-      const screenshotUrl = await storageRef.getDownloadURL();
+      // Upload to Cloudinary (unsigned preset — no CORS issues, no credit card)
+      const formData = new FormData();
+      formData.append("file", chosenFile);
+      formData.append("upload_preset", "etfc_uploads");
+      formData.append("folder", "payment-screenshots");
+      const cloudRes = await fetch("https://api.cloudinary.com/v1_1/yryolq8j/image/upload", {
+        method: "POST",
+        body: formData,
+      });
+      if (!cloudRes.ok) throw new Error("Screenshot upload failed — please try again.");
+      const cloudData = await cloudRes.json();
+      const screenshotUrl = cloudData.secure_url;
 
       btn.textContent = "Submitting…";
 

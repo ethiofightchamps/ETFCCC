@@ -90,7 +90,6 @@
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-storage-compat.js"></script>
 <script src="js/firebase-config.js"></script>
 <script src="js/auth.js"></script>
 <script src="js/partials.js"></script>
@@ -271,14 +270,18 @@
     btn.textContent = "Uploading screenshot…";
 
     try {
-      // Upload straight to Firebase Storage from the browser — same fix as
-      // tickets.html. Base64 through the API was crashing Vercel's 4.5MB
-      // request-body limit; this sidesteps it entirely.
-      const uid = auth.currentUser.uid;
-      const path = `bet-screenshots/${uid}/${Date.now()}-${chosenBetFile.name}`;
-      const storageRef = storage.ref().child(path);
-      await storageRef.put(chosenBetFile);
-      const screenshotUrl = await storageRef.getDownloadURL();
+      // Upload to Cloudinary (unsigned preset — no CORS issues, no credit card)
+      const formData = new FormData();
+      formData.append("file", chosenBetFile);
+      formData.append("upload_preset", "etfc_uploads");
+      formData.append("folder", "bet-screenshots");
+      const cloudRes = await fetch("https://api.cloudinary.com/v1_1/yryolq8j/image/upload", {
+        method: "POST",
+        body: formData,
+      });
+      if (!cloudRes.ok) throw new Error("Screenshot upload failed — please try again.");
+      const cloudData = await cloudRes.json();
+      const screenshotUrl = cloudData.secure_url;
 
       btn.textContent = "Submitting…";
 
