@@ -34,6 +34,40 @@ const SEAT_CONFIG = [
 const SOLD_SEATS = new Set();
 let selectedSeats = {};
 
+// SOLD_SEATS used to just sit empty forever — nothing ever populated it from
+// Firestore, so the map always showed every seat as available even after an
+// admin approved an order and marked those seats "sold". Pull real status
+// in before the first render.
+async function loadSeatAvailability() {
+  try {
+    const snap = await db.collection("seatMap").get();
+    snap.forEach((doc) => {
+      const status = doc.data().status;
+      if (status === "sold" || status === "pending") SOLD_SEATS.add(doc.id);
+    });
+  } catch (err) {
+    console.warn("Could not load live seat availability:", err);
+  }
+}
+
+function getSectionSeatIds(sec) {
+  const ids = [];
+  for (let r = 0; r < sec.rings; r++) {
+    const rowLetter = String.fromCharCode(65 + r);
+    for (let s = 0; s < sec.seatsPerRing; s++) {
+      ids.push(`${sec.section}-${rowLetter}-${s + 1}`);
+    }
+  }
+  return ids;
+}
+
+function seatIdToEntry(seatId, sec) {
+  const parts = seatId.split("-");
+  const num = parts[parts.length - 1];
+  const rowLetter = parts[parts.length - 2];
+  return { section: sec.section, tier: sec.tier, price: sec.price, label: `${sec.section} ${rowLetter}${num}` };
+}
+
 function renderSeatMap(sectionFilter = "all") {
   const mount = document.getElementById("seatMapMount");
   if (!mount) return;
@@ -49,7 +83,7 @@ function renderSeatMap(sectionFilter = "all") {
 
   sectionsToRender.forEach((sec) => {
     html += `<div class="seat-section" data-section="${sec.section}">`;
-    if (sectionFilter === "all") {
+    if (sectionFilter !== "all") {
       html += `<div class="seat-section-label">${sec.section} — ${sec.price.toLocaleString()} ETB</div>`;
     }
     html += `<div class="seat-rings">`;
@@ -112,6 +146,66 @@ function toggleSeat(el) {
     el.classList.add("selected");
   }
   renderSelectionPanel();
+  renderMobileTierPicker();
+}
+
+// ── Mobile tier picker: tapping precise 16px seats on a 300px-wide ring is
+// basically impossible on a phone. Instead show one card per section with a
+// quantity stepper — it auto-picks the next available seat(s) in that
+// section behind the scenes, writing to the exact same selectedSeats object
+// the desktop click-map uses, so checkout/pricing/Firestore locking all work
+// identically either way. ──────────────────────────────────────────────────
+function idSafe(sectionName) {
+  return sectionName.replace(/\s+/g, "");
+}
+
+function renderMobileTierPicker() {
+  const mount = document.getElementById("tierPickerMount");
+  if (!mount) return;
+
+  mount.innerHTML = SEAT_CONFIG.map((sec) => {
+    const seatIds = getSectionSeatIds(sec);
+    const selectedCount = seatIds.filter((id) => selectedSeats[id]).length;
+    const availableCount = seatIds.filter((id) => !SOLD_SEATS.has(id) && !selectedSeats[id]).length;
+    const key = idSafe(sec.section);
+
+    return `
+      <div class="tier-pick-card">
+        <div class="tier-pick-info">
+          <div class="tier-pick-name">${sec.section}</div>
+          <div class="tier-pick-price">${sec.price.toLocaleString()} ETB / seat</div>
+          <div class="tier-pick-avail" id="tierAvail-${key}">${availableCount} left</div>
+        </div>
+        <div class="tier-pick-stepper">
+          <button type="button" onclick="adjustTierQty('${sec.section}', -1)" ${selectedCount === 0 ? "disabled" : ""} aria-label="Remove a ${sec.section} seat">&minus;</button>
+          <span id="tierQty-${key}">${selectedCount}</span>
+          <button type="button" onclick="adjustTierQty('${sec.section}', 1)" ${availableCount === 0 ? "disabled" : ""} aria-label="Add a ${sec.section} seat">+</button>
+        </div>
+      </div>`;
+  }).join("");
+}
+
+function adjustTierQty(sectionName, delta) {
+  const sec = SEAT_CONFIG.find((s) => s.section === sectionName);
+  if (!sec) return;
+
+  const seatIds = getSectionSeatIds(sec);
+
+  if (delta > 0) {
+    const nextId = seatIds.find((id) => !SOLD_SEATS.has(id) && !selectedSeats[id]);
+    if (!nextId) {
+      if (typeof showToast === "function") showToast(`No more ${sectionName} seats available.`, "error");
+      return;
+    }
+    selectedSeats[nextId] = seatIdToEntry(nextId, sec);
+  } else {
+    const currentIds = seatIds.filter((id) => selectedSeats[id]);
+    const lastId = currentIds[currentIds.length - 1];
+    if (lastId) delete selectedSeats[lastId];
+  }
+
+  renderMobileTierPicker();
+  renderSelectionPanel();
 }
 
 function renderSelectionPanel() {
@@ -156,4 +250,8 @@ function proceedToCheckout() {
   });
 }
 
-document.addEventListener("DOMContentLoaded", () => renderSeatMap("all"));
+document.addEventListener("DOMContentLoaded", async () => {
+  await loadSeatAvailability();
+  renderSeatMap("all");
+  renderMobileTierPicker();
+});

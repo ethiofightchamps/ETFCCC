@@ -68,6 +68,21 @@ function completeSignIn(sessionData) {
   localStorage.setItem("etfc_session", JSON.stringify({ ...sessionData, ts: Date.now() }));
 }
 
+// Sessions created before uid was added to verify-otp's response are
+// missing session.uid, which silently breaks "userId" on any order/bet
+// they place afterward. Firebase itself still knows who they are (auth
+// persists across reloads), so patch it in here rather than forcing
+// everyone affected to log out and back in.
+if (typeof firebase !== "undefined" && firebase.auth) {
+  firebase.auth().onAuthStateChanged((user) => {
+    if (!user) return;
+    const session = currentSession();
+    if (session && !session.uid) {
+      completeSignIn({ ...session, uid: user.uid });
+    }
+  });
+}
+
 function logOut(e) {
   if (e) e.preventDefault();
   localStorage.removeItem("etfc_session");
@@ -242,7 +257,7 @@ async function verifyEmailOtp() {
     if (!res.ok) throw new Error(data.error || "Incorrect or expired code.");
 
     await auth.signInWithCustomToken(data.token);
-    completeSignIn({ name: data.name, phone: data.phone, email: data.email, method: "email" });
+    completeSignIn({ name: data.name, phone: data.phone, email: data.email, uid: data.uid, method: "email" });
     showToast(`Welcome, ${data.name.split(" ")[0]}!`, "success");
   } catch (err) {
     console.error("verifyEmailOtp failed:", err);

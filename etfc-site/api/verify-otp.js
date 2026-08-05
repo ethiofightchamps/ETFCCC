@@ -89,7 +89,7 @@ module.exports = async (req, res) => {
     await docRef.delete();
 
     const token = await admin.auth().createCustomToken(userRecord.uid);
-    return res.status(200).json({ token, name: data.name, phone: data.phone, email: email.toLowerCase() });
+    return res.status(200).json({ token, uid: userRecord.uid, name: data.name, phone: data.phone, email: email.toLowerCase() });
   } catch (err) {
     console.error("verify-otp failed:", err);
     return res.status(500).json({ error: "Something went wrong verifying your code." });
