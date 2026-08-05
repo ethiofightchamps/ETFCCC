@@ -42,21 +42,25 @@
       // Try email first, fall back to showing all orders where email matches
       const ordersSnap = await db.collection("orders")
         .where("userId", "==", user.uid)
-        .orderBy("createdAt", "desc")
         .get();
+
+      // Sort client-side so we don't need a composite index
+      const orderDocs = ordersSnap.docs.sort((a, b) => {
+        const ta = a.data().createdAt?.toMillis?.() || 0;
+        const tb = b.data().createdAt?.toMillis?.() || 0;
+        return tb - ta;
+      });
 
       const ticketsEl = document.getElementById("ticketsContainer");
       if (ordersSnap.empty) {
         ticketsEl.innerHTML = '<p class="text-dim">No tickets yet — <a href="tickets.html" style="color:var(--gold-bright);">get tickets</a>.</p>';
-        // Clear any stale pending order so tickets page resets
         localStorage.removeItem("etfc_pending_order");
       } else {
-        // If any order is confirmed, clear the pending order flag so tickets.html resets
-        const hasConfirmed = ordersSnap.docs.some(d => d.data().status === "confirmed");
+        const hasConfirmed = orderDocs.some(d => d.data().status === "confirmed");
         if (hasConfirmed) localStorage.removeItem("etfc_pending_order");
 
         ticketsEl.innerHTML = '<div class="grid-2">' +
-          ordersSnap.docs.map(doc => {
+          orderDocs.map(doc => {
             const o = doc.data();
             const seats = (o.seats || []).join(", ") || "—";
             const statusClass = o.status === "confirmed" ? "confirmed" : o.status === "rejected" ? "rejected" : "pending";
@@ -85,15 +89,20 @@
     try {
       const betsSnap = await db.collection("bets")
         .where("userId", "==", user.uid)
-        .orderBy("createdAt", "desc")
         .get();
+
+      const betDocs = betsSnap.docs.sort((a, b) => {
+        const ta = a.data().createdAt?.toMillis?.() || 0;
+        const tb = b.data().createdAt?.toMillis?.() || 0;
+        return tb - ta;
+      });
 
       const betsEl = document.getElementById("betsContainer");
       if (betsSnap.empty) {
         betsEl.innerHTML = '<p class="text-dim">No bets yet.</p>';
       } else {
         betsEl.innerHTML = '<div class="grid-2">' +
-          betsSnap.docs.map(doc => {
+          betDocs.map(doc => {
             const b = doc.data();
             const statusClass = b.status === "confirmed" ? "confirmed" : b.status === "rejected" ? "rejected" : "pending";
             const statusLabel = b.status === "confirmed" ? "Confirmed" : b.status === "rejected" ? "Rejected" : "Pending";

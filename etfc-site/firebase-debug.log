@@ -1,0 +1,49 @@
+[debug] [2026-08-05T11:16:17.244Z] ----------------------------------------------------------------------
+[debug] [2026-08-05T11:16:17.248Z] Command:       C:\Program Files\nodejs\node.exe C:\Users\PC\AppData\Roaming\npm\node_modules\firebase-tools\lib\bin\firebase.js deploy --only firestore:indexes
+[debug] [2026-08-05T11:16:17.249Z] CLI Version:   15.25.1
+[debug] [2026-08-05T11:16:17.249Z] Platform:      win32
+[debug] [2026-08-05T11:16:17.249Z] Node Version:  v26.3.0
+[debug] [2026-08-05T11:16:17.249Z] Detected Agent: unknown
+[debug] [2026-08-05T11:16:17.249Z] Time:          Wed Aug 05 2026 14:16:17 GMT+0300 (East Africa Time)
+[debug] [2026-08-05T11:16:17.249Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2026-08-05T11:16:21.412Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2026-08-05T11:16:21.413Z] > authorizing via signed-in user (ethiofightchamps@gmail.com)
+[debug] [2026-08-05T11:16:21.413Z] [iam] checking project etfc-75f9d for permissions ["datastore.indexes.create","datastore.indexes.delete","datastore.indexes.list","datastore.indexes.update","firebase.projects.get"]
+[debug] [2026-08-05T11:16:21.435Z] Checked if tokens are valid: true, expires at: 1785930924865
+[debug] [2026-08-05T11:16:21.436Z] Checked if tokens are valid: true, expires at: 1785930924865
+[debug] [2026-08-05T11:16:21.438Z] >>> [apiv2][query] POST https://cloudresourcemanager.googleapis.com/v1/projects/etfc-75f9d:testIamPermissions [none]
+[debug] [2026-08-05T11:16:21.439Z] >>> [apiv2][(partial)header] POST https://cloudresourcemanager.googleapis.com/v1/projects/etfc-75f9d:testIamPermissions  x-goog-user-project=etfc-75f9d
+[debug] [2026-08-05T11:16:21.439Z] >>> [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/etfc-75f9d:testIamPermissions {"permissions":["datastore.indexes.create","datastore.indexes.delete","datastore.indexes.list","datastore.indexes.update","firebase.projects.get"]}
+[debug] [2026-08-05T11:16:24.606Z] <<< [apiv2][status] POST https://cloudresourcemanager.googleapis.com/v1/projects/etfc-75f9d:testIamPermissions 200
+[debug] [2026-08-05T11:16:24.607Z] <<< [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/etfc-75f9d:testIamPermissions {"permissions":["datastore.indexes.create","datastore.indexes.delete","datastore.indexes.list","datastore.indexes.update","firebase.projects.get"]}
+[info] 
+[info] === Deploying to 'etfc-75f9d'...
+[info] 
+[info] i  deploying firestore 
+[info] i  firestore: ensuring required API firestore.googleapis.com is enabled... 
+[info] i  firestore: ensuring required API firestore.googleapis.com is enabled... 
+[debug] [2026-08-05T11:16:24.622Z] Checked if tokens are valid: true, expires at: 1785930924865
+[debug] [2026-08-05T11:16:24.622Z] Checked if tokens are valid: true, expires at: 1785930924865
+[debug] [2026-08-05T11:16:24.622Z] >>> [apiv2][query] GET https://firestore.googleapis.com/v1/projects/etfc-75f9d/databases/(default) [none]
+[debug] [2026-08-05T11:16:26.036Z] <<< [apiv2][status] GET https://firestore.googleapis.com/v1/projects/etfc-75f9d/databases/(default) 200
+[debug] [2026-08-05T11:16:26.037Z] <<< [apiv2][body] GET https://firestore.googleapis.com/v1/projects/etfc-75f9d/databases/(default) {"name":"projects/etfc-75f9d/databases/(default)","uid":"8f4c9299-6b74-4c90-8c04-63125e472b5a","createTime":"2026-08-03T23:58:00.449040Z","updateTime":"2026-08-03T23:58:00.449040Z","locationId":"eur3","type":"FIRESTORE_NATIVE","concurrencyMode":"PESSIMISTIC","versionRetentionPeriod":"3600s","earliestVersionTime":"2026-08-05T10:16:26.653181Z","appEngineIntegrationMode":"DISABLED","keyPrefix":"e","pointInTimeRecoveryEnablement":"POINT_IN_TIME_RECOVERY_DISABLED","deleteProtectionState":"DELETE_PROTECTION_DISABLED","databaseEdition":"STANDARD","freeTier":true,"realtimeUpdatesMode":"REALTIME_UPDATES_MODE_ENABLED","etag":"IOfZgbiuiZYDMNOBm5jVhZYD"}
+[info] i  cloud.firestore: checking firestore.rules for compilation errors... 
+[debug] [2026-08-05T11:16:26.041Z] Checked if tokens are valid: true, expires at: 1785930924865
+[debug] [2026-08-05T11:16:26.042Z] Checked if tokens are valid: true, expires at: 1785930924865
+[debug] [2026-08-05T11:16:26.042Z] >>> [apiv2][query] POST https://firebaserules.googleapis.com/v1/projects/etfc-75f9d:test [none]
+[debug] [2026-08-05T11:16:26.042Z] >>> [apiv2][body] POST https://firebaserules.googleapis.com/v1/projects/etfc-75f9d:test [omitted]
+[debug] [2026-08-05T11:16:27.268Z] <<< [apiv2][status] POST https://firebaserules.googleapis.com/v1/projects/etfc-75f9d:test 200
+[debug] [2026-08-05T11:16:27.269Z] <<< [apiv2][body] POST https://firebaserules.googleapis.com/v1/projects/etfc-75f9d:test {}
+[info] +  cloud.firestore: rules file firestore.rules compiled successfully 
+[info] i  firestore: deploying indexes... 
+[info] 
+[info] +  Deploy complete! 
+[info] 
+[info] Project Console: https://console.firebase.google.com/project/etfc-75f9d/overview
+[debug] [2026-08-05T11:16:35.284Z] Error: Timed out.
+    at Timeout._onTimeout (C:\Users\PC\AppData\Roaming\npm\node_modules\firebase-tools\lib\utils.js:296:49)
+    at listOnTimeout (node:internal/timers:605:17)
+    at process.processTimers (node:internal/timers:541:7)
+[error] 
+[error] Error: An unexpected error has occurred.

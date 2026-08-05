@@ -26,6 +26,7 @@ function renderNav(activePage) {
   const session = currentSession();
   const authHtml = session
     ? `<span class="nav-user" title="${session.email || ''}">${(session.name || 'Account').split(' ')[0]}</span>
+       <a href="dashboard.html" class="nav-link-auth${activePage === 'dashboard' ? ' active' : ''}">My Tickets</a>
        <a href="#" class="btn btn-outline btn-sm" onclick="logOut(event)">Log Out</a>`
     : `<a href="login.html" class="nav-link-auth">Log In</a>
        <a href="signup.html" class="btn btn-outline btn-sm">Sign Up</a>`;
