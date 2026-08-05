@@ -6,10 +6,10 @@
 //   Last Rows — 600 seats  — 1,500 ETB   (6 rings × 100 seats)
 
 const SEAT_CONFIG = [
-  { section: "Ringside",  tier: "ringside", price: 40000, rings: 2, seatsPerRing: 50, radiusStart: 110, radiusStep: 35 },
-  { section: "VIP",       tier: "vip",      price: 9000,  rings: 4, seatsPerRing: 50, radiusStart: 180, radiusStep: 35 },
-  { section: "Middle",    tier: "ga",       price: 2000,  rings: 6, seatsPerRing: 100, radiusStart: 320, radiusStep: 32 },
-  { section: "Last Rows", tier: "ga",       price: 1500,  rings: 6, seatsPerRing: 100, radiusStart: 512, radiusStep: 32 },
+  { section: "Ringside",  tier: "ringside", price: 40000, rings: 2, seatsPerRing: 50, radiusStart: 100, radiusStep: 25 },
+  { section: "VIP",       tier: "vip",      price: 9000,  rings: 4, seatsPerRing: 50, radiusStart: 155, radiusStep: 25 },
+  { section: "Middle",    tier: "ga",       price: 2000,  rings: 6, seatsPerRing: 80, radiusStart: 260, radiusStep: 22 },
+  { section: "Last Rows", tier: "ga",       price: 1500,  rings: 6, seatsPerRing: 120, radiusStart: 380, radiusStep: 22 },
 ];
 
 const SOLD_SEATS = new Set();
