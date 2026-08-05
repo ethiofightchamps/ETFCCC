@@ -1,4 +1,4 @@
-// ── SEAT MAP (Circular Arena Layout) ──────────────────────────────────────
+// ── SEAT MAP (Circular Arena Layout with Section Tabs) ────────────────────
 // Real ETFC venue layout — 1,500 seats in concentric rings around the ring:
 //   Ringside  — 100 seats  — 40,000 ETB  (2 rings × 50 seats)
 //   VIP       — 200 seats  — 9,000 ETB   (4 rings × 50 seats)
@@ -15,18 +15,24 @@ const SEAT_CONFIG = [
 const SOLD_SEATS = new Set();
 let selectedSeats = {};
 
-function renderSeatMap() {
+function renderSeatMap(sectionFilter = "all") {
   const mount = document.getElementById("seatMapMount");
   if (!mount) return;
+
+  const sectionsToRender = sectionFilter === "all"
+    ? SEAT_CONFIG
+    : SEAT_CONFIG.filter(s => s.section === sectionFilter);
 
   let html = `
     <div class="arena">
       <div class="ring-center">RING</div>
   `;
 
-  SEAT_CONFIG.forEach((sec) => {
+  sectionsToRender.forEach((sec) => {
     html += `<div class="seat-section" data-section="${sec.section}">`;
-    html += `<div class="seat-section-label">${sec.section} — ${sec.price.toLocaleString()} ETB</div>`;
+    if (sectionFilter === "all") {
+      html += `<div class="seat-section-label">${sec.section} — ${sec.price.toLocaleString()} ETB</div>`;
+    }
     html += `<div class="seat-rings">`;
 
     for (let r = 0; r < sec.rings; r++) {
@@ -130,4 +136,4 @@ function proceedToCheckout() {
   });
 }
 
-document.addEventListener("DOMContentLoaded", renderSeatMap);
+document.addEventListener("DOMContentLoaded", () => renderSeatMap("all"));

@@ -17,16 +17,25 @@
 
   <!-- STEP 1: SEAT SELECTION -->
   <div id="seatStep">
+    <!-- Section Tabs -->
+    <div class="section-tabs" id="sectionTabs" role="tablist">
+      <button class="section-tab active" role="tab" data-section="all" onclick="switchSection('all')">All Sections</button>
+      <button class="section-tab" role="tab" data-section="Ringside" onclick="switchSection('Ringside')">Ringside</button>
+      <button class="section-tab" role="tab" data-section="VIP" onclick="switchSection('VIP')">VIP</button>
+      <button class="section-tab" role="tab" data-section="Middle" onclick="switchSection('Middle')">Middle</button>
+      <button class="section-tab" role="tab" data-section="Last Rows" onclick="switchSection('Last Rows')">Last Rows</button>
+    </div>
+
     <div class="grid-2" style="grid-template-columns: 2fr 1fr; align-items:start;">
       <div>
         <div class="venue-map">
           <div id="seatMapMount"></div>
           <div class="seat-legend">
-            <div class="item"><span class="swatch" style="background:rgba(176,141,62,0.25);border:1px solid var(--gold);"></span>Ringside</div>
-            <div class="item"><span class="swatch" style="background:rgba(179,20,28,0.25);border:1px solid var(--crimson);"></span>VIP</div>
-            <div class="item"><span class="swatch" style="background:rgba(232,228,220,0.08);border:1px solid var(--border);"></span>General Admission</div>
-            <div class="item"><span class="swatch" style="background:var(--success);"></span>Selected</div>
-            <div class="item"><span class="swatch" style="background:#1a1a1a;opacity:0.4;"></span>Sold</div>
+            <div class="item"><span class="swatch ringside"></span>Ringside</div>
+            <div class="item"><span class="swatch vip"></span>VIP</div>
+            <div class="item"><span class="swatch ga"></span>General Admission</div>
+            <div class="item"><span class="swatch selected"></span>Selected</div>
+            <div class="item"><span class="swatch sold"></span>Sold</div>
           </div>
         </div>
       </div>
@@ -118,6 +127,15 @@
   }
 
   let chosenFile = null;
+  let currentSection = "all";
+
+  function switchSection(section) {
+    currentSection = section;
+    document.querySelectorAll(".section-tab").forEach(btn => {
+      btn.classList.toggle("active", btn.dataset.section === section);
+    });
+    if (typeof renderSeatMap === "function") renderSeatMap(section);
+  }
 
   function onScreenshotChosen(input) {
     const file = input.files[0];
@@ -191,7 +209,7 @@
           document.getElementById("checkoutStep").style.display = "none";
           document.getElementById("seatStep").style.display = "block";
           selectedSeats = {};
-          if (typeof renderSeatMap === "function") renderSeatMap();
+          if (typeof renderSeatMap === "function") renderSeatMap(currentSection);
           renderSelectionPanel();
         }, 2500);
         btn.removeAttribute("disabled");
