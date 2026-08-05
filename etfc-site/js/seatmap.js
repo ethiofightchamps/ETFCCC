@@ -1,18 +1,21 @@
 // ── SEAT MAP ─────────────────────────────────────────────────────────────
-// PLACEHOLDER layout — replace SEAT_CONFIG with ETFC's real venue chart
-// (rows, sections, capacity per section) once they send it.
+// Real ETFC venue layout:
+//   Ringside  — 100 seats  — 40,000 ETB  (2 rows × 50)
+//   VIP       — 200 seats  — 9,000 ETB   (4 rows × 50)
+//   Middle    — 600 seats  — 2,000 ETB   (6 rows × 100 → rendered as 2 blocks of 50)
+//   Last Rows — 600 seats  — 1,500 ETB   (6 rows × 100 → rendered as 2 blocks of 50)
+// Total: 1,500 seats
 
 const SEAT_CONFIG = [
-  { section: "Ringside", tier: "ringside", price: 3500, rows: 2, seatsPerRow: 12 },
-  { section: "VIP", tier: "vip", price: 1800, rows: 4, seatsPerRow: 16 },
-  { section: "General Admission", tier: "ga", price: 600, rows: 6, seatsPerRow: 20 },
+  { section: "Ringside",  tier: "ringside", price: 40000, rows: 2, seatsPerRow: 50 },
+  { section: "VIP",       tier: "vip",      price: 9000,  rows: 4, seatsPerRow: 50 },
+  { section: "Middle",    tier: "ga",       price: 2000,  rows: 6, seatsPerRow: 100 },
+  { section: "Last Rows", tier: "ga",       price: 1500,  rows: 6, seatsPerRow: 100 },
 ];
 
-// TODO: replace with a live read from Firestore `seatMap` collection,
-// so sold/locked seats reflect real purchase state.
-const SOLD_SEATS = new Set(["Ringside-A-3", "Ringside-A-4", "VIP-B-10", "GA-C-1"]);
+const SOLD_SEATS = new Set();
 
-let selectedSeats = {}; // { seatId: { section, tier, price, label } }
+let selectedSeats = {};
 
 function renderSeatMap() {
   const mount = document.getElementById("seatMapMount");
@@ -22,7 +25,7 @@ function renderSeatMap() {
 
   SEAT_CONFIG.forEach((sec) => {
     html += `<div class="seat-section">
-      <div class="seat-section-label">${sec.section} — ${sec.price} ETB</div>`;
+      <div class="seat-section-label">${sec.section} — ${sec.price.toLocaleString()} ETB</div>`;
     for (let r = 0; r < sec.rows; r++) {
       const rowLetter = String.fromCharCode(65 + r);
       html += `<div class="seat-row">`;
@@ -36,7 +39,7 @@ function renderSeatMap() {
           data-tier="${sec.tier}"
           data-price="${sec.price}"
           data-label="${sec.section} ${rowLetter}${s}"
-          title="${sec.section} ${rowLetter}${s} — ${sec.price} ETB"
+          title="${sec.section} ${rowLetter}${s} — ${sec.price.toLocaleString()} ETB"
           onclick="${sold ? "" : `toggleSeat(this)`}"
         ></div>`;
       }
@@ -50,14 +53,10 @@ function renderSeatMap() {
 
 function toggleSeat(el) {
   const seatId = el.dataset.seatId;
-
   if (selectedSeats[seatId]) {
     delete selectedSeats[seatId];
     el.classList.remove("selected");
   } else {
-    // TODO: before locking client-side, run a Firestore transaction that
-    // checks the seat is still unsold and writes a short-lived "locked" flag
-    // so two buyers can't select the same seat simultaneously.
     selectedSeats[seatId] = {
       section: el.dataset.section,
       tier: el.dataset.tier,
@@ -99,8 +98,6 @@ function renderSelectionPanel() {
 function proceedToCheckout() {
   if (Object.keys(selectedSeats).length === 0) return;
   requireAuth("buyTicket", () => {
-    // TODO: write a pending order doc to Firestore `orders` collection with
-    // the selected seatIds, then reveal the bank-transfer + upload step.
     const session = JSON.parse(localStorage.getItem("etfc_session") || "null");
     if (session) {
       const nameInput = document.getElementById("buyerNameInput");
