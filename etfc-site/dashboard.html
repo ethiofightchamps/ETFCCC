@@ -175,10 +175,9 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 12px;
-    padding: 10px 24px;
-    background: rgba(0,0,0,0.15);
-    border-top: 1px dashed rgba(176,141,62,0.2);
+    gap: 20px;
+    padding: 12px 0;
+    flex-wrap: wrap;
   }
   .ticket-sponsor-label {
     font-family: var(--font-mono);
@@ -189,12 +188,35 @@
     margin-right: 4px;
   }
   .ticket-sponsor-row img {
-    width: 34px;
-    height: 34px;
-    border-radius: 50%;
-    object-fit: cover;
+    height: 36px;
+    width: auto;
+    max-width: 120px;
+    display: block;
     filter: grayscale(40%);
     opacity: 0.95;
+  }
+
+  @media (max-width: 600px) {
+    .ticket-sponsor-row {
+      gap: 12px;
+      padding: 8px 0;
+    }
+    .ticket-sponsor-row img {
+      height: 28px;
+      max-width: 100px;
+    }
+    .ticket-sponsor-label {
+      font-size: 8px;
+    }
+  }
+  @media (max-width: 400px) {
+    .ticket-sponsor-row img {
+      height: 24px;
+      max-width: 80px;
+    }
+    .ticket-sponsor-row {
+      gap: 8px;
+    }
   }
 
   .empty-state {
