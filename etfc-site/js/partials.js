@@ -36,13 +36,31 @@ function renderNav(activePage) {
     <div class="nav-inner">
       <a href="index.html" class="nav-logo">ET<span>FC</span></a>
       <div class="nav-links">${linksHtml}</div>
-      <div style="display:flex;align-items:center;gap:14px;">
+      <div class="nav-actions">
         <div class="theme-toggle" onclick="toggleTheme()" title="Toggle light/dark mode" id="themeToggleBtn"></div>
-        ${authHtml}
-        <a href="tickets.html" class="nav-cta">Get Tickets</a>
+        <div class="nav-actions-desktop">
+          ${authHtml}
+          <a href="tickets.html" class="nav-cta">Get Tickets</a>
+        </div>
+        <button class="nav-hamburger" onclick="toggleMobileNav()" aria-label="Menu" aria-expanded="false" id="navHamburgerBtn">
+          <span></span><span></span><span></span>
+        </button>
       </div>
     </div>
+    <div class="nav-mobile-panel" id="navMobilePanel">
+      ${linksHtml}
+      <div class="nav-mobile-divider"></div>
+      ${authHtml}
+    </div>
   </nav>`;
+}
+
+function toggleMobileNav() {
+  const panel = document.getElementById("navMobilePanel");
+  const btn = document.getElementById("navHamburgerBtn");
+  const isOpen = panel.classList.toggle("open");
+  btn.classList.toggle("open", isOpen);
+  btn.setAttribute("aria-expanded", isOpen ? "true" : "false");
 }
 
 function renderSponsorsStrip() {

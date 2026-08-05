@@ -98,6 +98,27 @@ a { color: inherit; text-decoration: none; }
 }
 .nav-link-auth:hover { color: var(--gold); }
 .nav-user { font-size: 13px; font-weight: 600; color: var(--bone-dim); }
+.nav-actions { display: flex; align-items: center; gap: 14px; }
+.nav-actions-desktop { display: flex; align-items: center; gap: 14px; }
+.nav-hamburger {
+  display: none; flex-direction: column; justify-content: center; gap: 5px;
+  width: 36px; height: 36px; background: none; border: none; cursor: pointer; padding: 0;
+}
+.nav-hamburger span { width: 22px; height: 2px; background: var(--bone); transition: transform 0.15s, opacity 0.15s; }
+.nav-hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+.nav-hamburger.open span:nth-child(2) { opacity: 0; }
+.nav-hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+.nav-mobile-panel {
+  display: none; flex-direction: column; padding: 8px 24px 20px;
+  border-top: 1px solid var(--border); background: var(--nav-bg);
+}
+.nav-mobile-panel.open { display: flex; }
+.nav-mobile-panel a, .nav-mobile-panel .nav-link-auth, .nav-mobile-panel .nav-user {
+  padding: 12px 0; font-size: 14px; font-weight: 600; text-transform: uppercase;
+  letter-spacing: 0.5px; color: var(--bone-dim); border-bottom: 1px solid var(--border);
+}
+.nav-mobile-panel .btn { margin-top: 12px; }
+.nav-mobile-divider { display: none; }
 .nav-toggle { display: none; }
 
 /* ── AUTH PAGES (login.html / signup.html) ──────────────────────────── */
@@ -1222,6 +1243,7 @@ footer .copyright { font-size: 12px; color: var(--bone-dim); font-family: var(--
 
 /* ---------- UTIL ---------- */
 .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+.seat-select-grid { grid-template-columns: 2fr 1fr; }
 .grid-3 { display: grid; grid-template-columns: repeat(3,1fr); gap: 20px; }
 .text-dim { color: var(--bone-dim); }
 .mt-24 { margin-top: 24px; }
@@ -1235,17 +1257,20 @@ footer .copyright { font-size: 12px; color: var(--bone-dim); font-family: var(--
 .sticky-mobile-cta {
   display: none; position: fixed; bottom: 0; left: 0; right: 0; z-index: 150;
   background: var(--obsidian-2); border-top: 1px solid var(--border); padding: 12px 16px;
+  padding-bottom: calc(12px + env(safe-area-inset-bottom, 0px));
   gap: 10px;
 }
 @media (max-width: 860px) {
   .nav-links { display: none; }
+  .nav-actions-desktop { display: none; }
+  .nav-hamburger { display: flex; }
   .fighter-hero { grid-template-columns: 1fr; text-align: center; }
   .fighter-photo { margin: 0 auto; }
-  .grid-2, .grid-3, .tier-cards, .admin-stat-row { grid-template-columns: 1fr; }
+  .grid-2, .grid-3, .tier-cards, .admin-stat-row, .seat-select-grid { grid-template-columns: 1fr; }
   .admin-shell { grid-template-columns: 1fr; }
   .admin-sidebar { display: flex; overflow-x: auto; padding: 12px; }
   .sticky-mobile-cta { display: flex; }
-  body { padding-bottom: 70px; }
+  body { padding-bottom: calc(88px + env(safe-area-inset-bottom, 0px)); }
   .bout-row { grid-template-columns: 1fr; text-align: center; }
   .bout-row .matchup-line { flex-direction: column; }
   .bout-row .fighter-block.right { flex-direction: row; text-align: left; }

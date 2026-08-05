@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Get Tickets — ETFC</title>
-<script>(function(){var t=localStorage.getItem("etfc_theme")||"dark";document.documentElement.setAttribute("data-theme",t);})();</script>
+<script>(function(){var t=localStorage.getItem("etfc_theme")||"light";document.documentElement.setAttribute("data-theme",t);})();</script>
 <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
@@ -26,7 +26,7 @@
       <button class="section-tab" role="tab" data-section="Last Rows" onclick="switchSection('Last Rows')">Last Rows</button>
     </div>
 
-    <div class="grid-2" style="grid-template-columns: 2fr 1fr; align-items:start;">
+    <div class="grid-2 seat-select-grid" style="align-items:start;">
       <div>
         <div class="venue-map">
           <div id="seatMapMount"></div>

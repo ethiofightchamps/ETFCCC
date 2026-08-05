@@ -5,6 +5,25 @@
 //   Middle    — 600 seats  — 2,000 ETB   (6 rings × 100 seats)
 //   Last Rows — 600 seats  — 1,500 ETB   (6 rings × 100 seats)
 
+// Radius values in SEAT_CONFIG were tuned assuming a ~1000px-wide arena (its
+// CSS max-width). The arena is responsive (width:100%, aspect-ratio:1), so on
+// a narrow phone it renders much smaller — without scaling, seats positioned
+// with these raw pixel radii would sprawl far outside the tiny ring and pile
+// up on whatever sits below it. --ring-scale corrects for that.
+const REFERENCE_ARENA_WIDTH = 1000;
+
+function updateRingScale() {
+  const arena = document.querySelector(".arena");
+  if (!arena) return;
+  const scale = arena.clientWidth / REFERENCE_ARENA_WIDTH;
+  arena.style.setProperty("--ring-scale", scale);
+}
+
+window.addEventListener("resize", () => {
+  clearTimeout(window._ringScaleResizeTimer);
+  window._ringScaleResizeTimer = setTimeout(updateRingScale, 100);
+});
+
 const SEAT_CONFIG = [
   { section: "Ringside",  tier: "ringside", price: 40000, rings: 2, seatsPerRing: 50, radiusStart: 65, radiusStep: 25 },
   { section: "VIP",       tier: "vip",      price: 9000,  rings: 4, seatsPerRing: 50, radiusStart: 120, radiusStep: 25 },
@@ -62,7 +81,7 @@ function renderSeatMap(sectionFilter = "all") {
           data-price="${sec.price}"
           data-label="${sec.section} ${rowLetter}${s + 1}"
           title="${sec.section} ${rowLetter}${s + 1} — ${sec.price.toLocaleString()} ETB"
-          style="transform: translate(${x.toFixed(1)}px, ${y.toFixed(1)}px) rotate(${rotateDeg.toFixed(1)}deg);"
+          style="transform: translate(calc(${x.toFixed(1)}px * var(--ring-scale, 1)), calc(${y.toFixed(1)}px * var(--ring-scale, 1))) rotate(${rotateDeg.toFixed(1)}deg);"
           onclick="${sold ? "" : `toggleSeat(this)`}"
         ></div>`;
       }
@@ -75,6 +94,7 @@ function renderSeatMap(sectionFilter = "all") {
 
   html += `</div>`;
   mount.innerHTML = html;
+  updateRingScale();
 }
 
 function toggleSeat(el) {
