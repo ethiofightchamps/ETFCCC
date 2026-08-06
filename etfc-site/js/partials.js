@@ -105,7 +105,7 @@ function renderFooter() {
         <a href="fight-card.html">Fight Card</a>
         <a href="betting.html">Betting</a>
         <a href="tickets.html">Tickets</a>
-        <a href="about.html">About &amp; License</a>
+        <a href="about.html">About</a>
       </div>
       <div class="copyright">&copy; 2026 ETFC — Addis Ababa, Ethiopia</div>
     </div>

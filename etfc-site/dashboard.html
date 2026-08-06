@@ -189,9 +189,11 @@
   }
   .ticket-sponsor-row img {
     height: 36px;
-    width: auto;
+    width: 36px;
     max-width: 120px;
     display: block;
+    object-fit: cover;
+    border-radius: 50%;
     filter: grayscale(40%);
     opacity: 0.95;
   }
@@ -203,6 +205,7 @@
     }
     .ticket-sponsor-row img {
       height: 28px;
+      width: 28px;
       max-width: 100px;
     }
     .ticket-sponsor-label {
@@ -212,6 +215,7 @@
   @media (max-width: 400px) {
     .ticket-sponsor-row img {
       height: 24px;
+      width: 24px;
       max-width: 80px;
     }
     .ticket-sponsor-row {
