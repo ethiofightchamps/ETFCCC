@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Merch — ETFC</title>
+<script>(function(){var t=localStorage.getItem("etfc_theme")||"dark";document.documentElement.setAttribute("data-theme",t);})();</script>
+<link rel="stylesheet" href="css/style.css">
+<style>
+.merch-hero {
+  background: linear-gradient(135deg, #0a0a0a 0%, #1a0305 50%, #0d0a00 100%);
+  padding: 48px 24px 40px;
+  text-align: center;
+  border-bottom: 1px solid rgba(179,20,28,0.25);
+}
+.merch-hero-eyebrow { font-family:var(--font-mono); font-size:10px; letter-spacing:4px; color:var(--gold-bright); margin-bottom:10px; }
+.merch-hero-title { font-family:var(--font-display); font-size:clamp(36px,8vw,72px); font-weight:900; text-transform:uppercase; color:#fff; line-height:1; }
+.merch-hero-title span { color:var(--crimson-bright); }
+.merch-hero-sub { font-family:var(--font-mono); font-size:12px; color:var(--bone-dim); margin-top:10px; letter-spacing:2px; }
+
+.merch-coming-soon {
+  max-width: 700px;
+  margin: 64px auto;
+  padding: 0 24px;
+  text-align: center;
+}
+.merch-cs-icon { font-size: 64px; margin-bottom: 24px; }
+.merch-cs-title { font-family:var(--font-display); font-size:28px; font-weight:900; text-transform:uppercase; color:#fff; margin-bottom:12px; }
+.merch-cs-sub { color:var(--bone-dim); font-size:15px; line-height:1.6; margin-bottom:32px; }
+
+.merch-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 16px;
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 0 20px 64px;
+}
+.merch-card {
+  background: var(--obsidian-2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+  transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
+  cursor: pointer;
+}
+.merch-card:hover {
+  border-color: var(--gold);
+  transform: translateY(-4px);
+  box-shadow: 0 12px 32px rgba(0,0,0,0.4);
+}
+.merch-card-img {
+  width: 100%;
+  aspect-ratio: 1;
+  background: var(--obsidian-3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 56px;
+  position: relative;
+  overflow: hidden;
+}
+.merch-card-img img { width:100%; height:100%; object-fit:cover; display:block; }
+.merch-soon-badge {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: var(--crimson);
+  color: #fff;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 2px;
+  padding: 3px 8px;
+  border-radius: 20px;
+  text-transform: uppercase;
+}
+.merch-card-body { padding: 14px 16px 16px; }
+.merch-card-name { font-family:var(--font-display); font-size:15px; font-weight:800; color:#fff; text-transform:uppercase; margin-bottom:4px; }
+.merch-card-desc { font-size:12px; color:var(--bone-dim); margin-bottom:12px; }
+.merch-card-footer { display:flex; align-items:center; justify-content:space-between; }
+.merch-price { font-family:var(--font-mono); font-size:14px; color:var(--gold-bright); font-weight:700; }
+.merch-notify-btn {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 1px;
+  padding: 6px 12px;
+  border-radius: 6px;
+  border: 1px solid var(--gold);
+  color: var(--gold-bright);
+  background: transparent;
+  cursor: pointer;
+  text-transform: uppercase;
+  transition: background 0.15s, color 0.15s;
+}
+.merch-notify-btn:hover, .merch-notify-btn.notified { background: var(--gold); color: #000; }
+
+.merch-section-label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 4px;
+  color: var(--crimson-bright);
+  text-transform: uppercase;
+  text-align: center;
+  padding: 40px 0 20px;
+}
+</style>
+</head>
+<body>
+<div id="nav-mount" data-active="merch"></div>
+
+<div class="merch-hero">
+  <div class="merch-hero-eyebrow">Official ETFC Store</div>
+  <div class="merch-hero-title">ETFC <span>Merch</span></div>
+  <div class="merch-hero-sub">Rep the fight. Drop coming soon.</div>
+</div>
+
+<div class="merch-coming-soon">
+  <div class="merch-cs-icon">🥊</div>
+  <div class="merch-cs-title">Drop Coming Soon</div>
+  <div class="merch-cs-sub">Official ETFC Fight Night gear is on its way. Shirts, hoodies, hats — limited quantities. Click "Notify Me" on any item below and we'll hit you when it's live.</div>
+</div>
+
+<div class="merch-section-label">Coming Soon — Fight Night 2026</div>
+
+<div class="merch-grid">
+
+  <div class="merch-card">
+    <div class="merch-card-img">
+      👕
+      <div class="merch-soon-badge">Soon</div>
+    </div>
+    <div class="merch-card-body">
+      <div class="merch-card-name">Fight Night Tee</div>
+      <div class="merch-card-desc">Classic black tee with ETFC Fight Night Aug 29 print</div>
+      <div class="merch-card-footer">
+        <div class="merch-price">TBA</div>
+        <button class="merch-notify-btn" onclick="notifyMe(this)">Notify Me</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="merch-card">
+    <div class="merch-card-img">
+      🧥
+      <div class="merch-soon-badge">Soon</div>
+    </div>
+    <div class="merch-card-body">
+      <div class="merch-card-name">ETFC Hoodie</div>
+      <div class="merch-card-desc">Premium heavyweight hoodie with embroidered ETFC logo</div>
+      <div class="merch-card-footer">
+        <div class="merch-price">TBA</div>
+        <button class="merch-notify-btn" onclick="notifyMe(this)">Notify Me</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="merch-card">
+    <div class="merch-card-img">
+      🧢
+      <div class="merch-soon-badge">Soon</div>
+    </div>
+    <div class="merch-card-body">
+      <div class="merch-card-name">Snapback Cap</div>
+      <div class="merch-card-desc">Red & black ETFC snapback, limited edition</div>
+      <div class="merch-card-footer">
+        <div class="merch-price">TBA</div>
+        <button class="merch-notify-btn" onclick="notifyMe(this)">Notify Me</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="merch-card">
+    <div class="merch-card-img">
+      🥊
+      <div class="merch-soon-badge">Soon</div>
+    </div>
+    <div class="merch-card-body">
+      <div class="merch-card-name">Boxing Gloves</div>
+      <div class="merch-card-desc">ETFC branded training gloves — real leather</div>
+      <div class="merch-card-footer">
+        <div class="merch-price">TBA</div>
+        <button class="merch-notify-btn" onclick="notifyMe(this)">Notify Me</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="merch-card">
+    <div class="merch-card-img">
+      🩳
+      <div class="merch-soon-badge">Soon</div>
+    </div>
+    <div class="merch-card-body">
+      <div class="merch-card-name">Fight Shorts</div>
+      <div class="merch-card-desc">MMA-cut shorts with ETFC logo patch</div>
+      <div class="merch-card-footer">
+        <div class="merch-price">TBA</div>
+        <button class="merch-notify-btn" onclick="notifyMe(this)">Notify Me</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="merch-card">
+    <div class="merch-card-img">
+      📿
+      <div class="merch-soon-badge">Soon</div>
+    </div>
+    <div class="merch-card-body">
+      <div class="merch-card-name">Fighter Pendant</div>
+      <div class="merch-card-desc">Gold-plated ETFC chain pendant, numbered edition</div>
+      <div class="merch-card-footer">
+        <div class="merch-price">TBA</div>
+        <button class="merch-notify-btn" onclick="notifyMe(this)">Notify Me</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div id="footer-mount"></div>
+
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-storage-compat.js"></script>
+<script src="js/firebase-config.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/partials.js"></script>
+<script src="js/main.js"></script>
+<script>
+function notifyMe(btn) {
+  btn.textContent = "✓ Noted!";
+  btn.classList.add("notified");
+  btn.disabled = true;
+  showToast("We'll notify you when this drops!", "success");
+}
+</script>
+</body>
+</html>

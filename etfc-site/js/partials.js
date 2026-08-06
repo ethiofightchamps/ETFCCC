@@ -17,6 +17,7 @@ function renderNav(activePage) {
     { href: "fight-card.html", label: "Fight Card", key: "fight-card" },
     { href: "betting.html", label: "Betting", key: "betting" },
     { href: "tickets.html", label: "Tickets", key: "tickets" },
+    { href: "merch.html", label: "Merch", key: "merch" },
     { href: "about.html", label: "About", key: "about" },
   ];
   const linksHtml = links.map(l =>
@@ -105,6 +106,7 @@ function renderFooter() {
         <a href="fight-card.html">Fight Card</a>
         <a href="betting.html">Betting</a>
         <a href="tickets.html">Tickets</a>
+        <a href="merch.html">Merch</a>
         <a href="about.html">About</a>
       </div>
       <div class="copyright">&copy; 2026 ETFC — Addis Ababa, Ethiopia</div>
