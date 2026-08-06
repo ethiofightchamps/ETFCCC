@@ -12,9 +12,6 @@
 <div id="nav-mount" data-active="tickets"></div>
 
 <div class="container" style="padding-top:48px;">
-  <div class="section-eyebrow">Fight Night Seating</div>
-  <div class="section-title" style="font-size:38px;margin-bottom:24px;">Choose Your Seats</div>
-
   <div class="page-header" style="margin-bottom:24px;">
     <div>
       <div class="section-eyebrow">Fight Night Seating</div>
@@ -27,13 +24,12 @@
 
   <!-- STEP 1: SEAT SELECTION -->
   <div id="seatStep">
-    <!-- Section Tabs -->
+    <!-- Section Tabs (Ringside & VIP only — these are the sections small
+         enough to pick an exact seat on the map below) -->
     <div class="section-tabs" id="sectionTabs" role="tablist">
-      <button class="section-tab active" role="tab" data-section="all" onclick="switchSection('all')">All Sections</button>
+      <button class="section-tab active" role="tab" data-section="all" onclick="switchSection('all')">All Seats</button>
       <button class="section-tab" role="tab" data-section="Ringside" onclick="switchSection('Ringside')">Ringside</button>
       <button class="section-tab" role="tab" data-section="VIP" onclick="switchSection('VIP')">VIP</button>
-      <button class="section-tab" role="tab" data-section="Middle" onclick="switchSection('Middle')">Middle</button>
-      <button class="section-tab" role="tab" data-section="Last Rows" onclick="switchSection('Last Rows')">Last Rows</button>
     </div>
 
     <div class="grid-2 seat-select-grid" style="align-items:start;">
@@ -43,15 +39,21 @@
           <div class="seat-legend">
             <div class="item"><span class="swatch ringside"></span>Ringside</div>
             <div class="item"><span class="swatch vip"></span>VIP</div>
-            <div class="item"><span class="swatch ga"></span>General Admission</div>
             <div class="item"><span class="swatch selected"></span>Selected</div>
             <div class="item"><span class="swatch sold"></span>Sold</div>
           </div>
         </div>
-        <p class="text-dim tier-picker-hint" style="display:none;font-size:12px;margin:16px 0 8px;">
-          Tap + to add a seat in that section — we'll assign the best available one for you.
-        </p>
-        <div class="tier-picker-mobile" id="tierPickerMount"></div>
+
+        <!-- General Admission (Middle & Last Rows): 600 seats per section is
+             too many to tap individually, so pick a quantity instead — we
+             assign the best available seats automatically. -->
+        <div class="ga-picker-head">
+          <div class="section-eyebrow" style="margin-bottom:0;">General Admission</div>
+          <p class="text-dim" style="font-size:12px;margin:4px 0 0;">
+            Tap + to add a seat — we'll assign the best available one for you.
+          </p>
+        </div>
+        <div class="tier-picker-mobile" id="gaPickerMount"></div>
       </div>
       <div class="selection-panel">
         <h3>Your Seats</h3>
@@ -342,14 +344,5 @@
   </div>
 </div>
 
-<div id="footer-mount"></div>
-
-<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
-<script src="js/firebase-config.js"></script>
-<script src="js/auth.js"></script>
-<script src="js/partials.js"></script>
-<script src="js/main.js"></script>
-<script src="js/seatmap.js"></script>
-<script>
+</body>
+</html>

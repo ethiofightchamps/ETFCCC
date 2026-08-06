@@ -4,6 +4,13 @@
 //   VIP       — 200 seats  — 9,000 ETB   (4 rings × 50 seats)
 //   Middle    — 600 seats  — 2,000 ETB   (6 rings × 100 seats)
 //   Last Rows — 600 seats  — 1,500 ETB   (6 rings × 100 seats)
+//
+// Ringside and VIP are small enough to pick an exact seat, so they get the
+// clickable ring diagram below. Middle and Last Rows are general admission —
+// 600 seats each is unusable as individual tap targets on any screen size,
+// so those two always use a simple "how many seats" quantity stepper instead
+// (same one the old mobile-only fallback used) and we auto-assign the best
+// available seat behind the scenes.
 
 // Radius values in SEAT_CONFIG were tuned assuming a ~1000px-wide arena (its
 // CSS max-width). The arena is responsive (width:100%, aspect-ratio:1), so on
@@ -24,12 +31,19 @@ window.addEventListener("resize", () => {
   window._ringScaleResizeTimer = setTimeout(updateRingScale, 100);
 });
 
+// Rendered as individual clickable seats in the ring diagram.
 const SEAT_CONFIG = [
   { section: "Ringside",  tier: "ringside", price: 40000, rings: 2, seatsPerRing: 50, radiusStart: 65, radiusStep: 25 },
   { section: "VIP",       tier: "vip",      price: 9000,  rings: 4, seatsPerRing: 50, radiusStart: 120, radiusStep: 25 },
-  { section: "Middle",    tier: "ga",       price: 2000,  rings: 6, seatsPerRing: 80, radiusStart: 230, radiusStep: 22 },
-  { section: "Last Rows", tier: "ga",       price: 1500,  rings: 6, seatsPerRing: 120, radiusStart: 350, radiusStep: 22 },
 ];
+
+// General admission — quantity stepper only, no individual seat picking.
+const GA_CONFIG = [
+  { section: "Middle",    tier: "ga", price: 2000, rings: 6, seatsPerRing: 80  },
+  { section: "Last Rows", tier: "ga", price: 1500, rings: 6, seatsPerRing: 120 },
+];
+
+const ALL_SECTIONS = [...SEAT_CONFIG, ...GA_CONFIG];
 
 const SOLD_SEATS = new Set();
 let selectedSeats = {};
@@ -146,24 +160,24 @@ function toggleSeat(el) {
     el.classList.add("selected");
   }
   renderSelectionPanel();
-  renderMobileTierPicker();
 }
 
-// ── Mobile tier picker: tapping precise 16px seats on a 300px-wide ring is
-// basically impossible on a phone. Instead show one card per section with a
-// quantity stepper — it auto-picks the next available seat(s) in that
-// section behind the scenes, writing to the exact same selectedSeats object
-// the desktop click-map uses, so checkout/pricing/Firestore locking all work
-// identically either way. ──────────────────────────────────────────────────
+// ── General admission (Middle / Last Rows): quantity stepper only ────────
+// 600 seats per section makes individual tap targets impractical on any
+// screen size, so instead show one card per section with a quantity
+// stepper — it auto-picks the next available seat(s) in that section
+// behind the scenes, writing to the exact same selectedSeats object the
+// Ringside/VIP click-map uses, so checkout/pricing/Firestore locking all
+// work identically either way. ──────────────────────────────────────────
 function idSafe(sectionName) {
   return sectionName.replace(/\s+/g, "");
 }
 
-function renderMobileTierPicker() {
-  const mount = document.getElementById("tierPickerMount");
+function renderGaPicker() {
+  const mount = document.getElementById("gaPickerMount");
   if (!mount) return;
 
-  mount.innerHTML = SEAT_CONFIG.map((sec) => {
+  mount.innerHTML = GA_CONFIG.map((sec) => {
     const seatIds = getSectionSeatIds(sec);
     const selectedCount = seatIds.filter((id) => selectedSeats[id]).length;
     const availableCount = seatIds.filter((id) => !SOLD_SEATS.has(id) && !selectedSeats[id]).length;
@@ -186,7 +200,7 @@ function renderMobileTierPicker() {
 }
 
 function adjustTierQty(sectionName, delta) {
-  const sec = SEAT_CONFIG.find((s) => s.section === sectionName);
+  const sec = GA_CONFIG.find((s) => s.section === sectionName);
   if (!sec) return;
 
   const seatIds = getSectionSeatIds(sec);
@@ -204,7 +218,7 @@ function adjustTierQty(sectionName, delta) {
     if (lastId) delete selectedSeats[lastId];
   }
 
-  renderMobileTierPicker();
+  renderGaPicker();
   renderSelectionPanel();
 }
 
@@ -253,5 +267,5 @@ function proceedToCheckout() {
 document.addEventListener("DOMContentLoaded", async () => {
   await loadSeatAvailability();
   renderSeatMap("all");
-  renderMobileTierPicker();
+  renderGaPicker();
 });
