@@ -27,9 +27,10 @@
     <!-- Section Tabs (Ringside & VIP only — these are the sections small
          enough to pick an exact seat on the map below) -->
     <div class="section-tabs" id="sectionTabs" role="tablist">
-      <button class="section-tab active" role="tab" data-section="all" onclick="switchSection('all')">All Seats</button>
-      <button class="section-tab" role="tab" data-section="Ringside" onclick="switchSection('Ringside')">Ringside</button>
+      <button class="section-tab active" role="tab" data-section="Ringside" onclick="switchSection('Ringside')">Ringside</button>
       <button class="section-tab" role="tab" data-section="VIP" onclick="switchSection('VIP')">VIP</button>
+      <button class="section-tab" role="tab" data-section="Middle" onclick="switchSection('Middle')">Middle</button>
+      <button class="section-tab" role="tab" data-section="Back Row" onclick="switchSection('Back Row')">Back Row</button>
     </div>
 
     <div class="grid-2 seat-select-grid" style="align-items:start;">
@@ -143,14 +144,53 @@
   }
 
   let chosenFile = null;
-  let currentSection = "all";
+  let currentSection = "Ringside";
 
   function switchSection(section) {
     currentSection = section;
     document.querySelectorAll(".section-tab").forEach(btn => {
       btn.classList.toggle("active", btn.dataset.section === section);
     });
-    if (typeof renderSeatMap === "function") renderSeatMap(section);
+
+    const isGaSection = section === "Middle" || section === "Back Row";
+    const mapEl = document.getElementById("seatMapMount");
+    const gaEl = document.getElementById("gaPickerMount");
+
+    if (isGaSection) {
+      if (mapEl) mapEl.style.display = "none";
+      if (gaEl) { gaEl.style.display = "block"; renderGaSection(section); }
+    } else {
+      if (mapEl) mapEl.style.display = "";
+      if (gaEl) gaEl.style.display = "none";
+      if (typeof renderSeatMap === "function") renderSeatMap(section);
+    }
+  }
+
+  function renderGaSection(section) {
+    const gaEl = document.getElementById("gaPickerMount");
+    if (!gaEl) return;
+    // Find matching GA config
+    const sec = typeof GA_CONFIG !== "undefined"
+      ? GA_CONFIG.find(s => s.section === section)
+      : null;
+    if (!sec) { gaEl.innerHTML = `<p class="text-dim">No section data.</p>`; return; }
+    const seatIds = typeof getSectionSeatIds === "function" ? getSectionSeatIds(sec) : [];
+    const selectedCount = seatIds.filter(id => selectedSeats && selectedSeats[id]).length;
+    const availableCount = seatIds.filter(id => !(typeof SOLD_SEATS !== "undefined" && SOLD_SEATS.has(id)) && !(selectedSeats && selectedSeats[id])).length;
+    gaEl.innerHTML = `
+      <div class="tier-pick-card">
+        <div class="tier-pick-info">
+          <div class="tier-pick-name">${sec.section}</div>
+          <div class="tier-pick-price">${sec.price.toLocaleString()} ETB / seat</div>
+          <div class="tier-pick-avail">${availableCount} available</div>
+          <p class="text-dim" style="font-size:12px;margin-top:6px;">General admission — seats auto-assigned.</p>
+        </div>
+        <div class="tier-pick-stepper">
+          <button type="button" onclick="adjustTierQty('${sec.section}', -1); renderGaSection('${sec.section}')" ${selectedCount === 0 ? "disabled" : ""}>−</button>
+          <span id="tierQty-${sec.section.replace(/\s/g,'')}">${selectedCount}</span>
+          <button type="button" onclick="adjustTierQty('${sec.section}', 1); renderGaSection('${sec.section}')" ${availableCount === 0 ? "disabled" : ""}>+</button>
+        </div>
+      </div>`;
   }
 
   function onScreenshotChosen(input) {

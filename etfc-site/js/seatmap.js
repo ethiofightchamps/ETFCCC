@@ -33,14 +33,14 @@ window.addEventListener("resize", () => {
 
 // Rendered as individual clickable seats in the ring diagram.
 const SEAT_CONFIG = [
-  { section: "Ringside",  tier: "ringside", price: 40000, rings: 2, seatsPerRing: 50, radiusStart: 65, radiusStep: 25 },
-  { section: "VIP",       tier: "vip",      price: 9000,  rings: 4, seatsPerRing: 50, radiusStart: 120, radiusStep: 25 },
+  { section: "Ringside",  tier: "ringside", price: 40000, rings: 2, seatsPerRing: 40, radiusStart: 180, radiusStep: 36 },
+  { section: "VIP",       tier: "vip",      price: 9000,  rings: 4, seatsPerRing: 40, radiusStart: 265, radiusStep: 36 },
 ];
 
 // General admission — quantity stepper only, no individual seat picking.
 const GA_CONFIG = [
-  { section: "Middle",    tier: "ga", price: 2000, rings: 6, seatsPerRing: 80  },
-  { section: "Last Rows", tier: "ga", price: 1500, rings: 6, seatsPerRing: 120 },
+  { section: "Middle",   tier: "ga", price: 2000, rings: 6, seatsPerRing: 80  },
+  { section: "Back Row", tier: "ga", price: 1500, rings: 6, seatsPerRing: 120 },
 ];
 
 const ALL_SECTIONS = [...SEAT_CONFIG, ...GA_CONFIG];
@@ -129,7 +129,7 @@ function renderSeatMap(sectionFilter = "all") {
           data-price="${sec.price}"
           data-label="${sec.section} ${rowLetter}${s + 1}"
           title="${sec.section} ${rowLetter}${s + 1} — ${sec.price.toLocaleString()} ETB"
-          style="transform: translate(calc(${x.toFixed(1)}px * var(--ring-scale, 1)), calc(${y.toFixed(1)}px * var(--ring-scale, 1))) rotate(${rotateDeg.toFixed(1)}deg);"
+          style="--tx: calc(${x.toFixed(1)}px * var(--ring-scale, 1)); --ty: calc(${y.toFixed(1)}px * var(--ring-scale, 1)); --rot: ${rotateDeg.toFixed(1)}deg; transform: translate(var(--tx), var(--ty)) rotate(var(--rot)); pointer-events: auto;"
           onclick="${sold ? "" : `toggleSeat(this)`}"
         ></div>`;
       }
@@ -266,6 +266,7 @@ function proceedToCheckout() {
 
 document.addEventListener("DOMContentLoaded", async () => {
   await loadSeatAvailability();
-  renderSeatMap("all");
-  renderGaPicker();
+  renderSeatMap("Ringside");
+  const gaEl = document.getElementById("gaPickerMount");
+  if (gaEl) gaEl.style.display = "none";
 });
