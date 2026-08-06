@@ -27,7 +27,7 @@
     <!-- Section Tabs (Ringside & VIP only — these are the sections small
          enough to pick an exact seat on the map below) -->
     <div class="section-tabs" id="sectionTabs" role="tablist">
-      <button class="section-tab active" role="tab" data-section="Ringside" onclick="switchSection('Ringside')">Ringside</button>
+      <button class="section-tab active" role="tab" data-section="VVIP" onclick="switchSection('VVIP')">VVIP</button>
       <button class="section-tab" role="tab" data-section="VIP" onclick="switchSection('VIP')">VIP</button>
       <button class="section-tab" role="tab" data-section="Middle" onclick="switchSection('Middle')">Middle</button>
       <button class="section-tab" role="tab" data-section="Back Row" onclick="switchSection('Back Row')">Back Row</button>
@@ -38,7 +38,7 @@
         <div class="venue-map">
           <div id="seatMapMount"></div>
           <div class="seat-legend">
-            <div class="item"><span class="swatch ringside"></span>Ringside</div>
+            <div class="item"><span class="swatch ringside"></span>VVIP</div>
             <div class="item"><span class="swatch vip"></span>VIP</div>
             <div class="item"><span class="swatch selected"></span>Selected</div>
             <div class="item"><span class="swatch sold"></span>Sold</div>
@@ -144,7 +144,7 @@
   }
 
   let chosenFile = null;
-  let currentSection = "Ringside";
+  let currentSection = "VVIP";
 
   function switchSection(section) {
     currentSection = section;

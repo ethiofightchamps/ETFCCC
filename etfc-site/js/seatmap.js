@@ -34,14 +34,14 @@ window.addEventListener("resize", () => {
 
 // Rendered as individual clickable seats in the ring diagram.
 const SEAT_CONFIG = [
-  { section: "Ringside",  tier: "ringside", price: 40000, rings: 2, seatsPerRing: 40, radiusStart: 65,  radiusStep: 22 },
-  { section: "VIP",       tier: "vip",      price: 9000,  rings: 4, seatsPerRing: 40, radiusStart: 115, radiusStep: 22 },
+  { section: "VVIP",  tier: "ringside", price: 50000, rings: 2, seatsPerRing: 40, radiusStart: 110, radiusStep: 28 },
+  { section: "VIP",   tier: "vip",      price: 10000, rings: 4, seatsPerRing: 40, radiusStart: 175, radiusStep: 28 },
 ];
 
 // General admission — quantity stepper only, no individual seat picking.
 const GA_CONFIG = [
-  { section: "Middle",   tier: "ga", price: 2000, rings: 6, seatsPerRing: 80  },
-  { section: "Back Row", tier: "ga", price: 1500, rings: 6, seatsPerRing: 120 },
+  { section: "Middle",   tier: "ga", price: 5000, rings: 6, seatsPerRing: 80  },
+  { section: "Back Row", tier: "ga", price: 2000, rings: 6, seatsPerRing: 120 },
 ];
 
 const ALL_SECTIONS = [...SEAT_CONFIG, ...GA_CONFIG];
@@ -267,7 +267,7 @@ function proceedToCheckout() {
 
 document.addEventListener("DOMContentLoaded", async () => {
   await loadSeatAvailability();
-  renderSeatMap("Ringside");
+  renderSeatMap("VVIP");
   const gaEl = document.getElementById("gaPickerMount");
   if (gaEl) gaEl.style.display = "none";
 });
