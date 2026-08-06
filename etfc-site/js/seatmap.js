@@ -17,12 +17,13 @@
 // a narrow phone it renders much smaller — without scaling, seats positioned
 // with these raw pixel radii would sprawl far outside the tiny ring and pile
 // up on whatever sits below it. --ring-scale corrects for that.
-const REFERENCE_ARENA_WIDTH = 1000;
+const REFERENCE_ARENA_WIDTH = 500;
 
 function updateRingScale() {
   const arena = document.querySelector(".arena");
   if (!arena) return;
-  const scale = arena.clientWidth / REFERENCE_ARENA_WIDTH;
+  const w = arena.clientWidth;
+  const scale = Math.min(w / REFERENCE_ARENA_WIDTH, 1.8); // cap scale on huge screens
   arena.style.setProperty("--ring-scale", scale);
 }
 
@@ -33,8 +34,8 @@ window.addEventListener("resize", () => {
 
 // Rendered as individual clickable seats in the ring diagram.
 const SEAT_CONFIG = [
-  { section: "Ringside",  tier: "ringside", price: 40000, rings: 2, seatsPerRing: 40, radiusStart: 180, radiusStep: 36 },
-  { section: "VIP",       tier: "vip",      price: 9000,  rings: 4, seatsPerRing: 40, radiusStart: 265, radiusStep: 36 },
+  { section: "Ringside",  tier: "ringside", price: 40000, rings: 2, seatsPerRing: 40, radiusStart: 95,  radiusStep: 20 },
+  { section: "VIP",       tier: "vip",      price: 9000,  rings: 4, seatsPerRing: 40, radiusStart: 140, radiusStep: 20 },
 ];
 
 // General admission — quantity stepper only, no individual seat picking.
