@@ -194,20 +194,45 @@ function goToPhoneStep(e) {
   showStep("authStepPhone");
 }
 
+// Ethiopian mobile numbers: 10 digits, starting with 09 or 07 (e.g. 0912345678)
+function isValidEthiopianPhone(phone) {
+  return /^(09|07)\d{8}$/.test(phone);
+}
+
 function goToPasswordStep(e) {
   if (e) e.preventDefault();
-  const phone = document.getElementById("phoneInput").value.trim();
+  const phone = document.getElementById("phoneInput").value.replace(/\D/g, "");
 
   if (!phone) return showToast("Enter your phone number.", "error");
+  if (!isValidEthiopianPhone(phone)) {
+    return showToast("Enter a valid 10-digit phone number starting with 09 or 07.", "error");
+  }
   if (!pendingSignup) return showToast("Session expired — please start over.", "error");
 
   pendingSignup.phone = phone;
   showStep("authStepPassword");
 }
 
+// Only allow digits to be typed in the phone field, capped at 10
+document.addEventListener("input", (e) => {
+  if (e.target.id === "phoneInput") {
+    e.target.value = e.target.value.replace(/\D/g, "").slice(0, 10);
+  }
+});
+
+function clearOtpBoxes() {
+  document.querySelectorAll("#authStepOtp input").forEach((input) => (input.value = ""));
+  const first = document.querySelector("#authStepOtp input");
+  if (first) first.focus();
+}
+
 async function submitSignupPassword(e) {
   if (e) e.preventDefault();
   if (!pendingSignup) return showToast("Session expired — please start over.", "error");
+
+  // Wipe any digits left over from a previous attempt so the boxes are
+  // clean whether this is the first send or a resend.
+  clearOtpBoxes();
 
   const password = document.getElementById("passwordInput").value;
   const confirm = document.getElementById("passwordConfirmInput").value;
