@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>My Tickets — ETFC</title>
-<script>(function(){var t=localStorage.getItem("etfc_theme")||"light";document.documentElement.setAttribute("data-theme",t);})();</script>
+<script>(function(){var t=localStorage.getItem("etfc_theme")||"dark";document.documentElement.setAttribute("data-theme",t);})();</script>
 <link rel="stylesheet" href="css/style.css">
 <style>
   .ticket-card {
@@ -300,9 +300,9 @@
   const BADGE_LABEL = { confirmed: "E-TICKET", pending: "PENDING", rejected: "REJECTED" };
   const BADGE_CLASS = { confirmed: "", pending: "pending", rejected: "rejected" };
 
-  const EVENT_DATE_STR = "August 24, 2026";
-  const EVENT_TIME_STR = "7:00 PM";
-  const VENUE_STR = "Millennium Hall, Addis Ababa";
+  const EVENT_DATE_STR = "August 29, 2026";
+  const EVENT_TIME_STR = "10:00 AM";
+  const VENUE_STR = "Adwa Museum, Addis Ababa";
 
   function renderTicketQR(qrData, containerId) {
     const el = document.getElementById(containerId);
@@ -378,7 +378,7 @@
                 <div class="ticket-main">
                   <div class="ticket-event-info">
                     <div class="ticket-event-label">ETFC Fight Night</div>
-                    <div class="ticket-event-name">Millennium Hall</div>
+                    <div class="ticket-event-name">Adwa Museum</div>
                     <div class="ticket-event-date">${EVENT_DATE_STR} &middot; ${EVENT_TIME_STR}</div>
                   </div>
                   <div class="ticket-qr-wrap" id="${qrId}"></div>

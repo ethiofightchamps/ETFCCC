@@ -1,6 +1,6 @@
 // ── COUNTDOWN TIMER ──────────────────────────────────────────────────────
 // PLACEHOLDER date — replace with the real event date/time once confirmed.
-const EVENT_DATE = new Date("2026-08-24T19:00:00+03:00").getTime();
+const EVENT_DATE = new Date("2026-08-29T10:00:00+03:00").getTime();
 
 function tickCountdown() {
   const el = document.getElementById("countdown");
