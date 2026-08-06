@@ -23,7 +23,7 @@ function updateRingScale() {
   const arena = document.querySelector(".arena");
   if (!arena) return;
   const w = arena.clientWidth;
-  const scale = Math.min(w / REFERENCE_ARENA_WIDTH, 1.8); // cap scale on huge screens
+  const scale = Math.min(w / REFERENCE_ARENA_WIDTH, 2.2); // cap scale on huge screens
   arena.style.setProperty("--ring-scale", scale);
 }
 
@@ -34,8 +34,8 @@ window.addEventListener("resize", () => {
 
 // Rendered as individual clickable seats in the ring diagram.
 const SEAT_CONFIG = [
-  { section: "Ringside",  tier: "ringside", price: 40000, rings: 2, seatsPerRing: 40, radiusStart: 95,  radiusStep: 20 },
-  { section: "VIP",       tier: "vip",      price: 9000,  rings: 4, seatsPerRing: 40, radiusStart: 140, radiusStep: 20 },
+  { section: "Ringside",  tier: "ringside", price: 40000, rings: 2, seatsPerRing: 40, radiusStart: 65,  radiusStep: 22 },
+  { section: "VIP",       tier: "vip",      price: 9000,  rings: 4, seatsPerRing: 40, radiusStart: 115, radiusStep: 22 },
 ];
 
 // General admission — quantity stepper only, no individual seat picking.
@@ -130,7 +130,7 @@ function renderSeatMap(sectionFilter = "all") {
           data-price="${sec.price}"
           data-label="${sec.section} ${rowLetter}${s + 1}"
           title="${sec.section} ${rowLetter}${s + 1} — ${sec.price.toLocaleString()} ETB"
-          style="--tx: calc(${x.toFixed(1)}px * var(--ring-scale, 1)); --ty: calc(${y.toFixed(1)}px * var(--ring-scale, 1)); --rot: ${rotateDeg.toFixed(1)}deg; transform: translate(var(--tx), var(--ty)) rotate(var(--rot)); pointer-events: auto;"
+          style="--tx: calc(${x.toFixed(1)}px * var(--ring-scale, 1)); --ty: calc(${y.toFixed(1)}px * var(--ring-scale, 1)); --rot: ${rotateDeg.toFixed(1)}deg; transform: translate(var(--tx), var(--ty)) rotate(var(--rot)); pointer-events: auto; width: calc(18px * var(--ring-scale, 1)); height: calc(18px * var(--ring-scale, 1));"
           onclick="${sold ? "" : `toggleSeat(this)`}"
         ></div>`;
       }
