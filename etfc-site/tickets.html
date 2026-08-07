@@ -742,50 +742,33 @@
         telebirr: "0983196199",
       };
 
-      // Payment Method Modal
+      // Payment methods config
       const PAYMENT_METHODS = [
-        { id: "mpesa", name: "M-Pesa", icon: "/safaricom.png" },
-        { id: "telebirr", name: "Telebirr", icon: "/telebirr.webp" },
+        { id: "mpesa", name: "M-Pesa", icon: "/safaricom.png", accountName: "Efrem Werku Muluneh" },
+        { id: "telebirr", name: "Telebirr", icon: "/telebirr.webp", accountName: "ager" },
       ];
-
-      function openPaymentMethodModal() {
-        const modal = document.getElementById("paymentMethodModal");
-        const container = document.getElementById("paymentMethodOptions");
-        container.innerHTML = PAYMENT_METHODS.map(pm => `
-          <label style="display:flex;align-items:center;gap:16px;padding:18px;background:var(--obsidian);border:1px solid var(--border);border-radius:12px;cursor:pointer;transition:border-color 0.15s;" onmouseover="this.style.borderColor='var(--gold)'" onmouseout="this.style.borderColor='var(--border)'">
-            <input type="radio" name="paymentMethodModal" value="${pm.id}" ${pm.id === selectedPaymentMethod ? "checked" : ""} style="width:20px;height:20px;accent-color:var(--gold);">
-            <img src="${pm.icon}" alt="${pm.name}" style="width:56px;height:56px;object-fit:contain;background:#fff;border-radius:10px;padding:6px;">
-            <div style="flex:1;">
-              <div style="font-weight:700;color:var(--bone);font-size:16px;">${pm.name}</div>
-              <div style="font-family:var(--font-mono);font-size:13px;color:var(--gold-bright);" id="modal-${pm.id}Number">Loading…</div>
-            </div>
-          </label>
-        `).join("");
-        modal.classList.add("open");
-        document.body.style.overflow = "hidden";
-      }
-
-      function closePaymentMethodModal() {
-        document.getElementById("paymentMethodModal").classList.remove("open");
-        document.body.style.overflow = "";
-      }
 
       function selectPaymentMethod(methodId) {
         const pm = PAYMENT_METHODS.find(p => p.id === methodId);
         if (!pm) return;
         selectedPaymentMethod = methodId;
-        document.getElementById("selectedPaymentIcon").src = pm.icon;
-        document.getElementById("selectedPaymentName").textContent = pm.name;
-        document.getElementById("selectedPaymentNumber").textContent = document.getElementById(`modal-${pm.id}Number`).textContent;
-        closePaymentMethodModal();
+
+        // Update button styles
+        document.querySelectorAll('.payment-method-btn').forEach(btn => {
+          btn.style.borderColor = btn.dataset.method === methodId ? 'var(--gold)' : 'var(--border)';
+          btn.style.background = btn.dataset.method === methodId ? 'rgba(176,141,62,0.1)' : 'var(--obsidian)';
+        });
+
+        // Update hidden input
+        document.getElementById("selectedPaymentMethod").value = methodId;
+
+        // Update bank details
+        document.getElementById("payAccountName").textContent = pm.accountName;
       }
 
       document.addEventListener("DOMContentLoaded", () => {
-        document.getElementById("mpesaNumber").textContent = PAYMENT_NUMBERS.mpesa;
-        document.getElementById("telebirrNumber").textContent = PAYMENT_NUMBERS.telebirr;
-        document.getElementById("selectedPaymentNumber").textContent = PAYMENT_NUMBERS.mpesa;
-        document.getElementById("modal-mpesaNumber").textContent = PAYMENT_NUMBERS.mpesa;
-        document.getElementById("modal-telebirrNumber").textContent = PAYMENT_NUMBERS.telebirr;
+        document.getElementById("mpesaNumberDisplay").textContent = PAYMENT_NUMBERS.mpesa;
+        document.getElementById("telebirrNumberDisplay").textContent = PAYMENT_NUMBERS.telebirr;
         renderAd(0);
         adTimer = setInterval(nextAd, 5000);
       });
