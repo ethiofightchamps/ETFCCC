@@ -9,7 +9,8 @@ const DEFAULT_MERCH_PRODUCTS = [
     name: "Black Full Set",
     slug: "black-full-set",
     category: "Sets",
-    description: "ETFC Fight Night full tracksuit set — hoodie + shorts. Limited edition.",
+    description:
+      "ETFC Fight Night full tracksuit set — hoodie + shorts. Limited edition.",
     images: ["images/merch-black-full.png"],
     basePrice: 25000,
     offerPrice: 19999,
@@ -24,7 +25,8 @@ const DEFAULT_MERCH_PRODUCTS = [
     name: "Blue Full Set",
     slug: "blue-full-set",
     category: "Sets",
-    description: "ETFC blue edition full set. Premium quality, fight night branding.",
+    description:
+      "ETFC blue edition full set. Premium quality, fight night branding.",
     images: ["images/merch-blue-full.png"],
     basePrice: 25000,
     offerPrice: 19999,
@@ -54,7 +56,8 @@ const DEFAULT_MERCH_PRODUCTS = [
     name: "Hoodie + Tee + Shorts Set",
     slug: "hoodie-tee-shorts-set",
     category: "Sets",
-    description: "The full ETFC combo — hoodie, tee, and shorts. Best value bundle.",
+    description:
+      "The full ETFC combo — hoodie, tee, and shorts. Best value bundle.",
     images: ["images/merch-sleeve-hoodie-tshirt-shorts.png"],
     basePrice: 18000,
     offerPrice: 14999,
@@ -69,7 +72,8 @@ const DEFAULT_MERCH_PRODUCTS = [
     name: "Blue Fight Tee",
     slug: "blue-tshirt",
     category: "Apparel",
-    description: "Classic ETFC blue t-shirt with fight night logo. 100% cotton.",
+    description:
+      "Classic ETFC blue t-shirt with fight night logo. 100% cotton.",
     images: ["images/merch-blue-tshirt.png"],
     basePrice: 3500,
     offerPrice: 2499,
@@ -84,7 +88,8 @@ const DEFAULT_MERCH_PRODUCTS = [
     name: "White Sweater",
     slug: "white-sweater",
     category: "Outerwear",
-    description: "ETFC branded white sweater — heavyweight knit, embroidered logo.",
+    description:
+      "ETFC branded white sweater — heavyweight knit, embroidered logo.",
     images: ["images/merch-white-sweater.png"],
     basePrice: 6500,
     offerPrice: 4999,
@@ -99,7 +104,8 @@ const DEFAULT_MERCH_PRODUCTS = [
     name: "Open Sleeve Jacket",
     slug: "open-sleeve-jacket",
     category: "Outerwear",
-    description: "ETFC sleeveless fight jacket — worn cage-side. Bold red detailing.",
+    description:
+      "ETFC sleeveless fight jacket — worn cage-side. Bold red detailing.",
     images: ["images/merch-open-sleeve-jacket.png"],
     basePrice: 8500,
     offerPrice: 6499,
@@ -114,7 +120,8 @@ const DEFAULT_MERCH_PRODUCTS = [
     name: "Fight Shorts",
     slug: "fight-shorts",
     category: "Apparel",
-    description: "ETFC MMA-cut fight shorts with logo patch. Lightweight, durable.",
+    description:
+      "ETFC MMA-cut fight shorts with logo patch. Lightweight, durable.",
     images: ["images/merch-shorts.png"],
     basePrice: 3500,
     offerPrice: 2499,
@@ -129,7 +136,8 @@ const DEFAULT_MERCH_PRODUCTS = [
     name: "ETFC Boxing Gloves",
     slug: "boxing-gloves",
     category: "Gear",
-    description: "Official ETFC branded training gloves. Real leather, pro finish.",
+    description:
+      "Official ETFC branded training gloves. Real leather, pro finish.",
     images: ["images/merch-boxing-glove.png"],
     basePrice: 10000,
     offerPrice: 7999,
@@ -159,7 +167,8 @@ const DEFAULT_MERCH_PRODUCTS = [
     name: "ETFC Bracelet",
     slug: "etfc-bracelet",
     category: "Accessories",
-    description: "Gold-plated ETFC fighter bracelet — numbered limited edition.",
+    description:
+      "Gold-plated ETFC fighter bracelet — numbered limited edition.",
     images: ["images/merch-bracelet.png"],
     basePrice: 2500,
     offerPrice: 1799,

@@ -14,26 +14,42 @@
     <style>
       /* VVIP Ringside active tab */
       .section-tab.active[data-section="VVIP Ringside"] {
-        background: linear-gradient(135deg, var(--gold) 0%, #c8960a 100%) !important;
+        background: linear-gradient(
+          135deg,
+          var(--gold) 0%,
+          #c8960a 100%
+        ) !important;
         border-color: var(--gold) !important;
         color: #1a1508 !important;
-        box-shadow: 0 4px 16px rgba(176,141,62,0.3);
+        box-shadow: 0 4px 16px rgba(176, 141, 62, 0.3);
       }
       /* VVIP Premium active tab */
       .section-tab.active[data-section="VVIP Premium"] {
-        background: linear-gradient(135deg, var(--crimson) 0%, #8b0f15 100%) !important;
+        background: linear-gradient(
+          135deg,
+          var(--crimson) 0%,
+          #8b0f15 100%
+        ) !important;
         border-color: var(--crimson) !important;
         color: #fff !important;
-        box-shadow: 0 4px 16px rgba(179,20,28,0.3);
+        box-shadow: 0 4px 16px rgba(179, 20, 28, 0.3);
       }
       /* Inactive states */
       .section-tab[data-section="VVIP Ringside"]:not(.active) {
-        background: linear-gradient(135deg, rgba(176,141,62,0.15), rgba(176,141,62,0.05)) !important;
+        background: linear-gradient(
+          135deg,
+          rgba(176, 141, 62, 0.15),
+          rgba(176, 141, 62, 0.05)
+        ) !important;
         border-color: var(--gold) !important;
         color: var(--gold-bright) !important;
       }
       .section-tab[data-section="VVIP Premium"]:not(.active) {
-        background: linear-gradient(135deg, rgba(179,20,28,0.15), rgba(179,20,28,0.05)) !important;
+        background: linear-gradient(
+          135deg,
+          rgba(179, 20, 28, 0.15),
+          rgba(179, 20, 28, 0.05)
+        ) !important;
         border-color: var(--crimson) !important;
         color: var(--crimson-bright) !important;
       }
@@ -189,22 +205,38 @@
           transfer — usually within a few hours.
         </p>
 
-        <div class="checkout-section" style="margin-top:24px;">
+        <div class="checkout-section" style="margin-top: 24px">
           <div class="checkout-title">Payment Method</div>
-          <button type="button" class="payment-method-trigger" onclick="openPaymentMethodModal()" id="paymentMethodTrigger">
+          <button
+            type="button"
+            class="payment-method-trigger"
+            onclick="openPaymentMethodModal()"
+            id="paymentMethodTrigger"
+          >
             <span class="pmt-placeholder">Select payment method</span>
             <span class="pmt-chevron">›</span>
           </button>
 
-          <div id="bankDetailsBox" style="display:none;margin-top:12px;">
+          <div id="bankDetailsBox" style="display: none; margin-top: 12px">
             <div class="bank-details">
-              <div class="bank-row"><span>Account Name</span><span id="payAccountName">—</span></div>
-              <div class="bank-row highlight"><span>Reference Code</span><span id="refCode" class="ref-code">ETFC-XXXXXX</span></div>
+              <div class="bank-row">
+                <span>Account Name</span><span id="payAccountName">—</span>
+              </div>
+              <div class="bank-row">
+                <span>Number</span><span id="payAccountNumber">—</span>
+              </div>
+              <div class="bank-row highlight">
+                <span>Reference Code</span
+                ><span id="refCode" class="ref-code">ETFC-XXXXXX</span>
+              </div>
             </div>
-            <p class="hint">Send the exact amount to the number above and include the reference code.</p>
+            <p class="hint">
+              Send the exact amount to the number above and include the
+              reference code.
+            </p>
           </div>
 
-          <input type="hidden" id="selectedPaymentMethod" value="">
+          <input type="hidden" id="selectedPaymentMethod" value="" />
         </div>
 
         <div class="field mt-24">
@@ -321,7 +353,8 @@
         });
 
         // Only VVIP Ringside and VVIP Premium use the visual seat map
-        const isVisualMapSection = section === "VVIP Ringside" || section === "VVIP Premium";
+        const isVisualMapSection =
+          section === "VVIP Ringside" || section === "VVIP Premium";
         const mapEl = document.getElementById("seatMapMount");
         const gaEl = document.getElementById("gaPickerMount");
 
@@ -412,7 +445,9 @@
         const buyerPhone = document
           .getElementById("buyerPhoneInput")
           .value.trim();
-        const paymentMethod = document.getElementById("selectedPaymentMethod").value;
+        const paymentMethod = document.getElementById(
+          "selectedPaymentMethod"
+        ).value;
         const session = JSON.parse(
           localStorage.getItem("etfc_session") || "null"
         );
@@ -739,20 +774,34 @@
 
       // Payment methods config
       const PAYMENT_METHODS = [
-        { id: "mpesa", name: "M-Pesa", icon: "/safaricom.png", accountName: "Efrem Werku Muluneh" },
-        { id: "telebirr", name: "Telebirr", icon: "/telebirr.webp", accountName: "ager" },
+        {
+          id: "mpesa",
+          name: "M-Pesa",
+          icon: "/safaricom.png",
+          accountName: "Efrem Werku Muluneh",
+        },
+        {
+          id: "telebirr",
+          name: "Telebirr",
+          icon: "/telebirr.webp",
+          accountName: "ager",
+        },
       ];
 
       let selectedPaymentMethod = "";
 
       function openPaymentMethodModal() {
         const container = document.getElementById("paymentMethodOptions");
-        container.innerHTML = PAYMENT_METHODS.map((pm) => `
-          <button type="button" class="payment-method-row ${pm.id === selectedPaymentMethod ? "selected" : ""}" onclick="selectPaymentMethod('${pm.id}')">
+        container.innerHTML = PAYMENT_METHODS.map(
+          (pm) => `
+          <button type="button" class="payment-method-row ${
+            pm.id === selectedPaymentMethod ? "selected" : ""
+          }" onclick="selectPaymentMethod('${pm.id}')">
             <img src="${pm.icon}" alt="${pm.name}">
             <span class="pmr-name">${pm.name}</span>
           </button>
-        `).join("");
+        `
+        ).join("");
         document.getElementById("paymentMethodModal").classList.add("open");
       }
 
@@ -761,7 +810,7 @@
       }
 
       function selectPaymentMethod(methodId) {
-        const pm = PAYMENT_METHODS.find(p => p.id === methodId);
+        const pm = PAYMENT_METHODS.find((p) => p.id === methodId);
         if (!pm) return;
         selectedPaymentMethod = methodId;
         document.getElementById("selectedPaymentMethod").value = methodId;
@@ -770,16 +819,15 @@
         document.getElementById("paymentMethodTrigger").innerHTML = `
           <span class="pmt-left">
             <img src="${pm.icon}" alt="${pm.name}">
-            <span>
-              <span class="pmt-name">${pm.name}</span><br>
-              <span class="pmt-number">${PAYMENT_NUMBERS[pm.id]}</span>
-            </span>
+            <span class="pmt-name">${pm.name}</span>
           </span>
           <span class="pmt-chevron">›</span>
         `;
 
         // Reveal account details only now that a method is actually chosen
         document.getElementById("payAccountName").textContent = pm.accountName;
+        document.getElementById("payAccountNumber").textContent =
+          PAYMENT_NUMBERS[pm.id];
         document.getElementById("bankDetailsBox").style.display = "block";
 
         closePaymentMethodModal();
@@ -793,17 +841,19 @@
 
     <!-- MY TICKETS MODAL -->
     <!-- PAYMENT METHOD PICKER MODAL -->
-<div class="modal-overlay" id="paymentMethodModal">
-  <div class="modal" style="max-width:420px;">
-    <div class="modal-header">
-      <h3 style="margin:0;">Choose Payment Method</h3>
-      <span class="modal-close" onclick="closePaymentMethodModal()">&times;</span>
+    <div class="modal-overlay" id="paymentMethodModal">
+      <div class="modal" style="max-width: 420px">
+        <div class="modal-header">
+          <h3 style="margin: 0">Choose Payment Method</h3>
+          <span class="modal-close" onclick="closePaymentMethodModal()"
+            >&times;</span
+          >
+        </div>
+        <div class="modal-body" id="paymentMethodOptions"></div>
+      </div>
     </div>
-    <div class="modal-body" id="paymentMethodOptions"></div>
-  </div>
-</div>
 
-<div class="modal-overlay" id="myTicketsModal">
+    <div class="modal-overlay" id="myTicketsModal">
       <div
         class="modal modal-bet-slip"
         style="
