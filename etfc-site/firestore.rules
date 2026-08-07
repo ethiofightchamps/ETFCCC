@@ -26,6 +26,11 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
 
+    match /merchProducts/{productId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
     // Orders: user can create, and read any order where their uid OR email matches
     match /orders/{orderId} {
       allow create: if isSignedIn();
