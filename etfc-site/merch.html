@@ -725,26 +725,147 @@
           </div>
           <div class="checkout-section">
             <div class="checkout-title">Payment Details</div>
-            <div class="payment-methods-row" style="display:flex;gap:12px;margin-bottom:16px;flex-wrap:wrap;">
-              <button type="button" class="payment-method-btn" data-method="mpesa" onclick="selectPaymentMethod('mpesa')" style="flex:1;min-width:140px;display:flex;flex-direction:column;align-items:center;gap:8px;padding:16px;background:var(--obsidian);border:2px solid var(--border);border-radius:12px;cursor:pointer;transition:border-color 0.15s,background 0.15s;">
-                <img src="/safaricom.png" alt="M-Pesa" style="width:48px;height:48px;object-fit:contain;background:#fff;border-radius:8px;padding:4px;">
-                <div style="font-weight:700;color:var(--bone);font-size:14px;">M-Pesa</div>
-                <div style="font-family:var(--font-mono);font-size:11px;color:var(--gold-bright);" id="mpesaNumberDisplay">0725767614</div>
-                <div style="font-family:var(--font-mono);font-size:10px;color:var(--bone-dim);">Efrem Werku Muluneh</div>
+            <div
+              class="payment-methods-row"
+              style="
+                display: flex;
+                gap: 12px;
+                margin-bottom: 16px;
+                flex-wrap: wrap;
+              "
+            >
+              <button
+                type="button"
+                class="payment-method-btn"
+                data-method="mpesa"
+                onclick="selectPaymentMethod('mpesa')"
+                style="
+                  flex: 1;
+                  min-width: 140px;
+                  display: flex;
+                  flex-direction: column;
+                  align-items: center;
+                  gap: 8px;
+                  padding: 16px;
+                  background: var(--obsidian);
+                  border: 2px solid var(--border);
+                  border-radius: 12px;
+                  cursor: pointer;
+                  transition: border-color 0.15s, background 0.15s;
+                "
+              >
+                <img
+                  src="/safaricom.png"
+                  alt="M-Pesa"
+                  style="
+                    width: 48px;
+                    height: 48px;
+                    object-fit: contain;
+                    background: #fff;
+                    border-radius: 8px;
+                    padding: 4px;
+                  "
+                />
+                <div
+                  style="font-weight: 700; color: var(--bone); font-size: 14px"
+                >
+                  M-Pesa
+                </div>
+                <div
+                  style="
+                    font-family: var(--font-mono);
+                    font-size: 11px;
+                    color: var(--gold-bright);
+                  "
+                  id="mpesaNumberDisplay"
+                >
+                  0725767614
+                </div>
+                <div
+                  style="
+                    font-family: var(--font-mono);
+                    font-size: 10px;
+                    color: var(--bone-dim);
+                  "
+                >
+                  Efrem Werku Muluneh
+                </div>
               </button>
-              <button type="button" class="payment-method-btn" data-method="telebirr" onclick="selectPaymentMethod('telebirr')" style="flex:1;min-width:140px;display:flex;flex-direction:column;align-items:center;gap:8px;padding:16px;background:var(--obsidian);border:2px solid var(--border);border-radius:12px;cursor:pointer;transition:border-color 0.15s,background 0.15s;">
-                <img src="/telebirr.webp" alt="Telebirr" style="width:48px;height:48px;object-fit:contain;background:#fff;border-radius:8px;padding:4px;">
-                <div style="font-weight:700;color:var(--bone);font-size:14px;">Telebirr</div>
-                <div style="font-family:var(--font-mono);font-size:11px;color:var(--gold-bright);" id="telebirrNumberDisplay">0983196199</div>
-                <div style="font-family:var(--font-mono);font-size:10px;color:var(--bone-dim);">ager</div>
+              <button
+                type="button"
+                class="payment-method-btn"
+                data-method="telebirr"
+                onclick="selectPaymentMethod('telebirr')"
+                style="
+                  flex: 1;
+                  min-width: 140px;
+                  display: flex;
+                  flex-direction: column;
+                  align-items: center;
+                  gap: 8px;
+                  padding: 16px;
+                  background: var(--obsidian);
+                  border: 2px solid var(--border);
+                  border-radius: 12px;
+                  cursor: pointer;
+                  transition: border-color 0.15s, background 0.15s;
+                "
+              >
+                <img
+                  src="/telebirr.webp"
+                  alt="Telebirr"
+                  style="
+                    width: 48px;
+                    height: 48px;
+                    object-fit: contain;
+                    background: #fff;
+                    border-radius: 8px;
+                    padding: 4px;
+                  "
+                />
+                <div
+                  style="font-weight: 700; color: var(--bone); font-size: 14px"
+                >
+                  Telebirr
+                </div>
+                <div
+                  style="
+                    font-family: var(--font-mono);
+                    font-size: 11px;
+                    color: var(--gold-bright);
+                  "
+                  id="telebirrNumberDisplay"
+                >
+                  0983196199
+                </div>
+                <div
+                  style="
+                    font-family: var(--font-mono);
+                    font-size: 10px;
+                    color: var(--bone-dim);
+                  "
+                >
+                  ager
+                </div>
               </button>
             </div>
-            <div class="bank-details" style="margin-top:12px;">
-              <div class="bank-row"><span>Account Name</span><span id="payAccountName">Efrem Werku Muluneh</span></div>
-              <div class="bank-row highlight"><span>Reference Code</span><span id="merchRefCode" class="ref-code">ETFC-MERCH-XXXXXX</span></div>
+            <div class="bank-details" style="margin-top: 12px">
+              <div class="bank-row">
+                <span>Account Name</span
+                ><span id="payAccountName">Efrem Werku Muluneh</span>
+              </div>
+              <div class="bank-row highlight">
+                <span>Reference Code</span
+                ><span id="merchRefCode" class="ref-code"
+                  >ETFC-MERCH-XXXXXX</span
+                >
+              </div>
             </div>
-            <p class="hint">Select a payment method, send the exact amount, and include the reference code.</p>
-            <input type="hidden" id="selectedPaymentMethod" value="mpesa">
+            <p class="hint">
+              Select a payment method, send the exact amount, and include the
+              reference code.
+            </p>
+            <input type="hidden" id="selectedPaymentMethod" value="mpesa" />
           </div>
           <div class="checkout-section">
             <div class="checkout-title">Your Details</div>
@@ -895,47 +1016,47 @@
           .join("");
       }
 
-async function loadProducts() {
-    renderSkeletons();
-    try {
-      const snap = await db
-        .collection("merchProducts")
-        .where("active", "==", true)
-        .orderBy("createdAt", "desc")
-        .get();
-      const firestoreProducts = snap.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
-      console.log("Firestore products:", firestoreProducts.length);
-      // Use Firestore products if available, otherwise fall back to local seed data
-      allProducts =
-        firestoreProducts.length > 0
-          ? firestoreProducts
-          : typeof DEFAULT_MERCH_PRODUCTS !== "undefined"
-          ? DEFAULT_MERCH_PRODUCTS
-          : [];
-      console.log("Using products:", allProducts.length);
-      renderProducts();
-    } catch (err) {
-      console.error("loadProducts failed:", err);
-      // On error, still show local products so the page isn't blank
-      allProducts =
-        typeof DEFAULT_MERCH_PRODUCTS !== "undefined"
-          ? DEFAULT_MERCH_PRODUCTS
-          : [];
-      console.log("Fallback products:", allProducts.length);
-      if (allProducts.length > 0) {
-        renderProducts();
-      } else {
-        document.getElementById("merchGrid").innerHTML = `
+      async function loadProducts() {
+        renderSkeletons();
+        try {
+          const snap = await db
+            .collection("merchProducts")
+            .where("active", "==", true)
+            .orderBy("createdAt", "desc")
+            .get();
+          const firestoreProducts = snap.docs.map((doc) => ({
+            id: doc.id,
+            ...doc.data(),
+          }));
+          console.log("Firestore products:", firestoreProducts.length);
+          // Use Firestore products if available, otherwise fall back to local seed data
+          allProducts =
+            firestoreProducts.length > 0
+              ? firestoreProducts
+              : typeof DEFAULT_MERCH_PRODUCTS !== "undefined"
+              ? DEFAULT_MERCH_PRODUCTS
+              : [];
+          console.log("Using products:", allProducts.length);
+          renderProducts();
+        } catch (err) {
+          console.error("loadProducts failed:", err);
+          // On error, still show local products so the page isn't blank
+          allProducts =
+            typeof DEFAULT_MERCH_PRODUCTS !== "undefined"
+              ? DEFAULT_MERCH_PRODUCTS
+              : [];
+          console.log("Fallback products:", allProducts.length);
+          if (allProducts.length > 0) {
+            renderProducts();
+          } else {
+            document.getElementById("merchGrid").innerHTML = `
       <div class="empty-state">
         <div class="empty-icon">⚠️</div>
         <p>Could not load products. Try refreshing.</p>
       </div>`;
+          }
+        }
       }
-    }
-  }
 
       function renderProducts() {
         const grid = document.getElementById("merchGrid");
@@ -1067,8 +1188,10 @@ async function loadProducts() {
 
       function openMerchCheckout() {
         if (!currentProduct) return;
+        const productForCheckout = currentProduct; // save before closeMerchDetail nulls it
         requireAuth("buyMerch", () => {
           closeMerchDetail();
+          currentProduct = productForCheckout; // restore after close
           const session = JSON.parse(
             localStorage.getItem("etfc_session") || "null"
           );
@@ -1183,24 +1306,38 @@ async function loadProducts() {
 
       // Payment methods config
       const PAYMENT_METHODS = [
-        { id: "mpesa", name: "M-Pesa", icon: "/safaricom.png", accountName: "Efrem Werku Muluneh" },
-        { id: "telebirr", name: "Telebirr", icon: "/telebirr.webp", accountName: "ager" },
+        {
+          id: "mpesa",
+          name: "M-Pesa",
+          icon: "/safaricom.png",
+          accountName: "Efrem Werku Muluneh",
+        },
+        {
+          id: "telebirr",
+          name: "Telebirr",
+          icon: "/telebirr.webp",
+          accountName: "ager",
+        },
       ];
 
       function selectPaymentMethod(methodId) {
-        const pm = PAYMENT_METHODS.find(p => p.id === methodId);
+        const pm = PAYMENT_METHODS.find((p) => p.id === methodId);
         if (!pm) return;
         selectedPaymentMethod = methodId;
-        
+
         // Update button styles
-        document.querySelectorAll('.payment-method-btn').forEach(btn => {
-          btn.style.borderColor = btn.dataset.method === methodId ? 'var(--gold)' : 'var(--border)';
-          btn.style.background = btn.dataset.method === methodId ? 'rgba(176,141,62,0.1)' : 'var(--obsidian)';
+        document.querySelectorAll(".payment-method-btn").forEach((btn) => {
+          btn.style.borderColor =
+            btn.dataset.method === methodId ? "var(--gold)" : "var(--border)";
+          btn.style.background =
+            btn.dataset.method === methodId
+              ? "rgba(176,141,62,0.1)"
+              : "var(--obsidian)";
         });
-        
+
         // Update hidden input
         document.getElementById("selectedPaymentMethod").value = methodId;
-        
+
         // Update bank details
         document.getElementById("payAccountName").textContent = pm.accountName;
       }
@@ -1227,7 +1364,9 @@ async function loadProducts() {
         const buyerPhone = document
           .getElementById("merchBuyerPhone")
           .value.trim();
-        const paymentMethod = document.getElementById("selectedPaymentMethod").value;
+        const paymentMethod = document.getElementById(
+          "selectedPaymentMethod"
+        ).value;
         const session = JSON.parse(
           localStorage.getItem("etfc_session") || "null"
         );
