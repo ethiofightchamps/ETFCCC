@@ -19,7 +19,7 @@ module.exports = async (req, res) => {
     return res.status(405).json({ error: "Method not allowed" });
   }
 
-  const { legs, stake, buyerName, phone, email, userId, screenshotUrl } = req.body || {};
+  const { legs, stake, buyerName, phone, paymentMethod, email, userId, screenshotUrl } = req.body || {};
 
   if (!Array.isArray(legs) || legs.length === 0) {
     return res.status(400).json({ error: "At least one leg is required." });
@@ -100,6 +100,7 @@ module.exports = async (req, res) => {
     const betRef = await db.collection("bets").add({
       buyerName,
       phone,
+      paymentMethod: paymentMethod || "mpesa",
       email: email || "",
       userId: userId || "",
       legs: validatedLegs,

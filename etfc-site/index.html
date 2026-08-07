@@ -1,298 +1,518 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ETFC — Fight Night | [Event Name TBD]</title>
-<script>(function(){var t=localStorage.getItem("etfc_theme")||"dark";document.documentElement.setAttribute("data-theme",t);})();</script>
-<link rel="stylesheet" href="css/style.css">
-<style>
-/* Merch popout ad */
-.merch-ad-popup {
-  position: fixed;
-  bottom: 80px;
-  right: 20px;
-  z-index: 999;
-  width: 220px;
-  background: linear-gradient(135deg, #1a0e00 0%, #0d0d0d 100%);
-  border: 1px solid var(--gold);
-  border-radius: 14px;
-  box-shadow: 0 8px 40px rgba(0,0,0,0.7), 0 0 0 1px rgba(180,140,30,0.2);
-  overflow: hidden;
-  animation: slideInAd 0.5s cubic-bezier(0.34,1.56,0.64,1) forwards;
-  cursor: pointer;
-  transform-origin: bottom right;
-}
-@keyframes slideInAd {
-  from { opacity:0; transform: scale(0.7) translateY(20px); }
-  to   { opacity:1; transform: scale(1) translateY(0); }
-}
-.merch-ad-popup.hide {
-  animation: slideOutAd 0.3s ease forwards;
-}
-@keyframes slideOutAd {
-  to { opacity:0; transform: scale(0.7) translateY(20px); pointer-events:none; }
-}
-.merch-ad-close {
-  position: absolute;
-  top: 8px; right: 10px;
-  font-size: 16px;
-  color: var(--bone-dim);
-  cursor: pointer;
-  z-index: 2;
-  line-height: 1;
-  background: rgba(0,0,0,0.4);
-  border-radius: 50%;
-  width: 22px; height: 22px;
-  display: flex; align-items: center; justify-content: center;
-}
-.merch-ad-close:hover { color: #fff; }
-.merch-ad-banner {
-  background: linear-gradient(90deg, var(--gold) 0%, #c8960a 100%);
-  color: #000;
-  font-family: var(--font-mono);
-  font-size: 9px;
-  font-weight: 900;
-  letter-spacing: 3px;
-  text-align: center;
-  padding: 5px;
-  text-transform: uppercase;
-}
-.merch-ad-body { padding: 14px 14px 16px; }
-.merch-ad-icon { font-size: 32px; text-align: center; margin-bottom: 8px; }
-.merch-ad-title {
-  font-family: var(--font-display);
-  font-size: 18px;
-  font-weight: 900;
-  text-transform: uppercase;
-  color: #fff;
-  text-align: center;
-  line-height: 1.1;
-  margin-bottom: 4px;
-}
-.merch-ad-title span { color: var(--gold-bright); }
-.merch-ad-sub {
-  font-size: 11px;
-  color: var(--bone-dim);
-  text-align: center;
-  margin-bottom: 12px;
-  line-height: 1.4;
-}
-.merch-ad-cta {
-  display: block;
-  width: 100%;
-  text-align: center;
-  padding: 9px;
-  background: var(--crimson);
-  color: #fff;
-  font-family: var(--font-mono);
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  border-radius: 8px;
-  text-decoration: none;
-  transition: background 0.15s;
-}
-.merch-ad-cta:hover { background: var(--crimson-bright); color: #fff; }
-@media (max-width: 480px) {
-  .merch-ad-popup { width: 180px; bottom: 90px; right: 12px; }
-}
-</style>
-</head>
-<body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ETFC — Fight Night | [Event Name TBD]</title>
+    <script>
+      (function () {
+        var t = localStorage.getItem("etfc_theme") || "dark";
+        document.documentElement.setAttribute("data-theme", t);
+      })();
+    </script>
+    <link rel="stylesheet" href="css/style.css" />
+    <style>
+      /* Merch popout ad */
+      .merch-ad-popup {
+        position: fixed;
+        bottom: 80px;
+        right: 20px;
+        z-index: 999;
+        width: 220px;
+        background: linear-gradient(135deg, #1a0e00 0%, #0d0d0d 100%);
+        border: 1px solid var(--gold);
+        border-radius: 14px;
+        box-shadow: 0 8px 40px rgba(0, 0, 0, 0.7),
+          0 0 0 1px rgba(180, 140, 30, 0.2);
+        overflow: hidden;
+        animation: slideInAd 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+        cursor: pointer;
+        transform-origin: bottom right;
+      }
+      @keyframes slideInAd {
+        from {
+          opacity: 0;
+          transform: scale(0.7) translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: scale(1) translateY(0);
+        }
+      }
+      .merch-ad-popup.hide {
+        animation: slideOutAd 0.3s ease forwards;
+      }
+      @keyframes slideOutAd {
+        to {
+          opacity: 0;
+          transform: scale(0.7) translateY(20px);
+          pointer-events: none;
+        }
+      }
+      .merch-ad-close {
+        position: absolute;
+        top: 8px;
+        right: 10px;
+        font-size: 16px;
+        color: var(--bone-dim);
+        cursor: pointer;
+        z-index: 2;
+        line-height: 1;
+        background: rgba(0, 0, 0, 0.4);
+        border-radius: 50%;
+        width: 22px;
+        height: 22px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .merch-ad-close:hover {
+        color: #fff;
+      }
+      .merch-ad-banner {
+        background: linear-gradient(90deg, var(--gold) 0%, #c8960a 100%);
+        color: #000;
+        font-family: var(--font-mono);
+        font-size: 9px;
+        font-weight: 900;
+        letter-spacing: 3px;
+        text-align: center;
+        padding: 5px;
+        text-transform: uppercase;
+      }
+      .merch-ad-body {
+        padding: 14px 14px 16px;
+      }
+      .merch-ad-icon {
+        font-size: 32px;
+        text-align: center;
+        margin-bottom: 8px;
+      }
+      .merch-ad-title {
+        font-family: var(--font-display);
+        font-size: 18px;
+        font-weight: 900;
+        text-transform: uppercase;
+        color: #fff;
+        text-align: center;
+        line-height: 1.1;
+        margin-bottom: 4px;
+      }
+      .merch-ad-title span {
+        color: var(--gold-bright);
+      }
+      .merch-ad-sub {
+        font-size: 11px;
+        color: var(--bone-dim);
+        text-align: center;
+        margin-bottom: 12px;
+        line-height: 1.4;
+      }
+      .merch-ad-cta {
+        display: block;
+        width: 100%;
+        text-align: center;
+        padding: 9px;
+        background: var(--crimson);
+        color: #fff;
+        font-family: var(--font-mono);
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        border-radius: 8px;
+        text-decoration: none;
+        transition: background 0.15s;
+      }
+      .merch-ad-cta:hover {
+        background: var(--crimson-bright);
+        color: #fff;
+      }
+      @media (max-width: 480px) {
+        .merch-ad-popup {
+          width: 180px;
+          bottom: 90px;
+          right: 12px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="nav-mount" data-active="home"></div>
 
-<div id="nav-mount" data-active="home"></div>
-
-<!-- HERO -->
-<section class="hero">
-  <div class="hero-bg"><div class="face left" style="background-image:url('images/fighter-a.jpg');"></div><div class="face right" style="background-image:url('images/fighter-b.jpg');"></div></div>
-  <div class="hero-content">
-    <div class="hero-label">ETFC Fight Night &middot; Heavyweight Bout</div>
-    <h1 class="hero-title">SEDO <span class="vs">VS</span> JOHNNY</h1>
-    <p class="hero-sub">Main Event &middot; MMA</p>
-    <div class="hero-meta">
-      <span>&#128197; August 29, 2026 &middot; 10:00 AM</span>
-      <span>&#128205; Adwa Museum, Addis Ababa</span>
-    </div>
-    <div id="countdown" class="countdown"></div>
-    <div class="hero-ctas">
-      <a href="tickets.html" class="btn btn-primary">Get Your Tickets</a>
-      <a href="betting.html" class="btn btn-gold">View Odds &amp; Bet</a>
-      <a href="fight-card.html" class="btn btn-outline">Full Fight Card</a>
-    </div>
-  </div>
-</section>
-
-<div class="container">
-
-  <!-- BETTING STRIP -->
-  <section>
-    <div class="section-head">
-      <div>
-        <div class="section-eyebrow">Main Event Odds</div>
-        <div class="section-title">Back Your Fighter</div>
+    <!-- HERO -->
+    <section class="hero">
+      <div class="hero-bg">
+        <div
+          class="face left"
+          style="background-image: url('images/fighter-a.jpg')"
+        ></div>
+        <div
+          class="face right"
+          style="background-image: url('images/fighter-b.jpg')"
+        ></div>
       </div>
-      <a href="betting.html" class="section-link">Full Odds &rarr;</a>
-    </div>
-    <div class="betting-strip">
-      <div class="odds-pair">
-        <div class="odds-fighter">
-          <div class="thumb" style="background-image:url('images/fighter-a.jpg');background-size:cover;"></div>
-          <div><div class="name">Sedo</div><div class="price">1.85</div></div>
+      <div class="hero-content">
+        <div class="hero-label">ETFC Fight Night &middot; Heavyweight Bout</div>
+        <h1 class="hero-title">SEDO <span class="vs">VS</span> JOHNNY</h1>
+        <p class="hero-sub">Main Event &middot; MMA</p>
+        <div class="hero-meta">
+          <span>&#128197; August 27, 2026 &middot; 10:00 AM</span>
+          <span>&#128205; Adwa Museum, Addis Ababa</span>
         </div>
-        <div class="odds-vs">VS</div>
-        <div class="odds-fighter">
-          <div class="thumb" style="background-image:url('images/fighter-b.jpg');background-size:cover;"></div>
-          <div><div class="name">Johnny</div><div class="price">2.05</div></div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- FIGHT CARD PREVIEW -->
-  <section>
-    <div class="section-head">
-      <div>
-        <div class="section-eyebrow">Fight Night</div>
-        <div class="section-title">The Card</div>
-      </div>
-      <a href="fight-card.html" class="section-link">See All Bouts &rarr;</a>
-    </div>
-    <div class="card-strip">
-      <div class="bout-stub">
-        <div class="bout-number">MAIN EVENT &middot; MMA</div>
-        <div class="bout-weight">Heavyweight</div>
-        <div class="bout-matchup">
-          <div class="bout-fighter"><div class="thumb" style="background-image:url('images/fighter-a.jpg');background-size:cover;"></div><div class="name">Sedo</div></div>
-          <div class="bout-vs">VS</div>
-          <div class="bout-fighter"><div class="thumb" style="background-image:url('images/fighter-b.jpg');background-size:cover;"></div><div class="name">Johnny</div></div>
-        </div>
-        <div class="bout-actions">
-          <a href="betting.html" class="btn btn-gold">Odds</a>
-          <a href="tickets.html" class="btn btn-primary">Tickets</a>
+        <div id="countdown" class="countdown"></div>
+        <div class="hero-ctas">
+          <a href="tickets.html" class="btn btn-primary">Get Your Tickets</a>
+          <a href="betting.html" class="btn btn-gold">View Odds &amp; Bet</a>
+          <a href="fight-card.html" class="btn btn-outline">Full Fight Card</a>
         </div>
       </div>
-      <div class="bout-stub">
-        <div class="bout-number">MMA</div>
-        <div class="bout-weight">Heavyweight</div>
-        <div class="bout-matchup">
-          <div class="bout-fighter"><div class="thumb"></div><div class="name">Boyka</div></div>
-          <div class="bout-vs">VS</div>
-          <div class="bout-fighter"><div class="thumb"></div><div class="name">Endris</div></div>
+    </section>
+
+    <div class="container">
+      <!-- BETTING STRIP -->
+      <section>
+        <div class="section-head">
+          <div>
+            <div class="section-eyebrow">Main Event Odds</div>
+            <div class="section-title">Back Your Fighter</div>
+          </div>
+          <a href="betting.html" class="section-link">Full Odds &rarr;</a>
         </div>
-        <div class="bout-actions">
-          <a href="betting.html" class="btn btn-gold">Odds</a>
-          <a href="tickets.html" class="btn btn-primary">Tickets</a>
+        <div class="betting-strip">
+          <div class="odds-pair">
+            <div class="odds-fighter">
+              <div
+                class="thumb"
+                style="
+                  background-image: url('images/fighter-a.jpg');
+                  background-size: cover;
+                "
+              ></div>
+              <div>
+                <div class="name">Sedo</div>
+                <div class="price">1.85</div>
+              </div>
+            </div>
+            <div class="odds-vs">VS</div>
+            <div class="odds-fighter">
+              <div
+                class="thumb"
+                style="
+                  background-image: url('images/fighter-b.jpg');
+                  background-size: cover;
+                "
+              ></div>
+              <div>
+                <div class="name">Johnny</div>
+                <div class="price">2.05</div>
+              </div>
+            </div>
+          </div>
         </div>
-      </div>
-      <div class="bout-stub">
-        <div class="bout-number">BOXING</div>
-        <div class="bout-weight">Lightweight</div>
-        <div class="bout-matchup">
-          <div class="bout-fighter"><div class="thumb"></div><div class="name">Esubalew</div></div>
-          <div class="bout-vs">VS</div>
-          <div class="bout-fighter"><div class="thumb"></div><div class="name">Biniyam</div></div>
+      </section>
+
+      <!-- FIGHT CARD PREVIEW -->
+      <section>
+        <div class="section-head">
+          <div>
+            <div class="section-eyebrow">Fight Night</div>
+            <div class="section-title">The Card</div>
+          </div>
+          <a href="fight-card.html" class="section-link"
+            >See All Bouts &rarr;</a
+          >
         </div>
-        <div class="bout-actions">
-          <a href="betting.html" class="btn btn-gold">Odds</a>
-          <a href="tickets.html" class="btn btn-primary">Tickets</a>
+        <div class="card-strip">
+          <div class="bout-stub">
+            <div class="bout-number">MAIN EVENT &middot; MMA</div>
+            <div class="bout-weight">Heavyweight</div>
+            <div class="bout-matchup">
+              <div class="bout-fighter">
+                <div
+                  class="thumb"
+                  style="
+                    background-image: url('images/fighter-a.jpg');
+                    background-size: cover;
+                  "
+                ></div>
+                <div class="name">Sedo</div>
+              </div>
+              <div class="bout-vs">VS</div>
+              <div class="bout-fighter">
+                <div
+                  class="thumb"
+                  style="
+                    background-image: url('images/fighter-b.jpg');
+                    background-size: cover;
+                  "
+                ></div>
+                <div class="name">Johnny</div>
+              </div>
+            </div>
+            <div class="bout-actions">
+              <a href="betting.html" class="btn btn-gold">Odds</a>
+              <a href="tickets.html" class="btn btn-primary">Tickets</a>
+            </div>
+          </div>
+          <div class="bout-stub">
+            <div class="bout-number">MMA</div>
+            <div class="bout-weight">Heavyweight</div>
+            <div class="bout-matchup">
+              <div class="bout-fighter">
+                <div class="thumb"></div>
+                <div class="name">Boyka</div>
+              </div>
+              <div class="bout-vs">VS</div>
+              <div class="bout-fighter">
+                <div class="thumb"></div>
+                <div class="name">Endris</div>
+              </div>
+            </div>
+            <div class="bout-actions">
+              <a href="betting.html" class="btn btn-gold">Odds</a>
+              <a href="tickets.html" class="btn btn-primary">Tickets</a>
+            </div>
+          </div>
+          <div class="bout-stub">
+            <div class="bout-number">BOXING</div>
+            <div class="bout-weight">Lightweight</div>
+            <div class="bout-matchup">
+              <div class="bout-fighter">
+                <div class="thumb"></div>
+                <div class="name">Esubalew</div>
+              </div>
+              <div class="bout-vs">VS</div>
+              <div class="bout-fighter">
+                <div class="thumb"></div>
+                <div class="name">Biniyam</div>
+              </div>
+            </div>
+            <div class="bout-actions">
+              <a href="betting.html" class="btn btn-gold">Odds</a>
+              <a href="tickets.html" class="btn btn-primary">Tickets</a>
+            </div>
+          </div>
         </div>
-      </div>
+      </section>
+
+      <!-- TICKET TIERS TEASER -->
+      <section>
+        <div class="section-head">
+          <div>
+            <div class="section-eyebrow">Choose Your Seat</div>
+            <div class="section-title">Ticket Tiers</div>
+          </div>
+        </div>
+        <div class="tier-cards">
+          <div class="tier-card featured">
+            <div class="tier-name">VVIP</div>
+            <div class="tier-price">50,000 ETB</div>
+            <ul>
+              <li>Front-row ringside seats</li>
+              <li>Closest to the action</li>
+              <li>Premium experience</li>
+            </ul>
+            <a href="tickets.html" class="btn btn-gold btn-block"
+              >Select Seats</a
+            >
+          </div>
+          <div class="tier-card">
+            <div class="tier-name">VIP</div>
+            <div class="tier-price">10,000 ETB</div>
+            <ul>
+              <li>Reserved seating block</li>
+              <li>Closer to the ring</li>
+              <li>Priority entry</li>
+            </ul>
+            <a href="tickets.html" class="btn btn-outline btn-block"
+              >Select Seats</a
+            >
+          </div>
+          <div class="tier-card">
+            <div class="tier-name">Middle</div>
+            <div class="tier-price">5,000 ETB</div>
+            <ul>
+              <li>Center view seating</li>
+              <li>Great sightlines</li>
+              <li>Balanced experience</li>
+            </ul>
+            <a href="tickets.html" class="btn btn-outline btn-block"
+              >Select Seats</a
+            >
+          </div>
+          <div class="tier-card">
+            <div class="tier-name">Back Row</div>
+            <div class="tier-price">2,000 ETB</div>
+            <ul>
+              <li>Upper tier seating</li>
+              <li>Full event view</li>
+              <li>Most affordable</li>
+            </ul>
+            <a href="tickets.html" class="btn btn-outline btn-block"
+              >Select Seats</a
+            >
+          </div>
+        </div>
+      </section>
     </div>
-  </section>
 
-<!-- TICKET TIERS TEASER -->
-  <section>
-    <div class="section-head">
-      <div>
-        <div class="section-eyebrow">Choose Your Seat</div>
-        <div class="section-title">Ticket Tiers</div>
-      </div>
+    <div id="footer-mount"></div>
+
+    <div class="sticky-mobile-cta">
+      <a
+        href="tickets.html"
+        class="btn btn-primary"
+        style="flex: 1; text-align: center"
+        >Tickets</a
+      >
+      <a
+        href="betting.html"
+        class="btn btn-gold"
+        style="flex: 1; text-align: center"
+        >Bet</a
+      >
     </div>
-    <div class="tier-cards">
-      <div class="tier-card featured">
-        <div class="tier-name">VVIP</div>
-        <div class="tier-price">50,000 ETB</div>
-        <ul><li>Front-row ringside seats</li><li>Closest to the action</li><li>Premium experience</li></ul>
-        <a href="tickets.html" class="btn btn-gold btn-block">Select Seats</a>
-      </div>
-      <div class="tier-card">
-        <div class="tier-name">VIP</div>
-        <div class="tier-price">10,000 ETB</div>
-        <ul><li>Reserved seating block</li><li>Closer to the ring</li><li>Priority entry</li></ul>
-        <a href="tickets.html" class="btn btn-outline btn-block">Select Seats</a>
-      </div>
-      <div class="tier-card">
-        <div class="tier-name">Middle</div>
-        <div class="tier-price">5,000 ETB</div>
-        <ul><li>Center view seating</li><li>Great sightlines</li><li>Balanced experience</li></ul>
-        <a href="tickets.html" class="btn btn-outline btn-block">Select Seats</a>
-      </div>
-      <div class="tier-card">
-        <div class="tier-name">Back Row</div>
-        <div class="tier-price">2,000 ETB</div>
-        <ul><li>Upper tier seating</li><li>Full event view</li><li>Most affordable</li></ul>
-        <a href="tickets.html" class="btn btn-outline btn-block">Select Seats</a>
-      </div>
-    </div>
-  </section>
 
-</div>
+    <!-- ROTATING AD BANNER (Ticket + Merch) -->
+    <div class="rotating-ad-banner" id="rotatingAdBanner" style="display:none;"></div>
 
-<div id="footer-mount"></div>
+    <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-storage-compat.js"></script>
+    <script src="js/firebase-config.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/partials.js"></script>
+    <script src="js/main.js"></script>
+    <script>
+      // Rotating ads: mix of ticket promos and merch promos
+      const HOME_ADS = [
+        {
+          type: "ticket",
+          label: "🔥 LIMITED OFFER",
+          title: "Early Bird Tickets",
+          sub: "2,000 ETB — General admission, grab them before they're gone.",
+          cta: "Get Early Bird",
+          action: () => { window.location.href = "tickets.html#Early Bird"; },
+          bg: "linear-gradient(135deg, #1a0a00 0%, #2a1500 60%, #1a0a00 100%)",
+          accent: "#d4af5f",
+        },
+        {
+          type: "ticket",
+          label: "🥊 RINGSIDE ACCESS",
+          title: "VVIP Ringside",
+          sub: "100,000 ETB — Front row, cage-side. Pick your exact seat.",
+          cta: "Pick Seats",
+          action: () => { window.location.href = "tickets.html#VVIP Ringside"; },
+          bg: "linear-gradient(135deg, #1a0000 0%, #2a0a0a 60%, #1a0000 100%)",
+          accent: "#b3141c",
+        },
+        {
+          type: "merch",
+          label: "🛍 OFFICIAL MERCH",
+          title: "Black Full Set",
+          sub: "Fight Night tracksuit — hoodie + shorts. 30% off launch price.",
+          cta: "Shop Now",
+          action: () => { window.location.href = "merch.html"; },
+          img: "images/merch-black-full.png",
+          bg: "linear-gradient(135deg, #0d0d0d 0%, #1a0d0d 60%, #0d0d0d 100%)",
+          accent: "#d4af5f",
+        },
+        {
+          type: "merch",
+          label: "🥊 OFFICIAL GEAR",
+          title: "ETFC Boxing Gloves",
+          sub: "Real leather, fight-night branded. 40% off for 5 days.",
+          cta: "Shop Now",
+          action: () => { window.location.href = "merch.html"; },
+          img: "images/merch-boxing-glove.png",
+          bg: "linear-gradient(135deg, #0a0d10 0%, #101820 60%, #0a0d10 100%)",
+          accent: "#4aa0e8",
+        },
+        {
+          type: "merch",
+          label: "🛍 LIMITED DROP",
+          title: "White Full Set",
+          sub: "Clean white ETFC full set — rare colourway. Offer ends soon.",
+          cta: "Shop Now",
+          action: () => { window.location.href = "merch.html"; },
+          img: "images/merch-white-full.png",
+          bg: "linear-gradient(135deg, #111 0%, #1a1a1a 60%, #111 100%)",
+          accent: "#d4af5f",
+        },
+        {
+          type: "ticket",
+          label: "🎟 VIP EXPERIENCE",
+          title: "VIP Seating",
+          sub: "10,000 ETB — Reserved block, priority entry, great views.",
+          cta: "Select Seats",
+          action: () => { window.location.href = "tickets.html#VIP"; },
+          bg: "linear-gradient(135deg, #0a100a 0%, #0d1a0d 60%, #0a100a 100%)",
+          accent: "#3f8f5f",
+        },
+      ];
 
-<div class="sticky-mobile-cta">
-  <a href="tickets.html" class="btn btn-primary" style="flex:1;text-align:center;">Tickets</a>
-  <a href="betting.html" class="btn btn-gold" style="flex:1;text-align:center;">Bet</a>
-</div>
+      let homeAdIndex = 0;
+      let homeAdTimer = null;
 
-<!-- MERCH POPOUT AD -->
-<div class="merch-ad-popup" id="merchAd" onclick="goToMerch(event)">
-  <div class="merch-ad-close" onclick="closeMerchAd(event)">✕</div>
-  <div class="merch-ad-banner">🔥 5-Day Offer: 2,499 ETB</div>
-  <div class="merch-ad-body" style="padding:0;">
-    <div class="merch-ad-img" style="width:100%;aspect-ratio:1;overflow:hidden;border-radius:0 0 14px 14px;">
-      <img src="images/merch1.png" alt="ETFC Fight Night Tee" style="width:100%;height:100%;object-fit:cover;display:block;">
-    </div>
-    <div style="padding:12px 14px 14px;">
-      <div class="merch-ad-title">ETFC <span>Merch</span></div>
-      <div class="merch-ad-sub" style="margin-bottom:8px;">Fight Night Tee — was 4,999 ETB</div>
-      <div style="font-family:var(--font-mono);font-size:14px;color:var(--gold-bright);font-weight:700;text-align:center;margin-bottom:10px;">2,499 ETB</div>
-      <a href="merch.html" class="merch-ad-cta">Shop All 4 Items →</a>
-    </div>
-  </div>
-</div>
+      function renderHomeAd(idx) {
+        const ad = HOME_ADS[idx];
+        const banner = document.getElementById("rotatingAdBanner");
+        if (!banner) return;
 
-<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-storage-compat.js"></script>
-<script src="js/firebase-config.js"></script>
-<script src="js/auth.js"></script>
-<script src="js/partials.js"></script>
-<script src="js/main.js"></script>
-<script>
-  // Show merch ad after 2s, hide if already dismissed this session
-  (function() {
-    if (sessionStorage.getItem("merch_ad_closed")) return;
-    setTimeout(function() {
-      const ad = document.getElementById("merchAd");
-      if (ad) ad.style.display = "block";
-    }, 2000);
-  })();
-  function closeMerchAd(e) {
-    e.stopPropagation();
-    const ad = document.getElementById("merchAd");
-    if (!ad) return;
-    ad.classList.add("hide");
-    sessionStorage.setItem("merch_ad_closed", "1");
-    setTimeout(function() { ad.remove(); }, 400);
-  }
-  function goToMerch(e) {
-    if (e.target.classList.contains("merch-ad-close")) return;
-    window.location.href = "merch.html";
-  }
-</script>
-</body>
+        const imgHtml = ad.img
+          ? `<div style="width:90px;height:90px;flex-shrink:0;border-radius:8px;overflow:hidden;background:#1a1a1a;border:1px solid rgba(255,255,255,0.08);">
+            <img src="${ad.img}" style="width:100%;height:100%;object-fit:contain;padding:4px;">
+          </div>`
+          : `<div style="width:90px;height:90px;flex-shrink:0;border-radius:8px;background:rgba(255,255,255,0.05);display:flex;align-items:center;justify-content:center;font-size:40px;">🎟</div>`;
+
+        // Dot indicators
+        const dots = HOME_ADS.map(
+          (_, i) =>
+            `<span onclick="goToHomeAd(${i})" style="width:6px;height:6px;border-radius:50%;background:${
+              i === idx ? ad.accent : "rgba(255,255,255,0.25)"
+            };display:inline-block;cursor:pointer;transition:background 0.2s;"></span>`
+        ).join("");
+
+        banner.style.background = ad.bg;
+        banner.innerHTML = `
+      <div style="display:flex;align-items:center;gap:16px;padding:16px 20px;cursor:pointer;" onclick="homeAdClick(${idx})">
+        ${imgHtml}
+        <div style="flex:1;min-width:0;">
+          <div style="font-family:var(--font-mono);font-size:9px;letter-spacing:3px;color:${ad.accent};text-transform:uppercase;margin-bottom:4px;">${ad.label}</div>
+          <div style="font-family:var(--font-display);font-size:clamp(16px,4vw,22px);color:#fff;text-transform:uppercase;line-height:1.1;margin-bottom:4px;">${ad.title}</div>
+          <div style="font-size:12px;color:rgba(255,255,255,0.55);margin-bottom:10px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">${ad.sub}</div>
+          <button style="background:${ad.accent};color:#000;border:none;padding:7px 16px;border-radius:6px;font-family:var(--font-mono);font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;cursor:pointer;">${ad.cta}</button>
+        </div>
+        <div style="position:absolute;top:10px;right:14px;display:flex;gap:5px;align-items:center;">${dots}</div>
+      </div>`;
+        banner.style.display = "block";
+      }
+
+      function goToHomeAd(idx) {
+        homeAdIndex = idx;
+        renderHomeAd(idx);
+        clearInterval(homeAdTimer);
+        homeAdTimer = setInterval(nextHomeAd, 5000);
+      }
+
+      function homeAdClick(idx) {
+        HOME_ADS[idx].action();
+      }
+
+      function nextHomeAd() {
+        homeAdIndex = (homeAdIndex + 1) % HOME_ADS.length;
+        renderHomeAd(homeAdIndex);
+      }
+
+      // Start rotation after 2s
+      document.addEventListener("DOMContentLoaded", () => {
+        setTimeout(() => {
+          renderHomeAd(0);
+          homeAdTimer = setInterval(nextHomeAd, 5000);
+        }, 2000);
+      });
+    </script>
+  </body>
 </html>

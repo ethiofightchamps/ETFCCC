@@ -34,14 +34,49 @@ window.addEventListener("resize", () => {
 
 // Rendered as individual clickable seats in the ring diagram.
 const SEAT_CONFIG = [
-  { section: "VVIP",  tier: "ringside", price: 50000, rings: 2, seatsPerRing: 40, radiusStart: 110, radiusStep: 28 },
-  { section: "VIP",   tier: "vip",      price: 10000, rings: 4, seatsPerRing: 40, radiusStart: 175, radiusStep: 28 },
+  {
+    section: "VVIP Ringside",
+    tier: "ringside",
+    price: 100000,
+    rings: 2,
+    seatsPerRing: 40,
+    radiusStart: 110,
+    radiusStep: 28,
+  },
+  {
+    section: "VVIP Premium",
+    tier: "vip",
+    price: 50000,
+    rings: 2,
+    seatsPerRing: 40,
+    radiusStart: 175,
+    radiusStep: 28,
+  },
 ];
 
-// General admission — quantity stepper only, no individual seat picking.
+// General admission / stepper sections — quantity stepper only, no individual seat picking.
 const GA_CONFIG = [
-  { section: "Middle",   tier: "ga", price: 5000, rings: 6, seatsPerRing: 80  },
-  { section: "Back Row", tier: "ga", price: 2000, rings: 6, seatsPerRing: 120 },
+  {
+    section: "VVIP Normal",
+    tier: "vvip-normal",
+    price: 30000,
+    rings: 2,
+    seatsPerRing: 40,
+  },
+  {
+    section: "VIP",
+    tier: "vip-std",
+    price: 20000,
+    rings: 4,
+    seatsPerRing: 40,
+  },
+  {
+    section: "Early Bird",
+    tier: "ga",
+    price: 6000,
+    rings: 6,
+    seatsPerRing: 120,
+  },
 ];
 
 const ALL_SECTIONS = [...SEAT_CONFIG, ...GA_CONFIG];
@@ -80,16 +115,22 @@ function seatIdToEntry(seatId, sec) {
   const parts = seatId.split("-");
   const num = parts[parts.length - 1];
   const rowLetter = parts[parts.length - 2];
-  return { section: sec.section, tier: sec.tier, price: sec.price, label: `${sec.section} ${rowLetter}${num}` };
+  return {
+    section: sec.section,
+    tier: sec.tier,
+    price: sec.price,
+    label: `${sec.section} ${rowLetter}${num}`,
+  };
 }
 
 function renderSeatMap(sectionFilter = "all") {
   const mount = document.getElementById("seatMapMount");
   if (!mount) return;
 
-  const sectionsToRender = sectionFilter === "all"
-    ? SEAT_CONFIG
-    : SEAT_CONFIG.filter(s => s.section === sectionFilter);
+  const sectionsToRender =
+    sectionFilter === "all"
+      ? SEAT_CONFIG
+      : SEAT_CONFIG.filter((s) => s.section === sectionFilter);
 
   let html = `
     <div class="arena">
@@ -99,7 +140,9 @@ function renderSeatMap(sectionFilter = "all") {
   sectionsToRender.forEach((sec) => {
     html += `<div class="seat-section" data-section="${sec.section}">`;
     if (sectionFilter !== "all") {
-      html += `<div class="seat-section-label">${sec.section} — ${sec.price.toLocaleString()} ETB</div>`;
+      html += `<div class="seat-section-label">${
+        sec.section
+      } — ${sec.price.toLocaleString()} ETB</div>`;
     }
     html += `<div class="seat-rings">`;
 
@@ -117,8 +160,8 @@ function renderSeatMap(sectionFilter = "all") {
         const seatId = `${sec.section}-${rowLetter}-${s + 1}`;
         const sold = SOLD_SEATS.has(seatId);
 
-        const x = Math.cos(angle * Math.PI / 180) * radius;
-        const y = Math.sin(angle * Math.PI / 180) * radius;
+        const x = Math.cos((angle * Math.PI) / 180) * radius;
+        const y = Math.sin((angle * Math.PI) / 180) * radius;
 
         const rotateDeg = angle + 90;
 
@@ -129,8 +172,16 @@ function renderSeatMap(sectionFilter = "all") {
           data-tier="${sec.tier}"
           data-price="${sec.price}"
           data-label="${sec.section} ${rowLetter}${s + 1}"
-          title="${sec.section} ${rowLetter}${s + 1} — ${sec.price.toLocaleString()} ETB"
-          style="--tx: calc(${x.toFixed(1)}px * var(--ring-scale, 1)); --ty: calc(${y.toFixed(1)}px * var(--ring-scale, 1)); --rot: ${rotateDeg.toFixed(1)}deg; transform: translate(var(--tx), var(--ty)) rotate(var(--rot)); pointer-events: auto; width: calc(18px * var(--ring-scale, 1)); height: calc(18px * var(--ring-scale, 1));"
+          title="${sec.section} ${rowLetter}${
+          s + 1
+        } — ${sec.price.toLocaleString()} ETB"
+          style="--tx: calc(${x.toFixed(
+            1
+          )}px * var(--ring-scale, 1)); --ty: calc(${y.toFixed(
+          1
+        )}px * var(--ring-scale, 1)); --rot: ${rotateDeg.toFixed(
+          1
+        )}deg; transform: translate(var(--tx), var(--ty)) rotate(var(--rot)); pointer-events: auto; width: calc(18px * var(--ring-scale, 1)); height: calc(18px * var(--ring-scale, 1));"
           onclick="${sold ? "" : `toggleSeat(this)`}"
         ></div>`;
       }
@@ -181,7 +232,9 @@ function renderGaPicker() {
   mount.innerHTML = GA_CONFIG.map((sec) => {
     const seatIds = getSectionSeatIds(sec);
     const selectedCount = seatIds.filter((id) => selectedSeats[id]).length;
-    const availableCount = seatIds.filter((id) => !SOLD_SEATS.has(id) && !selectedSeats[id]).length;
+    const availableCount = seatIds.filter(
+      (id) => !SOLD_SEATS.has(id) && !selectedSeats[id]
+    ).length;
     const key = idSafe(sec.section);
 
     return `
@@ -192,9 +245,13 @@ function renderGaPicker() {
           <div class="tier-pick-avail" id="tierAvail-${key}">${availableCount} left</div>
         </div>
         <div class="tier-pick-stepper">
-          <button type="button" onclick="adjustTierQty('${sec.section}', -1)" ${selectedCount === 0 ? "disabled" : ""} aria-label="Remove a ${sec.section} seat">&minus;</button>
+          <button type="button" onclick="adjustTierQty('${sec.section}', -1)" ${
+      selectedCount === 0 ? "disabled" : ""
+    } aria-label="Remove a ${sec.section} seat">&minus;</button>
           <span id="tierQty-${key}">${selectedCount}</span>
-          <button type="button" onclick="adjustTierQty('${sec.section}', 1)" ${availableCount === 0 ? "disabled" : ""} aria-label="Add a ${sec.section} seat">+</button>
+          <button type="button" onclick="adjustTierQty('${sec.section}', 1)" ${
+      availableCount === 0 ? "disabled" : ""
+    } aria-label="Add a ${sec.section} seat">+</button>
         </div>
       </div>`;
   }).join("");
@@ -207,9 +264,12 @@ function adjustTierQty(sectionName, delta) {
   const seatIds = getSectionSeatIds(sec);
 
   if (delta > 0) {
-    const nextId = seatIds.find((id) => !SOLD_SEATS.has(id) && !selectedSeats[id]);
+    const nextId = seatIds.find(
+      (id) => !SOLD_SEATS.has(id) && !selectedSeats[id]
+    );
     if (!nextId) {
-      if (typeof showToast === "function") showToast(`No more ${sectionName} seats available.`, "error");
+      if (typeof showToast === "function")
+        showToast(`No more ${sectionName} seats available.`, "error");
       return;
     }
     selectedSeats[nextId] = seatIdToEntry(nextId, sec);
@@ -237,12 +297,16 @@ function renderSelectionPanel() {
     return;
   }
 
-  panel.innerHTML = entries.map(([id, s]) => `
+  panel.innerHTML = entries
+    .map(
+      ([id, s]) => `
     <div class="selection-item">
       <span>${s.label}</span>
       <span>${s.price.toLocaleString()} ETB</span>
     </div>
-  `).join("");
+  `
+    )
+    .join("");
 
   const total = entries.reduce((sum, [, s]) => sum + s.price, 0);
   totalEl.style.display = "flex";
@@ -257,8 +321,10 @@ function proceedToCheckout() {
     if (session) {
       const nameInput = document.getElementById("buyerNameInput");
       const phoneInput = document.getElementById("buyerPhoneInput");
-      if (nameInput && !nameInput.value && session.name) nameInput.value = session.name;
-      if (phoneInput && !phoneInput.value && session.phone) phoneInput.value = session.phone;
+      if (nameInput && !nameInput.value && session.name)
+        nameInput.value = session.name;
+      if (phoneInput && !phoneInput.value && session.phone)
+        phoneInput.value = session.phone;
     }
     document.getElementById("seatStep").style.display = "none";
     document.getElementById("checkoutStep").style.display = "block";
@@ -267,7 +333,7 @@ function proceedToCheckout() {
 
 document.addEventListener("DOMContentLoaded", async () => {
   await loadSeatAvailability();
-  renderSeatMap("VVIP");
+  renderSeatMap("VVIP Ringside");
   const gaEl = document.getElementById("gaPickerMount");
   if (gaEl) gaEl.style.display = "none";
 });
