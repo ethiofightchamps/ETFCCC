@@ -11,6 +11,33 @@
       })();
     </script>
     <link rel="stylesheet" href="css/style.css" />
+    <style>
+      /* VVIP Ringside active tab */
+      .section-tab.active[data-section="VVIP Ringside"] {
+        background: linear-gradient(135deg, var(--gold) 0%, #c8960a 100%) !important;
+        border-color: var(--gold) !important;
+        color: #1a1508 !important;
+        box-shadow: 0 4px 16px rgba(176,141,62,0.3);
+      }
+      /* VVIP Premium active tab */
+      .section-tab.active[data-section="VVIP Premium"] {
+        background: linear-gradient(135deg, var(--crimson) 0%, #8b0f15 100%) !important;
+        border-color: var(--crimson) !important;
+        color: #fff !important;
+        box-shadow: 0 4px 16px rgba(179,20,28,0.3);
+      }
+      /* Inactive states */
+      .section-tab[data-section="VVIP Ringside"]:not(.active) {
+        background: linear-gradient(135deg, rgba(176,141,62,0.15), rgba(176,141,62,0.05)) !important;
+        border-color: var(--gold) !important;
+        color: var(--gold-bright) !important;
+      }
+      .section-tab[data-section="VVIP Premium"]:not(.active) {
+        background: linear-gradient(135deg, rgba(179,20,28,0.15), rgba(179,20,28,0.05)) !important;
+        border-color: var(--crimson) !important;
+        color: var(--crimson-bright) !important;
+      }
+    </style>
   </head>
   <body>
     <div id="nav-mount" data-active="tickets"></div>
@@ -164,43 +191,23 @@
 
         <div class="checkout-section" style="margin-top:24px;">
           <div class="checkout-title">Payment Method</div>
-          <div class="payment-methods" style="display:flex;flex-direction:column;gap:12px;margin-bottom:16px;">
-            <label style="display:flex;align-items:center;gap:12px;padding:14px;background:var(--obsidian);border:1px solid var(--border);border-radius:10px;cursor:pointer;transition:border-color 0.15s;" onmouseover="this.style.borderColor='var(--gold)'" onmouseout="this.style.borderColor='var(--border)'">
-              <input type="radio" name="paymentMethod" value="mpesa" checked style="width:18px;height:18px;accent-color:var(--gold);">
+          <div class="payment-method-selector" style="margin-bottom:16px;">
+            <button type="button" class="btn btn-outline btn-block" onclick="openPaymentMethodModal()" style="display:flex;align-items:center;justify-content:space-between;gap:12px;">
               <div style="display:flex;align-items:center;gap:12px;flex:1;">
-                <img src="/mpesa-logo.png" alt="M-Pesa" style="width:48px;height:48px;object-fit:contain;background:#fff;border-radius:8px;padding:4px;">
+                <img id="selectedPaymentIcon" src="/mpesa-logo.png" alt="M-Pesa" style="width:40px;height:40px;object-fit:contain;background:#fff;border-radius:8px;padding:4px;">
                 <div>
-                  <div style="font-weight:700;color:var(--bone);">M-Pesa</div>
-                  <div style="font-family:var(--font-mono);font-size:12px;color:var(--gold-bright);" id="mpesaNumber">Loading…</div>
+                  <div style="font-weight:700;color:var(--bone);" id="selectedPaymentName">M-Pesa</div>
+                  <div style="font-family:var(--font-mono);font-size:11px;color:var(--gold-bright);" id="selectedPaymentNumber">Loading…</div>
                 </div>
               </div>
-            </label>
-            <label style="display:flex;align-items:center;gap:12px;padding:14px;background:var(--obsidian);border:1px solid var(--border);border-radius:10px;cursor:pointer;transition:border-color 0.15s;" onmouseover="this.style.borderColor='var(--gold)'" onmouseout="this.style.borderColor='var(--border)'">
-              <input type="radio" name="paymentMethod" value="safaricom" style="width:18px;height:18px;accent-color:var(--gold);">
-              <div style="display:flex;align-items:center;gap:12px;flex:1;">
-                <img src="/safaricom.png" alt="Safaricom" style="width:48px;height:48px;object-fit:contain;background:#fff;border-radius:8px;padding:4px;">
-                <div>
-                  <div style="font-weight:700;color:var(--bone);">Safaricom</div>
-                  <div style="font-family:var(--font-mono);font-size:12px;color:var(--gold-bright);" id="safaricomNumber">Loading…</div>
-                </div>
-              </div>
-            </label>
-            <label style="display:flex;align-items:center;gap:12px;padding:14px;background:var(--obsidian);border:1px solid var(--border);border-radius:10px;cursor:pointer;transition:border-color 0.15s;" onmouseover="this.style.borderColor='var(--gold)'" onmouseout="this.style.borderColor='var(--border)'">
-              <input type="radio" name="paymentMethod" value="telebirr" style="width:18px;height:18px;accent-color:var(--gold);">
-              <div style="display:flex;align-items:center;gap:12px;flex:1;">
-                <img src="/telebirr.webp" alt="Telebirr" style="width:48px;height:48px;object-fit:contain;background:#fff;border-radius:8px;padding:4px;">
-                <div>
-                  <div style="font-weight:700;color:var(--bone);">Telebirr</div>
-                  <div style="font-family:var(--font-mono);font-size:12px;color:var(--gold-bright);" id="telebirrNumber">Loading…</div>
-                </div>
-              </div>
-            </label>
+              <span style="color:var(--gold-bright);font-size:18px;">▼</span>
+            </button>
           </div>
           <div class="bank-details" style="background:var(--obsidian);border:1px dashed var(--gold);border-radius:8px;padding:16px;font-family:var(--font-mono);font-size:13px;margin-top:12px;">
             <div class="bank-row"><span>Account Name</span><span id="payAccountName">ETFC Fight Night</span></div>
             <div class="bank-row highlight"><span>Reference Code</span><span id="refCode" class="ref-code">ETFC-XXXXXX</span></div>
           </div>
-          <p class="hint">Select a payment method, send the exact amount, and include the reference code.</p>
+          <p class="hint">Tap to choose payment method, send the exact amount, and include the reference code.</p>
         </div>
 
         <div class="field mt-24">
@@ -728,19 +735,59 @@
 
       // Payment method phone numbers — UPDATE THESE WITH REAL NUMBERS
       const PAYMENT_NUMBERS = {
-        mpesa: "09XX XXX XXX",      // M-Pesa number
-        safaricom: "09XX XXX XXX",  // Safaricom number
-        telebirr: "09XX XXX XXX",   // Telebirr number
+        mpesa: "09XX XXX XXX",
+        telebirr: "09XX XXX XXX",
       };
 
-      // Load payment numbers on page load
+      // Payment Method Modal
+      const PAYMENT_METHODS = [
+        { id: "mpesa", name: "M-Pesa", icon: "/mpesa-logo.png" },
+        { id: "telebirr", name: "Telebirr", icon: "/telebirr.webp" },
+      ];
+
+      function openPaymentMethodModal() {
+        const modal = document.getElementById("paymentMethodModal");
+        const container = document.getElementById("paymentMethodOptions");
+        container.innerHTML = PAYMENT_METHODS.map(pm => `
+          <label style="display:flex;align-items:center;gap:16px;padding:18px;background:var(--obsidian);border:1px solid var(--border);border-radius:12px;cursor:pointer;transition:border-color 0.15s;" onmouseover="this.style.borderColor='var(--gold)'" onmouseout="this.style.borderColor='var(--border)'">
+            <input type="radio" name="paymentMethodModal" value="${pm.id}" ${pm.id === selectedPaymentMethod ? "checked" : ""} style="width:20px;height:20px;accent-color:var(--gold);">
+            <img src="${pm.icon}" alt="${pm.name}" style="width:56px;height:56px;object-fit:contain;background:#fff;border-radius:10px;padding:6px;">
+            <div style="flex:1;">
+              <div style="font-weight:700;color:var(--bone);font-size:16px;">${pm.name}</div>
+              <div style="font-family:var(--font-mono);font-size:13px;color:var(--gold-bright);" id="modal-${pm.id}Number">Loading…</div>
+            </div>
+          </label>
+        `).join("");
+        modal.classList.add("open");
+        document.body.style.overflow = "hidden";
+      }
+
+      function closePaymentMethodModal() {
+        document.getElementById("paymentMethodModal").classList.remove("open");
+        document.body.style.overflow = "";
+      }
+
+      function selectPaymentMethod(methodId) {
+        const pm = PAYMENT_METHODS.find(p => p.id === methodId);
+        if (!pm) return;
+        selectedPaymentMethod = methodId;
+        document.getElementById("selectedPaymentIcon").src = pm.icon;
+        document.getElementById("selectedPaymentName").textContent = pm.name;
+        document.getElementById("selectedPaymentNumber").textContent = document.getElementById(`modal-${pm.id}Number`).textContent;
+        closePaymentMethodModal();
+      }
+
       document.addEventListener("DOMContentLoaded", () => {
         document.getElementById("mpesaNumber").textContent = PAYMENT_NUMBERS.mpesa;
-        document.getElementById("safaricomNumber").textContent = PAYMENT_NUMBERS.safaricom;
         document.getElementById("telebirrNumber").textContent = PAYMENT_NUMBERS.telebirr;
+        document.getElementById("selectedPaymentNumber").textContent = PAYMENT_NUMBERS.mpesa;
+        document.getElementById("modal-mpesaNumber").textContent = PAYMENT_NUMBERS.mpesa;
+        document.getElementById("modal-telebirrNumber").textContent = PAYMENT_NUMBERS.telebirr;
         renderAd(0);
         adTimer = setInterval(nextAd, 5000);
       });
+
+      let selectedPaymentMethod = "mpesa";
     </script>
 
     <!-- MY TICKETS MODAL -->
@@ -775,6 +822,19 @@
             </button>
           </div>
           <div id="myTicketsContainer"><p class="text-dim">Loading…</p></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Payment Method Modal -->
+    <div class="modal-overlay" id="paymentMethodModal" style="z-index: 300;">
+      <div class="modal" style="max-width:420px;width:90%;margin:auto;">
+        <div class="modal-header">
+          <h3 style="margin:0;">Choose Payment Method</h3>
+          <span class="modal-close" onclick="closePaymentMethodModal()">&times;</span>
+        </div>
+        <div class="modal-body" style="padding:16px;">
+          <div id="paymentMethodOptions" style="display:flex;flex-direction:column;gap:12px;"></div>
         </div>
       </div>
     </div>
