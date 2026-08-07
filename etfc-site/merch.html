@@ -104,10 +104,9 @@
       .merch-card-img img {
         width: 100%;
         height: 100%;
-        object-fit: contain;
-        object-position: center;
+        object-fit: cover;
+        object-position: center top;
         display: block;
-        padding: 8px;
       }
       .merch-offer-badge {
         position: absolute;
@@ -995,7 +994,6 @@
           const snap = await db
             .collection("merchProducts")
             .where("active", "==", true)
-            .orderBy("createdAt", "desc")
             .get();
           const firestoreProducts = snap.docs.map((doc) => ({
             id: doc.id,
