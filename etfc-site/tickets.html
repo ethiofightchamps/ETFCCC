@@ -260,12 +260,18 @@
         <div class="field">
           <label>Upload Payment Screenshot</label>
           <div
-            class="upload-box"
+            class="upload-area"
+            id="screenshotUploadArea"
             onclick="document.getElementById('screenshotInput').click()"
           >
-            <span id="uploadLabel"
-              >&#128247; Tap to upload proof of payment</span
-            >
+            <div class="upload-icon">&#128247;</div>
+            <span id="uploadLabel">Tap to upload proof of payment</span>
+            <span class="upload-hint">Max 5MB • JPG/PNG</span>
+            <img
+              class="upload-preview"
+              id="screenshotPreview"
+              alt="Screenshot preview"
+            />
             <input
               type="file"
               id="screenshotInput"
@@ -432,6 +438,16 @@
         }
         chosenFile = file;
         document.getElementById("uploadLabel").textContent = `✓ ${file.name}`;
+        const area = document.getElementById("screenshotUploadArea");
+        const preview = document.getElementById("screenshotPreview");
+        if (area && preview) {
+          const reader = new FileReader();
+          reader.onload = (e) => {
+            preview.src = e.target.result;
+            area.classList.add("has-file");
+          };
+          reader.readAsDataURL(file);
+        }
       }
 
       async function submitOrder() {
