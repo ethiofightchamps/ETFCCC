@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>My Tickets — ETFC</title>
-<script>(function(){var t=localStorage.getItem("etfc_theme")||"dark";document.documentElement.setAttribute("data-theme",t);})();</script>
+<script>(function(){var t=localStorage.getItem("etfc_theme")||"light";document.documentElement.setAttribute("data-theme",t);})();</script>
 <link rel="stylesheet" href="css/style.css">
 <style>
   .ticket-card {
@@ -171,58 +171,6 @@
   }
   .ticket-footer-note { color: var(--gold-bright); opacity: 0.8; }
 
-  .ticket-sponsor-row {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 20px;
-    padding: 12px 0;
-    flex-wrap: wrap;
-  }
-  .ticket-sponsor-label {
-    font-family: var(--font-mono);
-    font-size: 9px;
-    letter-spacing: 1.5px;
-    text-transform: uppercase;
-    color: var(--bone-dim);
-    margin-right: 4px;
-  }
-  .ticket-sponsor-row img {
-    height: 36px;
-    width: 36px;
-    max-width: 120px;
-    display: block;
-    object-fit: cover;
-    border-radius: 50%;
-    filter: grayscale(40%);
-    opacity: 0.95;
-  }
-
-  @media (max-width: 600px) {
-    .ticket-sponsor-row {
-      gap: 12px;
-      padding: 8px 0;
-    }
-    .ticket-sponsor-row img {
-      height: 28px;
-      width: 28px;
-      max-width: 100px;
-    }
-    .ticket-sponsor-label {
-      font-size: 8px;
-    }
-  }
-  @media (max-width: 400px) {
-    .ticket-sponsor-row img {
-      height: 24px;
-      width: 24px;
-      max-width: 80px;
-    }
-    .ticket-sponsor-row {
-      gap: 8px;
-    }
-  }
-
   .empty-state {
     text-align: center;
     padding: 48px 24px;
@@ -283,9 +231,10 @@
   </div>
   <div id="ticketsContainer"><p class="text-dim">Loading…</p></div>
 
-  <p class="text-dim" style="font-size:12px;margin-top:32px;text-align:center;">
-    Looking for your bets? They've moved to the <a href="betting.html" style="color:var(--gold-bright);">Betting page</a>.
-  </p>
+  <div class="section-header">
+    <h2>Bets</h2>
+  </div>
+  <div id="betsContainer"><p class="text-dim">Loading…</p></div>
 </div>
 
 <div id="footer-mount"></div>
@@ -304,9 +253,9 @@
   const BADGE_LABEL = { confirmed: "E-TICKET", pending: "PENDING", rejected: "REJECTED" };
   const BADGE_CLASS = { confirmed: "", pending: "pending", rejected: "rejected" };
 
-  const EVENT_DATE_STR = "August 29, 2026";
-  const EVENT_TIME_STR = "10:00 AM";
-  const VENUE_STR = "Adwa Museum, Addis Ababa";
+  const EVENT_DATE_STR = "August 24, 2026";
+  const EVENT_TIME_STR = "7:00 PM";
+  const VENUE_STR = "Millennium Hall, Addis Ababa";
 
   function renderTicketQR(qrData, containerId) {
     const el = document.getElementById(containerId);
@@ -368,7 +317,7 @@
           const ticketCode = o.ticketCode || o.refCode || "—";
           const date = o.createdAt ? new Date(o.createdAt.toMillis()).toLocaleDateString("en-GB", {day:"numeric",month:"short",year:"numeric"}) : "";
           const qrId = `qr-${doc.id}-${idx}`;
-          const qrData = `${window.location.origin}/verify.html?code=${ticketCode}`;
+          const qrData = `ETFC|${ticketCode}|${seats}|${o.buyerName || "Guest"}|${date}`;
 
           setTimeout(() => renderTicketQR(qrData, qrId), 0);
 
@@ -382,7 +331,7 @@
                 <div class="ticket-main">
                   <div class="ticket-event-info">
                     <div class="ticket-event-label">ETFC Fight Night</div>
-                    <div class="ticket-event-name">Adwa Museum</div>
+                    <div class="ticket-event-name">Millennium Hall</div>
                     <div class="ticket-event-date">${EVENT_DATE_STR} &middot; ${EVENT_TIME_STR}</div>
                   </div>
                   <div class="ticket-qr-wrap" id="${qrId}"></div>
@@ -402,13 +351,6 @@
                   <div class="ticket-field-value code">${ticketCode}</div>
                 </div>
               </div>
-              <div class="ticket-sponsor-row">
-                <span class="ticket-sponsor-label">Presented by</span>
-                <img src="images/sponsors/mpesa.jpg" alt="M-Pesa">
-                <img src="images/sponsors/genatv.jpg" alt="Gena TV">
-                <img src="images/sponsors/sweatbox.jpg" alt="Sweat Box">
-                <img src="images/sponsors/gofere.jpg" alt="Gofere">
-              </div>
               <div class="ticket-footer">
                 <span>${o.buyerName || "Guest"}</span>
                 <span class="ticket-footer-note">Present QR at entry • Non-transferable</span>
@@ -419,6 +361,59 @@
     } catch (err) {
       ticketsEl.innerHTML = `<p style="color:var(--crimson-bright);">Could not load tickets — ${err.message}</p>`;
       console.error("tickets:", err);
+    }
+
+    // ── Bets ─────────────────────────────────────────────────────────────────
+    const betsEl = document.getElementById("betsContainer");
+    try {
+      const snap = await db.collection("bets")
+        .where("userId", "==", user.uid)
+        .get();
+
+      let docs = snap.docs;
+      if (docs.length === 0) {
+        const snapEmail = await db.collection("bets").where("email", "==", user.email).get();
+        docs = snapEmail.docs;
+      }
+      docs.sort((a, b) => (b.data().createdAt?.toMillis?.() || 0) - (a.data().createdAt?.toMillis?.() || 0));
+
+      if (docs.length === 0) {
+        betsEl.innerHTML = `<div class="empty-state"><div class="empty-icon">🥊</div><p style="margin:0;">No bets placed yet.</p></div>`;
+      } else {
+        betsEl.innerHTML = docs.map(doc => {
+          const b = doc.data();
+          const s = b.status || "pending";
+
+          // Handle both old single-leg and new multi-leg format
+          const legs = b.legs || (b.fightId ? [{ fightId: b.fightId, side: b.side, odds: b.odds, fighterName: b.fighterName }] : []);
+          const legsHtml = legs.map((leg) => `
+            <div style="font-size:12px;margin-bottom:2px;">
+              <span style="font-weight:600;">${leg.fighterName}</span>
+              <span class="text-dim"> @ ${Number(leg.odds).toFixed(2)}</span>
+            </div>
+          `).join("");
+
+          const combinedOdds = b.combinedOdds || b.odds || 0;
+          const grossPayout = b.grossPayout || b.potentialPayout || 0;
+          const taxAmount = b.taxAmount || 0;
+          const netPayout = b.netPayout || grossPayout - taxAmount || grossPayout;
+
+          return `<div class="ticket-card">
+            <div class="ticket-left" style="min-width:0;">
+              <div style="font-size:12px;margin-bottom:4px;">${legsHtml || "<span class='text-dim'>—</span>"}</div>
+              <div class="ticket-meta">Stake: ${(b.stake || 0).toLocaleString()} ETB &middot; Odds: ${Number(combinedOdds).toFixed(2)} &middot; Ref: ${b.refCode || "—"}</div>
+            </div>
+            <div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px;">
+              <span class="status-pill ${s}">${STATUS_ICON[s] || ""} ${STATUS_LABEL[s] || s}</span>
+              <span class="ticket-amount">Net: ${Number(netPayout).toLocaleString()} ETB</span>
+              <span class="text-dim" style="font-size:11px;">Gross: ${Number(grossPayout).toLocaleString()} ETB &middot; Tax: ${Number(taxAmount).toLocaleString()} ETB</span>
+            </div>
+          </div>`;
+        }).join("");
+      }
+    } catch (err) {
+      betsEl.innerHTML = `<p style="color:var(--crimson-bright);">Could not load bets — ${err.message}</p>`;
+      console.error("bets:", err);
     }
   }
 

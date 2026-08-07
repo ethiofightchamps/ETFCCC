@@ -4,101 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ETFC — Fight Night | [Event Name TBD]</title>
-<script>(function(){var t=localStorage.getItem("etfc_theme")||"dark";document.documentElement.setAttribute("data-theme",t);})();</script>
+<script>(function(){var t=localStorage.getItem("etfc_theme")||"light";document.documentElement.setAttribute("data-theme",t);})();</script>
 <link rel="stylesheet" href="css/style.css">
-<style>
-/* Merch popout ad */
-.merch-ad-popup {
-  position: fixed;
-  bottom: 80px;
-  right: 20px;
-  z-index: 999;
-  width: 220px;
-  background: linear-gradient(135deg, #1a0e00 0%, #0d0d0d 100%);
-  border: 1px solid var(--gold);
-  border-radius: 14px;
-  box-shadow: 0 8px 40px rgba(0,0,0,0.7), 0 0 0 1px rgba(180,140,30,0.2);
-  overflow: hidden;
-  animation: slideInAd 0.5s cubic-bezier(0.34,1.56,0.64,1) forwards;
-  cursor: pointer;
-  transform-origin: bottom right;
-}
-@keyframes slideInAd {
-  from { opacity:0; transform: scale(0.7) translateY(20px); }
-  to   { opacity:1; transform: scale(1) translateY(0); }
-}
-.merch-ad-popup.hide {
-  animation: slideOutAd 0.3s ease forwards;
-}
-@keyframes slideOutAd {
-  to { opacity:0; transform: scale(0.7) translateY(20px); pointer-events:none; }
-}
-.merch-ad-close {
-  position: absolute;
-  top: 8px; right: 10px;
-  font-size: 16px;
-  color: var(--bone-dim);
-  cursor: pointer;
-  z-index: 2;
-  line-height: 1;
-  background: rgba(0,0,0,0.4);
-  border-radius: 50%;
-  width: 22px; height: 22px;
-  display: flex; align-items: center; justify-content: center;
-}
-.merch-ad-close:hover { color: #fff; }
-.merch-ad-banner {
-  background: linear-gradient(90deg, var(--gold) 0%, #c8960a 100%);
-  color: #000;
-  font-family: var(--font-mono);
-  font-size: 9px;
-  font-weight: 900;
-  letter-spacing: 3px;
-  text-align: center;
-  padding: 5px;
-  text-transform: uppercase;
-}
-.merch-ad-body { padding: 14px 14px 16px; }
-.merch-ad-icon { font-size: 32px; text-align: center; margin-bottom: 8px; }
-.merch-ad-title {
-  font-family: var(--font-display);
-  font-size: 18px;
-  font-weight: 900;
-  text-transform: uppercase;
-  color: #fff;
-  text-align: center;
-  line-height: 1.1;
-  margin-bottom: 4px;
-}
-.merch-ad-title span { color: var(--gold-bright); }
-.merch-ad-sub {
-  font-size: 11px;
-  color: var(--bone-dim);
-  text-align: center;
-  margin-bottom: 12px;
-  line-height: 1.4;
-}
-.merch-ad-cta {
-  display: block;
-  width: 100%;
-  text-align: center;
-  padding: 9px;
-  background: var(--crimson);
-  color: #fff;
-  font-family: var(--font-mono);
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  border-radius: 8px;
-  text-decoration: none;
-  transition: background 0.15s;
-}
-.merch-ad-cta:hover { background: var(--crimson-bright); color: #fff; }
-@media (max-width: 480px) {
-  .merch-ad-popup { width: 180px; bottom: 90px; right: 12px; }
-}
-</style>
 </head>
 <body>
 
@@ -112,8 +19,9 @@
     <h1 class="hero-title">SEDO <span class="vs">VS</span> JOHNNY</h1>
     <p class="hero-sub">Main Event &middot; MMA</p>
     <div class="hero-meta">
-      <span>&#128197; August 29, 2026 &middot; 10:00 AM</span>
+      <span>&#128197; [Date TBD] &middot; Time TBA</span>
       <span>&#128205; Adwa Museum, Addis Ababa</span>
+      <span>&#127934; License: [Pending]</span>
     </div>
     <div id="countdown" class="countdown"></div>
     <div class="hero-ctas">
@@ -146,6 +54,9 @@
           <div class="thumb" style="background-image:url('images/fighter-b.jpg');background-size:cover;"></div>
           <div><div class="name">Johnny</div><div class="price">2.05</div></div>
         </div>
+      </div>
+      <div>
+        <span class="badge-locked">&#128274; Betting opens once ETFC's license is confirmed</span>
       </div>
     </div>
   </section>
@@ -212,27 +123,21 @@
     </div>
     <div class="tier-cards">
       <div class="tier-card">
-        <div class="tier-name">Ringside</div>
-        <div class="tier-price">40,000 ETB</div>
-        <ul><li>Front-row numbered seats</li><li>Closest to the action</li><li>Premium experience</li></ul>
+        <div class="tier-name">General Admission</div>
+        <div class="tier-price">[Price] ETB</div>
+        <ul><li>Standing / general section</li><li>Full event access</li></ul>
         <a href="tickets.html" class="btn btn-outline btn-block">Select Seats</a>
       </div>
       <div class="tier-card featured">
         <div class="tier-name">VIP</div>
-        <div class="tier-price">9,000 ETB</div>
+        <div class="tier-price">[Price] ETB</div>
         <ul><li>Reserved seating block</li><li>Closer to the ring</li><li>Priority entry</li></ul>
         <a href="tickets.html" class="btn btn-gold btn-block">Select Seats</a>
       </div>
       <div class="tier-card">
-        <div class="tier-name">Middle</div>
-        <div class="tier-price">2,000 ETB</div>
-        <ul><li>Center view seating</li><li>Great sightlines</li><li>Balanced experience</li></ul>
-        <a href="tickets.html" class="btn btn-outline btn-block">Select Seats</a>
-      </div>
-      <div class="tier-card">
-        <div class="tier-name">Last Rows</div>
-        <div class="tier-price">1,500 ETB</div>
-        <ul><li>Upper tier seating</li><li>Full event view</li><li>Most affordable</li></ul>
+        <div class="tier-name">Ringside</div>
+        <div class="tier-price">[Price] ETB</div>
+        <ul><li>Front-row numbered seats</li><li>Premium experience</li></ul>
         <a href="tickets.html" class="btn btn-outline btn-block">Select Seats</a>
       </div>
     </div>
@@ -247,18 +152,6 @@
   <a href="betting.html" class="btn btn-gold" style="flex:1;text-align:center;">Bet</a>
 </div>
 
-<!-- MERCH POPOUT AD -->
-<div class="merch-ad-popup" id="merchAd" onclick="goToMerch(event)">
-  <div class="merch-ad-close" onclick="closeMerchAd(event)">✕</div>
-  <div class="merch-ad-banner">🔥 New Drop</div>
-  <div class="merch-ad-body">
-    <div class="merch-ad-icon">👕🧢🥊</div>
-    <div class="merch-ad-title">ETFC <span>Merch</span></div>
-    <div class="merch-ad-sub">Official Fight Night gear. Limited drop coming soon.</div>
-    <a href="merch.html" class="merch-ad-cta">Shop Now →</a>
-  </div>
-</div>
-
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
@@ -267,27 +160,5 @@
 <script src="js/auth.js"></script>
 <script src="js/partials.js"></script>
 <script src="js/main.js"></script>
-<script>
-  // Show merch ad after 2s, hide if already dismissed this session
-  (function() {
-    if (sessionStorage.getItem("merch_ad_closed")) return;
-    setTimeout(function() {
-      const ad = document.getElementById("merchAd");
-      if (ad) ad.style.display = "block";
-    }, 2000);
-  })();
-  function closeMerchAd(e) {
-    e.stopPropagation();
-    const ad = document.getElementById("merchAd");
-    if (!ad) return;
-    ad.classList.add("hide");
-    sessionStorage.setItem("merch_ad_closed", "1");
-    setTimeout(function() { ad.remove(); }, 400);
-  }
-  function goToMerch(e) {
-    if (e.target.classList.contains("merch-ad-close")) return;
-    window.location.href = "merch.html";
-  }
-</script>
 </body>
 </html>

@@ -44,13 +44,12 @@ module.exports = async (req, res) => {
   }
 
   try {
-    // Only block if a non-rejected bet already used this screenshot
+    // Reject if this exact screenshot was already used
     const dupSnap = await db.collection("bets")
       .where("screenshotUrl", "==", screenshotUrl)
-      .limit(5)
+      .limit(1)
       .get();
-    const activeDup = dupSnap.docs.find(d => d.data().status !== "rejected");
-    if (activeDup) {
+    if (!dupSnap.empty) {
       return res.status(400).json({ error: "This payment screenshot has already been used. Upload a new one." });
     }
 

@@ -1,7 +1,7 @@
 # ETFC Fight Night Platform
 
 ## What's built
-- Home, Fight Card, Fighter Profile, About, Betting, Tickets (interactive
+- Home, Fight Card, Fighter Profile, About/License, Betting, Tickets (interactive
   seat map), User Dashboard, and a real, working **Admin Panel**
 - Auth: Google sign-in + manual signup with email OTP (no SMS/phone OTP — dropped
   in favor of zero-cost email verification). Email box is shown up front on both

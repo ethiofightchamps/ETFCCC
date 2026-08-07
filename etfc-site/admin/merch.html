@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ETFC Admin — Merch Products</title>
+<script>(function(){var t=localStorage.getItem("etfc_theme")||"dark";document.documentElement.setAttribute("data-theme",t);})();</script>
+<link rel="stylesheet" href="../css/style.css">
+<script src="../js/main.js"></script>
+</head>
+<body>
+
+<div class="admin-shell">
+  <div class="admin-sidebar" style="display:flex;flex-direction:column;">
+    <div class="nav-logo" style="padding:0 24px 20px;font-size:22px;">ET<span>FC</span> <span style="font-size:12px;color:var(--bone-dim);">Admin</span></div>
+    <div style="padding:0 12px 12px;font-family:var(--font-mono);font-size:10px;color:var(--gold-bright);letter-spacing:2px;text-transform:uppercase;">TICKETS</div>
+    <a href="index.html">Pending Review</a>
+    <a href="index.html" onclick="loadOrders('confirmed');return false;">Confirmed</a>
+    <a href="index.html" onclick="loadOrders('rejected');return false;">Rejected</a>
+    <a href="index.html" onclick="loadOrders('all');return false;">All Orders</a>
+    <div style="padding:0 12px 12px;font-family:var(--font-mono);font-size:10px;color:var(--gold-bright);letter-spacing:2px;text-transform:uppercase;">BETTING</div>
+    <a href="odds.html">Betting Odds</a>
+    <a href="bets.html">Bet Review</a>
+    <div style="padding:0 12px 12px;font-family:var(--font-mono);font-size:10px;color:var(--gold-bright);letter-spacing:2px;text-transform:uppercase;">SEATS</div>
+    <a href="seats.html">Seat Management</a>
+    <div style="padding:0 12px 12px;font-family:var(--font-mono);font-size:10px;color:var(--gold-bright);letter-spacing:2px;text-transform:uppercase;">MERCH</div>
+    <a href="merch.html" class="active">Merch Products</a>
+    <a href="index.html" onclick="loadMerchOrders('pending');return false;">Merch Orders</a>
+    <a href="#" style="margin-top:auto;color:var(--crimson-bright);" onclick="logout();return false;">Log Out</a>
+  </div>
+
+  <div class="admin-main">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:16px;">
+      <div>
+        <div class="section-title" style="font-size:28px;margin-bottom:4px;">Merch Products</div>
+        <p class="text-dim">Create, edit, and manage Fight Night merchandise.</p>
+      </div>
+      <button class="btn btn-primary" onclick="openProductModal()">+ Add Product</button>
+    </div>
+
+    <div id="loadingMsg" class="text-dim">Loading products…</div>
+    <div id="errorMsg" class="text-dim" style="color:var(--crimson-bright);display:none;"></div>
+
+    <table class="admin-table" id="productsTable" style="display:none;">
+      <thead>
+        <tr><th>Image</th><th>Name</th><th>Category</th><th>Base Price</th><th>Offer Price</th><th>Offer Ends</th><th>Colors</th><th>Sizes</th><th>Stock</th><th>Active</th><th>Action</th></tr>
+      </thead>
+      <tbody id="productsBody"></tbody>
+    </table>
+
+    <div id="emptyMsg" class="text-dim" style="display:none;">No products yet. Click "Add Product" to create one.</div>
+  </div>
+</div>
+
+<!-- PRODUCT MODAL -->
+<div class="modal-overlay" id="productModal">
+  <div class="modal modal-bet-slip" style="display:flex;flex-direction:column;max-height:90vh;overflow:hidden;width:95%;max-width:700px;">
+    <div class="modal-header">
+      <h3 id="productModalTitle">Add Product</h3>
+      <span class="modal-close" onclick="closeProductModal()">&times;</span>
+    </div>
+    <div class="modal-body" style="overflow-y:auto;flex:1;padding:20px;">
+      <form id="productForm">
+        <input type="hidden" id="productId">
+        
+        <div class="field">
+          <label>Name *</label>
+          <input type="text" id="pName" required placeholder="e.g. Fight Night Tee">
+        </div>
+        
+        <div class="field">
+          <label>Slug * (URL-friendly, unique)</label>
+          <input type="text" id="pSlug" required placeholder="fight-night-tee">
+        </div>
+        
+        <div class="field">
+          <label>Description</label>
+          <textarea id="pDescription" rows="3" placeholder="Product description..."></textarea>
+        </div>
+        
+        <div class="field">
+          <label>Category</label>
+          <input type="text" id="pCategory" placeholder="e.g. Apparel, Sets, Accessories, Outerwear, Gear">
+        </div>
+        
+        <div class="field-row">
+          <div class="field" style="flex:1;">
+            <label>Base Price (ETB) *</label>
+            <input type="number" id="pBasePrice" required min="0" step="1" placeholder="4999">
+          </div>
+          <div class="field" style="flex:1;">
+            <label>Offer Price (ETB)</label>
+            <input type="number" id="pOfferPrice" min="0" step="1" placeholder="2499 (leave empty for no offer)">
+          </div>
+        </div>
+        
+        <div class="field">
+          <label>Offer Ends At (optional)</label>
+          <input type="datetime-local" id="pOfferEndsAt">
+          <div class="field-hint">Leave empty for no time limit on offer price</div>
+        </div>
+        
+        <div class="field">
+          <label>Colors (comma-separated) *</label>
+          <input type="text" id="pColors" required placeholder="Black, White, Red">
+        </div>
+        
+        <div class="field">
+          <label>Sizes (comma-separated) *</label>
+          <input type="text" id="pSizes" required placeholder="S, M, L, XL, XXL">
+        </div>
+        
+        <div class="field-row">
+          <div class="field" style="flex:1;">
+            <label>Stock *</label>
+            <input type="number" id="pStock" required min="0" step="1" placeholder="50">
+          </div>
+          <div class="field" style="flex:1;">
+            <label>Active</label>
+            <div style="display:flex;align-items:center;gap:12px;margin-top:24px;">
+              <input type="checkbox" id="pActive" checked style="width:18px;height:18px;">
+              <label for="pActive" style="margin:0;font-weight:600;">Product is active/visible</label>
+            </div>
+          </div>
+        </div>
+        
+        <div class="field">
+          <label>Images (URLs, one per line)</label>
+          <textarea id="pImages" rows="4" placeholder="images/merch-black-full.png&#10;images/merch-white-full.png"></textarea>
+          <div class="field-hint">Upload images to Firebase Storage or Cloudinary first, then paste URLs here. One per line.</div>
+        </div>
+        
+        <div id="productFormError" class="error-msg" style="display:none;"></div>
+      </form>
+    </div>
+    <div class="modal-footer" style="position:sticky;bottom:0;padding:16px 20px;background:var(--obsidian-3);border-top:1px solid var(--border);border-radius:0 0 12px 12px;">
+      <button class="btn btn-outline" onclick="closeProductModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveProduct()">Save Product</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  let editingProductId = null;
+
+  async function loadProducts() {
+    document.getElementById("loadingMsg").style.display = "block";
+    document.getElementById("errorMsg").style.display = "none";
+    document.getElementById("productsTable").style.display = "none";
+    document.getElementById("emptyMsg").style.display = "none";
+
+    try {
+      const res = await fetch("/api/admin-merch");
+      if (res.status === 401) { window.location.href = "login.html"; return; }
+      const data = await res.json();
+      document.getElementById("loadingMsg").style.display = "none";
+
+      if (!res.ok) {
+        document.getElementById("errorMsg").textContent = data.error || "Failed to load products.";
+        document.getElementById("errorMsg").style.display = "block";
+        return;
+      }
+
+      renderProducts(data.products);
+    } catch (err) {
+      document.getElementById("loadingMsg").style.display = "none";
+      document.getElementById("errorMsg").textContent = "Network error loading products.";
+      document.getElementById("errorMsg").style.display = "block";
+    }
+  }
+
+  function renderProducts(products) {
+    const tbody = document.getElementById("productsBody");
+    const table = document.getElementById("productsTable");
+    const empty = document.getElementById("emptyMsg");
+
+    if (products.length === 0) {
+      empty.style.display = "block";
+      table.style.display = "none";
+      return;
+    }
+
+    tbody.innerHTML = products.map((p) => `
+      <tr>
+        <td>${p.images && p.images[0] ? `<img src="${p.images[0]}" class="thumb-sm" style="object-fit:cover;">` : `<div class="thumb-sm"></div>`}</td>
+        <td>${p.name}</td>
+        <td>${p.category || "—"}</td>
+        <td>${Number(p.basePrice || 0).toLocaleString()} ETB</td>
+        <td>${p.offerPrice ? Number(p.offerPrice).toLocaleString() + " ETB" : `<span class="text-dim">—</span>`}</td>
+        <td>${p.offerEndsAt ? new Date(p.offerEndsAt).toLocaleString() : `<span class="text-dim">—</span>`}</td>
+        <td>${(p.colors || []).join(", ")}</td>
+        <td>${(p.sizes || []).join(", ")}</td>
+        <td>${p.stock || 0}</td>
+        <td><span class="status-pill ${p.active ? 'confirmed' : 'rejected'}">${p.active ? "Active" : "Hidden"}</span></td>
+        <td>
+          <div style="display:flex;gap:6px;">
+            <button class="btn btn-primary btn-sm" onclick="editProduct('${p.id}')">Edit</button>
+            <button class="btn btn-outline btn-sm" style="color:var(--crimson-bright);border-color:var(--crimson-bright);" onclick="deleteProduct('${p.id}')">Delete</button>
+          </div>
+        </td>
+      </tr>
+    `).join("");
+
+    table.style.display = "table";
+  }
+
+  function openProductModal(product = null) {
+    editingProductId = product?.id || null;
+    const form = document.getElementById("productForm");
+    form.reset();
+    document.getElementById("productId").value = "";
+    document.getElementById("productModalTitle").textContent = product ? "Edit Product" : "Add Product";
+
+    if (product) {
+      document.getElementById("productId").value = product.id;
+      document.getElementById("pName").value = product.name || "";
+      document.getElementById("pSlug").value = product.slug || "";
+      document.getElementById("pDescription").value = product.description || "";
+      document.getElementById("pCategory").value = product.category || "";
+      document.getElementById("pBasePrice").value = product.basePrice || "";
+      document.getElementById("pOfferPrice").value = product.offerPrice || "";
+      document.getElementById("pOfferEndsAt").value = product.offerEndsAt ? new Date(product.offerEndsAt).toISOString().slice(0, 16) : "";
+      document.getElementById("pColors").value = (product.colors || []).join(", ");
+      document.getElementById("pSizes").value = (product.sizes || []).join(", ");
+      document.getElementById("pStock").value = product.stock || 0;
+      document.getElementById("pActive").checked = product.active !== false;
+      document.getElementById("pImages").value = (product.images || []).join("\n");
+    } else {
+      document.getElementById("pActive").checked = true;
+    }
+
+    document.getElementById("productModal").classList.add("open");
+    document.body.style.overflow = "hidden";
+  }
+
+  function closeProductModal() {
+    document.getElementById("productModal").classList.remove("open");
+    document.body.style.overflow = "";
+    editingProductId = null;
+  }
+
+  async function saveProduct() {
+    const errEl = document.getElementById("productFormError");
+    errEl.style.display = "none";
+
+    const name = document.getElementById("pName").value.trim();
+    const slug = document.getElementById("pSlug").value.trim();
+    const description = document.getElementById("pDescription").value.trim();
+    const category = document.getElementById("pCategory").value.trim();
+    const basePrice = Number(document.getElementById("pBasePrice").value);
+    const offerPrice = document.getElementById("pOfferPrice").value ? Number(document.getElementById("pOfferPrice").value) : null;
+    const offerEndsAt = document.getElementById("pOfferEndsAt").value ? new Date(document.getElementById("pOfferEndsAt").value).getTime() : null;
+    const colors = document.getElementById("pColors").value.split(",").map(s => s.trim()).filter(Boolean);
+    const sizes = document.getElementById("pSizes").value.split(",").map(s => s.trim()).filter(Boolean);
+    const stock = Number(document.getElementById("pStock").value) || 0;
+    const active = document.getElementById("pActive").checked;
+    const images = document.getElementById("pImages").value.split("\n").map(s => s.trim()).filter(Boolean);
+
+    if (!name || !slug || !basePrice) {
+      errEl.textContent = "Name, slug, and base price are required.";
+      errEl.style.display = "block";
+      return;
+    }
+    if (colors.length === 0 || sizes.length === 0) {
+      errEl.textContent = "At least one color and one size are required.";
+      errEl.style.display = "block";
+      return;
+    }
+
+    const btn = document.querySelector("#productModal .btn-primary");
+    btn.setAttribute("disabled", "true");
+    btn.textContent = editingProductId ? "Saving…" : "Creating…";
+
+    try {
+      const body = { name, slug, description, category, basePrice, offerPrice, offerEndsAt, colors, sizes, stock, active, images };
+      if (editingProductId) body.id = editingProductId;
+
+      const res = await fetch("/api/admin-merch", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+      const data = await res.json();
+
+      if (!res.ok) throw new Error(data.error || "Save failed.");
+
+      showToast(editingProductId ? "Product updated." : "Product created.", "success");
+      closeProductModal();
+      loadProducts();
+    } catch (err) {
+      errEl.textContent = err.message || "Could not save product.";
+      errEl.style.display = "block";
+      btn.removeAttribute("disabled");
+      btn.textContent = editingProductId ? "Save" : "Create";
+    }
+  }
+
+  async function editProduct(id) {
+    try {
+      const res = await fetch("/api/admin-merch");
+      if (res.status === 401) { window.location.href = "login.html"; return; }
+      const data = await res.json();
+      const product = data.products.find(p => p.id === id);
+      if (product) openProductModal(product);
+    } catch (err) {
+      showToast("Could not load product.", "error");
+    }
+  }
+
+  async function deleteProduct(id) {
+    if (!confirm("Delete this product? This cannot be undone.")) return;
+
+    try {
+      const res = await fetch("/api/admin-merch", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Delete failed.");
+      showToast("Product deleted.", "success");
+      loadProducts();
+    } catch (err) {
+      showToast(err.message, "error");
+    }
+  }
+
+  function logout() {
+    document.cookie = "etfc_admin_session=; Max-Age=0; Path=/;";
+    window.location.href = "login.html";
+  }
+
+  loadProducts();
+</script>
+</body>
+</html>

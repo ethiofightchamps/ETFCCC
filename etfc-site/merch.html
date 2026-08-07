@@ -18,15 +18,21 @@
 .merch-hero-title span { color:var(--crimson-bright); }
 .merch-hero-sub { font-family:var(--font-mono); font-size:12px; color:var(--bone-dim); margin-top:10px; letter-spacing:2px; }
 
-.merch-coming-soon {
-  max-width: 700px;
-  margin: 64px auto;
-  padding: 0 24px;
+.merch-offer-banner {
+  max-width: 1000px;
+  margin: 32px auto 0;
+  padding: 16px 20px;
+  background: linear-gradient(90deg, var(--gold) 0%, #c8960a 100%);
+  border-radius: 12px;
   text-align: center;
+  color: #000;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 2px;
+  text-transform: uppercase;
 }
-.merch-cs-icon { font-size: 64px; margin-bottom: 24px; }
-.merch-cs-title { font-family:var(--font-display); font-size:28px; font-weight:900; text-transform:uppercase; color:#fff; margin-bottom:12px; }
-.merch-cs-sub { color:var(--bone-dim); font-size:15px; line-height:1.6; margin-bottom:32px; }
+.merch-offer-banner span { color: var(--crimson-bright); font-family: var(--font-display); font-size: 16px; }
 
 .merch-grid {
   display: grid;
@@ -61,10 +67,10 @@
   overflow: hidden;
 }
 .merch-card-img img { width:100%; height:100%; object-fit:cover; display:block; }
-.merch-soon-badge {
+.merch-offer-badge {
   position: absolute;
   top: 10px;
-  right: 10px;
+  left: 10px;
   background: var(--crimson);
   color: #fff;
   font-family: var(--font-mono);
@@ -74,25 +80,39 @@
   border-radius: 20px;
   text-transform: uppercase;
 }
+.merch-original-price {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: rgba(0,0,0,0.7);
+  color: var(--bone-dim);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  text-decoration: line-through;
+}
 .merch-card-body { padding: 14px 16px 16px; }
 .merch-card-name { font-family:var(--font-display); font-size:15px; font-weight:800; color:#fff; text-transform:uppercase; margin-bottom:4px; }
-.merch-card-desc { font-size:12px; color:var(--bone-dim); margin-bottom:12px; }
+.merch-card-category { font-size:11px; color:var(--gold-bright); text-transform:uppercase; letter-spacing:1px; margin-bottom:4px; }
+.merch-card-desc { font-size:12px; color:var(--bone-dim); margin-bottom:12px; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
 .merch-card-footer { display:flex; align-items:center; justify-content:space-between; }
-.merch-price { font-family:var(--font-mono); font-size:14px; color:var(--gold-bright); font-weight:700; }
-.merch-notify-btn {
+.merch-price { font-family:var(--font-mono); font-size:18px; color:var(--gold-bright); font-weight:700; }
+.merch-buy-btn {
   font-family: var(--font-mono);
   font-size: 10px;
   letter-spacing: 1px;
-  padding: 6px 12px;
+  padding: 8px 16px;
   border-radius: 6px;
-  border: 1px solid var(--gold);
-  color: var(--gold-bright);
-  background: transparent;
+  background: var(--crimson);
+  color: #fff;
+  border: none;
   cursor: pointer;
   text-transform: uppercase;
-  transition: background 0.15s, color 0.15s;
+  transition: background 0.15s;
 }
-.merch-notify-btn:hover, .merch-notify-btn.notified { background: var(--gold); color: #000; }
+.merch-buy-btn:hover { background: var(--crimson-bright); }
+.merch-buy-btn:disabled { background: #555; cursor: not-allowed; }
 
 .merch-section-label {
   font-family: var(--font-mono);
@@ -103,6 +123,157 @@
   text-align: center;
   padding: 40px 0 20px;
 }
+
+.loading-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 16px;
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 0 20px 64px;
+}
+.loading-card {
+  background: var(--obsidian-2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+}
+.loading-skeleton {
+  width: 100%;
+  aspect-ratio: 1;
+  background: linear-gradient(90deg, var(--obsidian-3) 25%, var(--obsidian-2) 50%, var(--obsidian-3) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+@keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+.loading-body { padding: 14px 16px 16px; }
+.loading-line { height: 16px; background: var(--obsidian-3); border-radius: 4px; margin-bottom: 8px; animation: shimmer 1.5s infinite; }
+.loading-line.short { width: 60%; }
+.loading-line.medium { width: 80%; }
+
+.empty-state {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 64px 24px;
+  border: 1px dashed var(--border);
+  border-radius: 12px;
+  color: var(--bone-dim);
+}
+.empty-icon { font-size: 48px; margin-bottom: 16px; }
+
+/* Product Detail Modal */
+.merch-detail-modal {
+  max-width: 520px;
+  width: 95%;
+}
+.merch-detail-header {
+  display: flex;
+  gap: 20px;
+  padding: 20px;
+  background: var(--obsidian-3);
+  border-bottom: 1px solid var(--border);
+}
+.merch-detail-img {
+  width: 140px;
+  height: 140px;
+  border-radius: 8px;
+  overflow: hidden;
+  flex-shrink: 0;
+  background: var(--obsidian-2);
+}
+.merch-detail-img img { width:100%; height:100%; object-fit:cover; }
+.merch-detail-info { flex: 1; min-width: 0; }
+.merch-detail-name { font-family:var(--font-display); font-size:18px; font-weight:800; color:#fff; text-transform:uppercase; margin-bottom:4px; }
+.merch-detail-category { font-size:11px; color:var(--gold-bright); text-transform:uppercase; letter-spacing:1px; margin-bottom:8px; }
+.merch-detail-price-row { display:flex; align-items:center; gap:10px; margin-bottom:8px; }
+.merch-detail-offer-price { font-family:var(--font-mono); font-size:22px; color:var(--gold-bright); font-weight:700; }
+.merch-detail-base-price { font-family:var(--font-mono); font-size:14px; color:var(--bone-dim); text-decoration:line-through; }
+.merch-detail-badge { background:var(--crimson); color:#fff; font-family:var(--font-mono); font-size:9px; letter-spacing:2px; padding:2px 8px; border-radius:20px; text-transform:uppercase; }
+.merch-detail-desc { font-size:13px; color:var(--bone-dim); line-height:1.5; }
+
+.merch-detail-options { padding: 20px; }
+.option-group { margin-bottom: 20px; }
+.option-label { display:block; font-family:var(--font-mono); font-size:11px; letter-spacing:2px; text-transform:uppercase; color:var(--gold-bright); margin-bottom:10px; }
+.option-select {
+  width: 100%;
+  background: var(--obsidian);
+  border: 1px solid var(--border);
+  color: var(--bone);
+  padding: 14px 16px;
+  border-radius: 8px;
+  font-size: 15px;
+  font-family: var(--font-body);
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%239a968d' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 16px center;
+  background-size: 16px;
+  padding-right: 48px;
+}
+.option-select:focus { outline: none; border-color: var(--gold); }
+
+.qty-stepper { display:flex; align-items:center; gap:12px; }
+.qty-btn {
+  width: 48px; height: 48px;
+  border-radius: 8px;
+  border: 1px solid var(--gold);
+  background: var(--obsidian-2);
+  color: var(--gold-bright);
+  font-size: 20px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.qty-btn:hover:not(:disabled) { background: var(--gold); color: #000; }
+.qty-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+.qty-value { font-family:var(--font-mono); font-size:20px; color:var(--bone); font-weight:700; min-width: 40px; text-align:center; }
+
+.merch-detail-total { padding: 16px 20px; background: var(--obsidian-3); border-top: 1px solid var(--border); display:flex; justify-content:space-between; align-items:center; }
+.merch-detail-total-label { font-family:var(--font-mono); font-size:13px; color:var(--bone-dim); text-transform:uppercase; }
+.merch-detail-total-price { font-family:var(--font-mono); font-size:24px; color:var(--gold-bright); font-weight:700; }
+
+.merch-detail-actions { padding: 20px; display:flex; gap:12px; }
+.merch-detail-actions .btn { flex: 1; }
+
+/* Checkout Modal */
+.merch-checkout-modal { max-width: 480px; width: 95%; }
+.checkout-section { padding: 20px; border-top: 1px solid var(--border); }
+.checkout-section:first-child { border-top: none; }
+.checkout-title { font-family:var(--font-display); font-size:16px; text-transform:uppercase; margin-bottom:16px; color:var(--bone); }
+.bank-details { background: var(--obsidian); border: 1px dashed var(--gold); border-radius: 8px; padding: 16px; font-family: var(--font-mono); font-size: 13px; margin-bottom: 16px; }
+.bank-row { display:flex; justify-content:space-between; padding: 6px 0; }
+.bank-row.highlight { border-top: 1px solid var(--border); margin-top: 8px; padding-top: 12px; font-weight: 700; }
+.ref-code { color: var(--gold-bright); letter-spacing: 1px; }
+
+.upload-area {
+  border: 2px dashed var(--border);
+  border-radius: 10px;
+  padding: 28px 16px;
+  text-align: center;
+  color: var(--bone-dim);
+  cursor: pointer;
+  transition: all 0.15s;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+.upload-area:hover, .upload-area.has-file { border-color: var(--gold); background: rgba(176,141,62,0.05); color: var(--gold-bright); }
+.upload-icon { font-size: 32px; }
+.upload-hint { font-size: 11px; color: var(--bone-dim); }
+.upload-preview { max-width: 100%; max-height: 120px; border-radius: 6px; display: none; }
+.upload-area.has-file .upload-preview { display: block; }
+.upload-area.has-file .upload-icon, .upload-area.has-file .upload-hint { display: none; }
+
+.error-msg { color: var(--crimson-bright); font-size: 13px; margin-top: 8px; padding: 10px; background: rgba(179,20,28,0.1); border-radius: 6px; border: 1px solid rgba(179,20,28,0.3); display: none; }
+
+@media (max-width: 480px) {
+  .merch-offer-banner { font-size: 10px; padding: 12px 16px; }
+  .merch-offer-banner span { font-size: 14px; }
+  .merch-detail-header { flex-direction: column; align-items: center; text-align: center; }
+  .merch-detail-img { width: 120px; height: 120px; }
+  .merch-detail-actions { flex-direction: column; }
+}
 </style>
 </head>
 <body>
@@ -111,112 +282,125 @@
 <div class="merch-hero">
   <div class="merch-hero-eyebrow">Official ETFC Store</div>
   <div class="merch-hero-title">ETFC <span>Merch</span></div>
-  <div class="merch-hero-sub">Rep the fight. Drop coming soon.</div>
+  <div class="merch-hero-sub">Rep the fight. Limited drop live now.</div>
 </div>
 
-<div class="merch-coming-soon">
-  <div class="merch-cs-icon">🥊</div>
-  <div class="merch-cs-title">Drop Coming Soon</div>
-  <div class="merch-cs-sub">Official ETFC Fight Night gear is on its way. Shirts, hoodies, hats — limited quantities. Click "Notify Me" on any item below and we'll hit you when it's live.</div>
+<div class="merch-offer-banner" style="max-width:1000px;margin:32px auto 0;">
+  🔥 5-Day Launch Offer — <span>Up to 50% Off</span> — Ends Soon
 </div>
 
-<div class="merch-section-label">Coming Soon — Fight Night 2026</div>
+<div class="merch-section-label">Fight Night 2026 Collection</div>
 
-<div class="merch-grid">
-
-  <div class="merch-card">
-    <div class="merch-card-img">
-      👕
-      <div class="merch-soon-badge">Soon</div>
-    </div>
-    <div class="merch-card-body">
-      <div class="merch-card-name">Fight Night Tee</div>
-      <div class="merch-card-desc">Classic black tee with ETFC Fight Night Aug 29 print</div>
-      <div class="merch-card-footer">
-        <div class="merch-price">TBA</div>
-        <button class="merch-notify-btn" onclick="notifyMe(this)">Notify Me</button>
-      </div>
-    </div>
-  </div>
-
-  <div class="merch-card">
-    <div class="merch-card-img">
-      🧥
-      <div class="merch-soon-badge">Soon</div>
-    </div>
-    <div class="merch-card-body">
-      <div class="merch-card-name">ETFC Hoodie</div>
-      <div class="merch-card-desc">Premium heavyweight hoodie with embroidered ETFC logo</div>
-      <div class="merch-card-footer">
-        <div class="merch-price">TBA</div>
-        <button class="merch-notify-btn" onclick="notifyMe(this)">Notify Me</button>
-      </div>
-    </div>
-  </div>
-
-  <div class="merch-card">
-    <div class="merch-card-img">
-      🧢
-      <div class="merch-soon-badge">Soon</div>
-    </div>
-    <div class="merch-card-body">
-      <div class="merch-card-name">Snapback Cap</div>
-      <div class="merch-card-desc">Red & black ETFC snapback, limited edition</div>
-      <div class="merch-card-footer">
-        <div class="merch-price">TBA</div>
-        <button class="merch-notify-btn" onclick="notifyMe(this)">Notify Me</button>
-      </div>
-    </div>
-  </div>
-
-  <div class="merch-card">
-    <div class="merch-card-img">
-      🥊
-      <div class="merch-soon-badge">Soon</div>
-    </div>
-    <div class="merch-card-body">
-      <div class="merch-card-name">Boxing Gloves</div>
-      <div class="merch-card-desc">ETFC branded training gloves — real leather</div>
-      <div class="merch-card-footer">
-        <div class="merch-price">TBA</div>
-        <button class="merch-notify-btn" onclick="notifyMe(this)">Notify Me</button>
-      </div>
-    </div>
-  </div>
-
-  <div class="merch-card">
-    <div class="merch-card-img">
-      🩳
-      <div class="merch-soon-badge">Soon</div>
-    </div>
-    <div class="merch-card-body">
-      <div class="merch-card-name">Fight Shorts</div>
-      <div class="merch-card-desc">MMA-cut shorts with ETFC logo patch</div>
-      <div class="merch-card-footer">
-        <div class="merch-price">TBA</div>
-        <button class="merch-notify-btn" onclick="notifyMe(this)">Notify Me</button>
-      </div>
-    </div>
-  </div>
-
-  <div class="merch-card">
-    <div class="merch-card-img">
-      📿
-      <div class="merch-soon-badge">Soon</div>
-    </div>
-    <div class="merch-card-body">
-      <div class="merch-card-name">Fighter Pendant</div>
-      <div class="merch-card-desc">Gold-plated ETFC chain pendant, numbered edition</div>
-      <div class="merch-card-footer">
-        <div class="merch-price">TBA</div>
-        <button class="merch-notify-btn" onclick="notifyMe(this)">Notify Me</button>
-      </div>
-    </div>
-  </div>
-
+<div class="loading-grid" id="merchGrid">
+  <!-- Skeletons will be injected here -->
 </div>
 
 <div id="footer-mount"></div>
+
+<!-- PRODUCT DETAIL MODAL -->
+<div class="modal-overlay" id="merchDetailModal">
+  <div class="modal modal-bet-slip merch-detail-modal" style="display:flex;flex-direction:column;max-height:90vh;overflow:hidden;">
+    <div class="modal-header">
+      <h3 style="margin:0;">Product Details</h3>
+      <span class="modal-close" onclick="closeMerchDetail()">&times;</span>
+    </div>
+    <div class="modal-body" style="overflow-y:auto;flex:1;padding:0;">
+      <div class="merch-detail-header">
+        <div class="merch-detail-img" id="detailImg"></div>
+        <div class="merch-detail-info">
+          <div class="merch-detail-name" id="detailName"></div>
+          <div class="merch-detail-category" id="detailCategory"></div>
+          <div class="merch-detail-price-row">
+            <span class="merch-detail-offer-price" id="detailOfferPrice"></span>
+            <span class="merch-detail-base-price" id="detailBasePrice"></span>
+            <span class="merch-detail-badge" id="detailBadge" style="display:none;">Offer</span>
+          </div>
+          <div class="merch-detail-desc" id="detailDesc"></div>
+        </div>
+      </div>
+      <div class="merch-detail-options">
+        <div class="option-group">
+          <label class="option-label">Color</label>
+          <select class="option-select" id="detailColor" onchange="updateDetailTotal()"></select>
+        </div>
+        <div class="option-group">
+          <label class="option-label">Size</label>
+          <select class="option-select" id="detailSize" onchange="updateDetailTotal()"></select>
+        </div>
+        <div class="option-group">
+          <label class="option-label">Quantity</label>
+          <div class="qty-stepper">
+            <button class="qty-btn" onclick="changeQty(-1)" id="qtyMinus" aria-label="Decrease quantity">−</button>
+            <span class="qty-value" id="qtyValue">1</span>
+            <button class="qty-btn" onclick="changeQty(1)" id="qtyPlus" aria-label="Increase quantity">+</button>
+            <span style="margin-left:auto;font-size:12px;color:var(--bone-dim);" id="stockHint"></span>
+          </div>
+        </div>
+      </div>
+      <div class="merch-detail-total">
+        <span class="merch-detail-total-label">Total</span>
+        <span class="merch-detail-total-price" id="detailTotal">0 ETB</span>
+      </div>
+      <div class="merch-detail-actions">
+        <button class="btn btn-outline" onclick="closeMerchDetail()">Cancel</button>
+        <button class="btn btn-primary" id="buyNowBtn" onclick="openMerchCheckout()">Buy Now</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CHECKOUT MODAL -->
+<div class="modal-overlay" id="merchCheckoutModal">
+  <div class="modal modal-bet-slip merch-checkout-modal" style="display:flex;flex-direction:column;max-height:90vh;overflow:hidden;">
+    <div class="modal-header">
+      <h3 style="margin:0;">Checkout</h3>
+      <span class="modal-close" onclick="closeMerchCheckout()">&times;</span>
+    </div>
+    <div class="modal-body" style="overflow-y:auto;flex:1;padding-bottom:80px;">
+      <div class="checkout-section">
+        <div class="checkout-title">Order Summary</div>
+        <div id="checkoutSummary"></div>
+      </div>
+      <div class="checkout-section">
+        <div class="checkout-title">Payment Details</div>
+        <div class="bank-details">
+          <div class="bank-row"><span>Bank</span><span>[Bank Name]</span></div>
+          <div class="bank-row"><span>Account Name</span><span>[ETFC Account Name]</span></div>
+          <div class="bank-row"><span>Account Number</span><span>[Account Number]</span></div>
+          <div class="bank-row highlight"><span>Reference Code</span><span id="merchRefCode" class="ref-code">ETFC-MERCH-XXXXXX</span></div>
+        </div>
+        <p class="hint">Include the reference code in your transfer description.</p>
+      </div>
+      <div class="checkout-section">
+        <div class="checkout-title">Your Details</div>
+        <div class="field"><label>Full Name</label><input type="text" id="merchBuyerName" placeholder="As it should appear on your order" autocomplete="name"></div>
+        <div class="field"><label>Phone Number</label><input type="tel" id="merchBuyerPhone" placeholder="e.g. 0912345678" autocomplete="tel"></div>
+      </div>
+      <div class="checkout-section">
+        <div class="checkout-title">Proof of Payment</div>
+        <div class="upload-area" id="merchUploadArea" onclick="document.getElementById('merchScreenshotInput').click()">
+          <div class="upload-icon">&#128247;</div>
+          <span class="upload-label" id="merchUploadLabel">Tap to upload payment screenshot</span>
+          <span class="upload-hint">Max 5MB • JPG/PNG</span>
+          <img class="upload-preview" id="merchUploadPreview" alt="Screenshot preview">
+          <input type="file" id="merchScreenshotInput" accept="image/*" style="display:none;" onchange="onMerchScreenshotChosen(this)">
+        </div>
+      </div>
+      <p id="merchCheckoutError" class="error-msg"></p>
+    </div>
+    <div class="modal-footer" style="position:sticky;bottom:0;padding:16px 20px;background:var(--obsidian-3);border-top:1px solid var(--border);border-radius:0 0 12px 12px;">
+      <button class="btn btn-outline btn-block" onclick="closeMerchCheckout()">Cancel</button>
+      <button class="btn btn-primary btn-block" id="submitMerchOrderBtn" onclick="submitMerchOrder()">Submit Order</button>
+    </div>
+    <div id="merchCheckoutSuccess" class="modal-body success-state" style="display:none;">
+      <div class="success-icon">&#10003;</div>
+      <h3>Order Submitted!</h3>
+      <span class="status-pill pending">Pending Verification</span>
+      <p class="text-dim mt-24">ETFC is reviewing your payment. Check <a href="dashboard.html" style="color:var(--gold-bright);">My Account</a> for status.</p>
+      <button class="btn btn-outline btn-block mt-24" onclick="closeMerchCheckout(true)">Done</button>
+    </div>
+  </div>
+</div>
 
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
@@ -227,12 +411,313 @@
 <script src="js/partials.js"></script>
 <script src="js/main.js"></script>
 <script>
-function notifyMe(btn) {
-  btn.textContent = "✓ Noted!";
-  btn.classList.add("notified");
-  btn.disabled = true;
-  showToast("We'll notify you when this drops!", "success");
+let allProducts = [];
+let currentProduct = null;
+let chosenMerchFile = null;
+
+function formatPrice(n) { return Number(n).toLocaleString() + " ETB"; }
+
+function isOfferActive(product) {
+  if (!product.offerPrice || !product.offerEndsAt) return false;
+  const end = product.offerEndsAt.toMillis ? product.offerEndsAt.toMillis() : product.offerEndsAt;
+  return Date.now() < end;
 }
+
+function getDisplayPrice(product) {
+  return isOfferActive(product) ? product.offerPrice : product.basePrice;
+}
+
+function renderSkeletons() {
+  const grid = document.getElementById("merchGrid");
+  grid.innerHTML = Array(8).fill(0).map(() => `
+    <div class="loading-card">
+      <div class="loading-skeleton"></div>
+      <div class="loading-body">
+        <div class="loading-line medium"></div>
+        <div class="loading-line short" style="margin-top:8px;"></div>
+        <div class="loading-line" style="margin-top:12px;width:100%;"></div>
+        <div class="loading-line short" style="margin-top:8px;"></div>
+      </div>
+    </div>
+  `).join("");
+}
+
+async function loadProducts() {
+  renderSkeletons();
+  try {
+    const snap = await db.collection("merchProducts")
+      .where("active", "==", true)
+      .orderBy("createdAt", "desc")
+      .get();
+    allProducts = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    renderProducts();
+  } catch (err) {
+    console.error("loadProducts failed:", err);
+    document.getElementById("merchGrid").innerHTML = `
+      <div class="empty-state">
+        <div class="empty-icon">⚠️</div>
+        <p>Could not load products. Try refreshing.</p>
+      </div>`;
+  }
+}
+
+function renderProducts() {
+  const grid = document.getElementById("merchGrid");
+  if (allProducts.length === 0) {
+    grid.innerHTML = `
+      <div class="empty-state">
+        <div class="empty-icon">📦</div>
+        <p>No products available right now.</p>
+      </div>`;
+    return;
+  }
+  grid.innerHTML = allProducts.map(p => {
+    const price = getDisplayPrice(p);
+    const onOffer = isOfferActive(p);
+    const img = (p.images && p.images[0]) || "";
+    return `
+      <div class="merch-card" onclick="openMerchDetail('${p.id}')">
+        <div class="merch-card-img">
+          ${img ? `<img src="${img}" alt="${p.name}" loading="lazy">` : '📦'}
+          ${onOffer ? '<div class="merch-offer-badge">Offer</div>' : ''}
+          ${onOffer && p.basePrice ? `<div class="merch-original-price">${formatPrice(p.basePrice)}</div>` : ''}
+        </div>
+        <div class="merch-card-body">
+          <div class="merch-card-name">${p.name}</div>
+          ${p.category ? `<div class="merch-card-category">${p.category}</div>` : ''}
+          <div class="merch-card-desc">${p.description || ""}</div>
+          <div class="merch-card-footer">
+            <div class="merch-price">${formatPrice(price)}</div>
+            <button class="merch-buy-btn" onclick="event.stopPropagation(); openMerchDetail('${p.id}')">Buy</button>
+          </div>
+        </div>
+      </div>
+    `;
+  }).join("");
+  grid.className = "merch-grid";
+}
+
+function openMerchDetail(productId) {
+  currentProduct = allProducts.find(p => p.id === productId);
+  if (!currentProduct) return;
+
+  const price = getDisplayPrice(currentProduct);
+  const onOffer = isOfferActive(currentProduct);
+
+  document.getElementById("detailImg").innerHTML = currentProduct.images && currentProduct.images[0]
+    ? `<img src="${currentProduct.images[0]}" alt="${currentProduct.name}">`
+    : '📦';
+  document.getElementById("detailName").textContent = currentProduct.name;
+  document.getElementById("detailCategory").textContent = currentProduct.category || "General";
+  document.getElementById("detailOfferPrice").textContent = formatPrice(price);
+  document.getElementById("detailBasePrice").style.display = onOffer && currentProduct.basePrice ? "inline" : "none";
+  document.getElementById("detailBasePrice").textContent = formatPrice(currentProduct.basePrice);
+  document.getElementById("detailBadge").style.display = onOffer ? "inline-block" : "none";
+  document.getElementById("detailDesc").textContent = currentProduct.description || "";
+
+  const colorSelect = document.getElementById("detailColor");
+  colorSelect.innerHTML = (currentProduct.colors || []).map(c => `<option value="${c}">${c}</option>`).join("");
+  const sizeSelect = document.getElementById("detailSize");
+  sizeSelect.innerHTML = (currentProduct.sizes || []).map(s => `<option value="${s}">${s}</option>`).join("");
+
+  document.getElementById("qtyValue").textContent = 1;
+  updateDetailTotal();
+  updateQtyButtons();
+
+  document.getElementById("merchDetailModal").classList.add("open");
+  document.body.style.overflow = "hidden";
+}
+
+function closeMerchDetail() {
+  document.getElementById("merchDetailModal").classList.remove("open");
+  document.body.style.overflow = "";
+  currentProduct = null;
+}
+
+function changeQty(delta) {
+  const val = parseInt(document.getElementById("qtyValue").textContent) + delta;
+  const max = currentProduct?.stock || 99;
+  if (val >= 1 && val <= max) {
+    document.getElementById("qtyValue").textContent = val;
+    updateDetailTotal();
+    updateQtyButtons();
+  }
+}
+
+function updateQtyButtons() {
+  const val = parseInt(document.getElementById("qtyValue").textContent);
+  const max = currentProduct?.stock || 99;
+  document.getElementById("qtyMinus").disabled = val <= 1;
+  document.getElementById("qtyPlus").disabled = val >= max;
+  document.getElementById("stockHint").textContent = `${max} in stock`;
+}
+
+function updateDetailTotal() {
+  if (!currentProduct) return;
+  const qty = parseInt(document.getElementById("qtyValue").textContent);
+  const price = getDisplayPrice(currentProduct);
+  document.getElementById("detailTotal").textContent = formatPrice(price * qty);
+}
+
+function openMerchCheckout() {
+  if (!currentProduct) return;
+  requireAuth("buyMerch", () => {
+    closeMerchDetail();
+    const session = JSON.parse(localStorage.getItem("etfc_session") || "null");
+    if (session?.name) document.getElementById("merchBuyerName").value = session.name;
+    if (session?.phone) document.getElementById("merchBuyerPhone").value = session.phone;
+
+    const qty = parseInt(document.getElementById("qtyValue").textContent);
+    const color = document.getElementById("detailColor").value;
+    const size = document.getElementById("detailSize").value;
+    const price = getDisplayPrice(currentProduct);
+    const total = price * qty;
+
+    document.getElementById("checkoutSummary").innerHTML = `
+      <div style="display:flex;gap:12px;align-items:center;padding:12px;background:var(--obsidian);border-radius:8px;border:1px solid var(--border);">
+        <div style="width:60px;height:60px;border-radius:6px;overflow:hidden;background:var(--obsidian-2);flex-shrink:0;">
+          ${currentProduct.images && currentProduct.images[0] ? `<img src="${currentProduct.images[0]}" style="width:100%;height:100%;object-fit:cover;">` : '📦'}
+        </div>
+        <div style="flex:1;min-width:0;">
+          <div style="font-weight:600;color:var(--bone);">${currentProduct.name}</div>
+          <div style="font-size:12px;color:var(--bone-dim);">${color} / ${size} × ${qty}</div>
+          <div style="font-family:var(--font-mono);color:var(--gold-bright);font-weight:700;margin-top:4px;">${formatPrice(total)}</div>
+        </div>
+      </div>
+    `;
+    document.getElementById("merchRefCode").textContent = "ETFC-MERCH-" + Math.random().toString(36).slice(2, 8).toUpperCase();
+    document.getElementById("merchCheckoutModal").classList.add("open");
+    document.body.style.overflow = "hidden";
+    resetCheckoutForm();
+  });
+}
+
+function closeMerchCheckout(clearAll = false) {
+  document.getElementById("merchCheckoutModal").classList.remove("open");
+  document.body.style.overflow = "";
+  if (clearAll) {
+    chosenMerchFile = null;
+    document.getElementById("merchScreenshotInput").value = "";
+    document.getElementById("merchUploadLabel").textContent = "Tap to upload payment screenshot";
+    document.getElementById("merchUploadPreview").style.display = "none";
+    document.getElementById("merchUploadArea").classList.remove("has-file");
+    document.getElementById("merchCheckoutSuccess").style.display = "none";
+    document.querySelector("#merchCheckoutModal .modal-body").style.display = "block";
+    document.querySelector("#merchCheckoutModal .modal-footer").style.display = "flex";
+  }
+}
+
+function resetCheckoutForm() {
+  chosenMerchFile = null;
+  document.getElementById("merchScreenshotInput").value = "";
+  document.getElementById("merchUploadLabel").textContent = "Tap to upload payment screenshot";
+  document.getElementById("merchUploadPreview").style.display = "none";
+  document.getElementById("merchUploadArea").classList.remove("has-file");
+  document.getElementById("merchCheckoutError").style.display = "none";
+  document.getElementById("merchCheckoutSuccess").style.display = "none";
+  document.querySelector("#merchCheckoutModal .modal-body").style.display = "block";
+  document.querySelector("#merchCheckoutModal .modal-footer").style.display = "flex";
+  const btn = document.getElementById("submitMerchOrderBtn");
+  btn.removeAttribute("disabled");
+  btn.textContent = "Submit Order";
+}
+
+function onMerchScreenshotChosen(input) {
+  const file = input.files[0];
+  if (!file) return;
+  if (file.size > 5 * 1024 * 1024) {
+    showMerchCheckoutError("Screenshot is over 5MB — please choose a smaller image.");
+    input.value = "";
+    return;
+  }
+  chosenMerchFile = file;
+  document.getElementById("merchUploadLabel").textContent = `✓ ${file.name}`;
+  const preview = document.getElementById("merchUploadPreview");
+  preview.src = URL.createObjectURL(file);
+  preview.style.display = "block";
+  document.getElementById("merchUploadArea").classList.add("has-file");
+}
+
+function showMerchCheckoutError(msg) {
+  const el = document.getElementById("merchCheckoutError");
+  el.textContent = msg;
+  el.style.display = "block";
+}
+
+async function submitMerchOrder() {
+  const errEl = document.getElementById("merchCheckoutError");
+  const btn = document.getElementById("submitMerchOrderBtn");
+  errEl.style.display = "none";
+
+  if (!currentProduct) return showMerchCheckoutError("Session expired — please try again.");
+  const qty = parseInt(document.getElementById("qtyValue").textContent);
+  const color = document.getElementById("detailColor").value;
+  const size = document.getElementById("detailSize").value;
+  const buyerName = document.getElementById("merchBuyerName").value.trim();
+  const buyerPhone = document.getElementById("merchBuyerPhone").value.trim();
+  const session = JSON.parse(localStorage.getItem("etfc_session") || "null");
+
+  if (!buyerName) return showMerchCheckoutError("Enter your full name.");
+  if (!buyerPhone) return showMerchCheckoutError("Enter your phone number.");
+  if (!/^(09|07)\d{8}$/.test(buyerPhone)) return showMerchCheckoutError("Enter a valid Ethiopian phone number (e.g. 0912345678).");
+  if (!chosenMerchFile) return showMerchCheckoutError("Upload your payment screenshot.");
+  if (!session) return showMerchCheckoutError("Session expired — please sign in again.");
+  if (!auth.currentUser) return showMerchCheckoutError("Session expired — please sign in again.");
+
+  btn.setAttribute("disabled", "true");
+  btn.textContent = "Uploading screenshot…";
+
+  try {
+    const formData = new FormData();
+    formData.append("file", chosenMerchFile);
+    formData.append("upload_preset", "etfc_uploads");
+    formData.append("folder", "merch-screenshots");
+    const cloudRes = await fetch("https://api.cloudinary.com/v1_1/yryolq8j/image/upload", {
+      method: "POST",
+      body: formData,
+    });
+    if (!cloudRes.ok) throw new Error("Screenshot upload failed — please try again.");
+    const cloudData = await cloudRes.json();
+    const screenshotUrl = cloudData.secure_url;
+
+    btn.textContent = "Submitting…";
+
+    const price = getDisplayPrice(currentProduct);
+    const total = price * qty;
+
+    const res = await fetch("/api/create-merch-order", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        productId: currentProduct.id,
+        productName: currentProduct.name,
+        productSlug: currentProduct.slug,
+        quantity: qty,
+        color,
+        size,
+        buyerName,
+        phone: buyerPhone,
+        email: session.email || "",
+        userId: session.uid || "",
+        screenshotUrl,
+        unitPrice: price,
+        totalAmount: total,
+      }),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || "Could not submit order.");
+
+    document.querySelector("#merchCheckoutModal .modal-body").style.display = "none";
+    document.querySelector("#merchCheckoutModal .modal-footer").style.display = "none";
+    document.getElementById("merchCheckoutSuccess").style.display = "block";
+  } catch (err) {
+    showMerchCheckoutError(err.message || "Upload failed — check your connection and try again.");
+    btn.removeAttribute("disabled");
+    btn.textContent = "Submit Order";
+  }
+}
+
+loadProducts();
 </script>
 </body>
 </html>
