@@ -145,7 +145,7 @@
           </button>
         </div>
         <div class="bank-details-card" style="margin-top:12px;">
-          <div class="detail-row"><span>Account Name</span><span id="betPayAccountName">ETFC Fight Night</span></div>
+          <div class="detail-row"><span>Account Name</span><span id="betPayAccountName">Efrem Werku Muluneh</span></div>
           <div class="detail-row highlight-row"><span>Reference Code</span><span id="betRefCode" class="ref-code">ETFC-BET-XXXXXX</span></div>
         </div>
         <p class="hint">Tap to choose payment method, send the exact amount, and include the reference code.</p>
@@ -665,8 +665,8 @@
     const modal = document.getElementById("paymentMethodModal");
     const container = document.getElementById("paymentMethodOptions");
     container.innerHTML = PAYMENT_METHODS.map(pm => `
-      <label style="display:flex;align-items:center;gap:16px;padding:18px;background:var(--obsidian);border:1px solid var(--border);border-radius:12px;cursor:pointer;transition:border-color 0.15s;" onmouseover="this.style.borderColor='var(--gold)'" onmouseout="this.style.borderColor='var(--border)'">
-        <input type="radio" name="paymentMethodModal" value="${pm.id}" ${pm.id === selectedPaymentMethod ? "checked" : ""} style="width:20px;height:20px;accent-color:var(--gold);">
+      <label style="display:flex;align-items:center;gap:16px;padding:18px;background:var(--obsidian);border:1px solid var(--border);border-radius:12px;cursor:pointer;transition:border-color 0.15s;" onclick="selectPaymentMethod('${pm.id}')" onmouseover="this.style.borderColor='var(--gold)'" onmouseout="this.style.borderColor='var(--border)'">
+        <input type="radio" name="paymentMethodModal" value="${pm.id}" ${pm.id === selectedPaymentMethod ? "checked" : ""} style="width:20px;height:20px;accent-color:var(--gold);" onclick="event.stopPropagation();">
         <img src="${pm.icon}" alt="${pm.name}" style="width:56px;height:56px;object-fit:contain;background:#fff;border-radius:10px;padding:6px;">
         <div style="flex:1;">
           <div style="font-weight:700;color:var(--bone);font-size:16px;">${pm.name}</div>
@@ -690,6 +690,9 @@
     document.getElementById("selectedPaymentIcon").src = pm.icon;
     document.getElementById("selectedPaymentName").textContent = pm.name;
     document.getElementById("selectedPaymentNumber").textContent = document.getElementById(`modal-${pm.id}Number`).textContent;
+    const names = { mpesa: "Efrem Werku Muluneh", telebirr: "Ager" };
+    const nameEl = document.getElementById("betPayAccountName");
+    if (nameEl) nameEl.textContent = names[methodId] || "";
     closePaymentMethodModal();
   }
 
