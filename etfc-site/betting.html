@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Betting — ETFC</title>
-<script>(function(){var t=localStorage.getItem("etfc_theme")||"light";document.documentElement.setAttribute("data-theme",t);})();</script>
+<script>(function(){var t=localStorage.getItem("etfc_theme")||"dark";document.documentElement.setAttribute("data-theme",t);})();</script>
 <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
@@ -26,11 +26,14 @@
       <div class="section-eyebrow">Fixed Odds</div>
       <div class="section-title" style="font-size:38px;margin-bottom:4px;">Fight Night Betting</div>
     </div>
-    <div class="bet-slip-preview" id="betSlipPreview" style="display:none;">
-      <div class="preview-legs" id="previewLegs"></div>
-      <div class="preview-footer">
-        <span class="preview-odds">Odds: <span id="previewOdds">0.00</span></span>
-        <button class="btn btn-gold btn-sm" onclick="document.getElementById('betSlipModal').classList.add('open')">View Slip</button>
+    <div style="display:flex;align-items:center;gap:12px;">
+      <button class="btn btn-outline btn-sm" onclick="openMyBetsModal()">My Bets</button>
+      <div class="bet-slip-preview" id="betSlipPreview" style="display:none;">
+        <div class="preview-legs" id="previewLegs"></div>
+        <div class="preview-footer">
+          <span class="preview-odds">Odds: <span id="previewOdds">0.00</span></span>
+          <button class="btn btn-gold btn-sm" onclick="document.getElementById('betSlipModal').classList.add('open')">View Slip</button>
+        </div>
       </div>
     </div>
   </div>
@@ -43,14 +46,30 @@
   <p class="text-dim" id="footNote" style="font-size:12px;margin-top:12px;">Odds can move until a bet is submitted — the odds locked in are whatever was live the moment you hit Submit Bet.</p>
 </div>
 
+<!-- MY BETS MODAL -->
+<div class="modal-overlay" id="myBetsModal">
+  <div class="modal modal-bet-slip" style="display:flex;flex-direction:column;max-height:85vh;overflow:hidden;">
+    <div class="modal-header">
+      <h3>My Bets</h3>
+      <span class="modal-close" onclick="document.getElementById('myBetsModal').classList.remove('open')">&times;</span>
+    </div>
+    <div class="modal-body" style="overflow-y:auto;flex:1;">
+      <div style="display:flex;justify-content:flex-end;margin-bottom:12px;">
+        <button class="refresh-btn" onclick="loadMyBets()">↻ Refresh</button>
+      </div>
+      <div id="myBetsContainer"><p class="text-dim">Loading…</p></div>
+    </div>
+  </div>
+</div>
+
 <!-- BET SLIP MODAL -->
 <div class="modal-overlay" id="betSlipModal">
-  <div class="modal modal-bet-slip">
+  <div class="modal modal-bet-slip" style="display:flex;flex-direction:column;max-height:90vh;overflow:hidden;">
     <div class="modal-header">
       <h3>Place Your Bet</h3>
       <span class="modal-close" onclick="closeBetSlip()">&times;</span>
     </div>
-    <div class="modal-body" id="betSlipForm">
+    <div class="modal-body" id="betSlipForm" style="overflow-y:auto;flex:1;padding-bottom:80px;">
       
       <!-- Accumulator legs list -->
       <div class="bet-section">
@@ -148,10 +167,11 @@
 
       <p id="betSubmitError" class="error-msg" style="display:none;"></p>
       
-      <!-- Sticky Submit Button -->
-      <div class="modal-footer">
-        <button class="btn btn-primary btn-block" id="submitBetBtn" onclick="submitBet()">Submit Bet</button>
-      </div>
+    </div><!-- end modal-body betSlipForm -->
+    <!-- Sticky Submit Button outside scroll area -->
+    <div class="modal-footer" style="position:sticky;bottom:0;padding:16px 24px;background:var(--obsidian-2,#111);border-top:1px solid var(--border);z-index:10;">
+      <p id="betSubmitError" class="error-msg" style="display:none;margin-bottom:8px;color:var(--crimson-bright);"></p>
+      <button class="btn btn-primary btn-block" id="submitBetBtn" onclick="submitBet()">Submit Bet</button>
     </div>
 
     <!-- Success State -->
@@ -163,7 +183,7 @@
         ETFC is reviewing your payment. Your bet goes live once approved — check
         <a href="dashboard.html" style="color:var(--gold-bright);">My Account</a> for status.
       </p>
-      <button class="btn btn-outline btn-block mt-24" onclick="closeBetSlip()">Done</button>
+      <button class="btn btn-outline btn-block mt-24" onclick="closeBetSlip(true)">Done</button>
     </div>
   </div>
 </div>
@@ -287,9 +307,18 @@
 
   function openBetSlip(fightId, side, fighterName, odds, discipline, order) {
     requireAuth("placeBet", () => {
-      // Check if this leg already exists
-      const exists = betLegs.find(l => l.fightId === fightId && l.side === side);
-      if (exists) return; // already added
+      // Block same fight same side duplicate
+      const exactDup = betLegs.find(l => l.fightId === fightId && l.side === side);
+      if (exactDup) {
+        document.getElementById("betSlipModal").classList.add("open");
+        return;
+      }
+      // Block betting both sides of the same fight
+      const oppositeSide = betLegs.find(l => l.fightId === fightId && l.side !== side);
+      if (oppositeSide) {
+        alert("You can't bet on both fighters in the same match.");
+        return;
+      }
 
       betLegs.push({ fightId, side, fighterName, odds, discipline, order });
       chosenBetFile = null;
@@ -303,8 +332,25 @@
     });
   }
 
-  function closeBetSlip() {
+  function closeBetSlip(clearAll = false) {
     document.getElementById("betSlipModal").classList.remove("open");
+    // Always reset file + error
+    chosenBetFile = null;
+    document.getElementById("betUploadLabel").textContent = "Tap to upload payment screenshot";
+    document.getElementById("betScreenshotInput").value = "";
+    const errEl = document.getElementById("betSubmitError");
+    if (errEl) errEl.style.display = "none";
+    // Reset submit button in case it was stuck
+    const btn = document.getElementById("submitBetBtn");
+    if (btn) { btn.removeAttribute("disabled"); btn.textContent = "Submit Bet"; }
+    // If coming from success state (Done button), clear everything
+    if (clearAll) {
+      betLegs = [];
+      refreshBetSlip();
+      document.getElementById("betSlipForm").style.display = "block";
+      document.getElementById("betSlipPending").style.display = "none";
+      document.getElementById("betAmount").value = "";
+    }
   }
 
   // Allow clicking preview/indicator to open modal
@@ -490,8 +536,12 @@
       betLegs = [];
       chosenBetFile = null;
 
+      betLegs = [];
+      chosenBetFile = null;
       document.getElementById("betSlipForm").style.display = "none";
       document.getElementById("betSlipPending").style.display = "block";
+      // Also reset the floating indicator
+      refreshBetSlip();
     } catch (err) {
       showBetSubmitError(err.message || "Upload failed — check your connection and try again.");
       btn.removeAttribute("disabled");
@@ -514,6 +564,78 @@
       console.warn("Could not load minStake:", err);
     }
   }
+
+  // ── My Bets ────────────────────────────────────────────────────────────
+  const STATUS_ICON = { confirmed: "⏳", pending: "⏳", won: "✅", lost: "❌", rejected: "❌" };
+  const STATUS_LABEL = { confirmed: "Awaiting Fight", pending: "Pending Review", won: "Won", lost: "Lost", rejected: "Rejected" };
+
+  async function loadMyBets() {
+    const el = document.getElementById("myBetsContainer");
+    const user = auth.currentUser;
+
+    if (!user) {
+      el.innerHTML = `<div class="empty-state"><div class="empty-icon">🔒</div><p style="margin:0;">Sign in to view your bets.</p></div>`;
+      return;
+    }
+
+    el.innerHTML = `<p class="text-dim">Loading…</p>`;
+
+    try {
+      const snap = await db.collection("bets").where("userId", "==", user.uid).get();
+      let docs = snap.docs;
+      if (docs.length === 0 && user.email) {
+        const snapEmail = await db.collection("bets").where("email", "==", user.email).get();
+        docs = snapEmail.docs;
+      }
+      docs.sort((a, b) => (b.data().createdAt?.toMillis?.() || 0) - (a.data().createdAt?.toMillis?.() || 0));
+
+      if (docs.length === 0) {
+        el.innerHTML = `<div class="empty-state"><div class="empty-icon">🥊</div><p style="margin:0;">No bets placed yet — pick a fighter above to get started.</p></div>`;
+        return;
+      }
+
+      el.innerHTML = docs.map((doc) => {
+        const b = doc.data();
+        const s = b.status || "pending";
+
+        const legs = b.legs || (b.fightId ? [{ fightId: b.fightId, side: b.side, odds: b.odds, fighterName: b.fighterName }] : []);
+        const legsHtml = legs.map((leg) => `
+          <div class="bet-leg-row">
+            <span class="fighter">${leg.fighterName}</span>
+            <span class="odds"> @ ${Number(leg.odds).toFixed(2)}</span>
+          </div>
+        `).join("");
+
+        const combinedOdds = b.combinedOdds || b.odds || 0;
+        const grossPayout = b.grossPayout || b.potentialPayout || 0;
+        const taxAmount = b.taxAmount || 0;
+        const netPayout = b.netPayout || (grossPayout - taxAmount) || grossPayout;
+
+        return `
+          <div class="bet-card ${s}">
+            <div class="bet-card-legs">
+              ${legsHtml || `<span class="text-dim">—</span>`}
+              <div class="bet-card-meta">Stake: ${(b.stake || 0).toLocaleString()} ETB &middot; Combined Odds: ${Number(combinedOdds).toFixed(2)} &middot; Ref: ${b.refCode || "—"}</div>
+            </div>
+            <div class="bet-card-result">
+              <span class="status-pill ${s}">${STATUS_ICON[s] || ""} ${STATUS_LABEL[s] || s}</span>
+              <span class="bet-payout-net">${s === "lost" || s === "rejected" ? "—" : `Net: ${Number(netPayout).toLocaleString()} ETB`}</span>
+              ${s !== "lost" && s !== "rejected" ? `<span class="bet-payout-detail">Gross: ${Number(grossPayout).toLocaleString()} ETB &middot; Tax: ${Number(taxAmount).toLocaleString()} ETB</span>` : ""}
+            </div>
+          </div>`;
+      }).join("");
+    } catch (err) {
+      el.innerHTML = `<p style="color:var(--crimson-bright);">Could not load bets — ${err.message}</p>`;
+      console.error("bets:", err);
+    }
+  }
+
+  function openMyBetsModal() {
+    document.getElementById("myBetsModal").classList.add("open");
+    loadMyBets();
+  }
+
+  auth.onAuthStateChanged(() => loadMyBets());
 
   loadBettingPage();
   loadMinStake();

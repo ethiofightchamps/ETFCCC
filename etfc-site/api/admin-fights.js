@@ -11,19 +11,18 @@ const { isValidAdminSession } = require("./_adminSession");
 const db = admin.firestore();
 
 const SEED_FIGHTS = [
-  { discipline: "mma", order: 1, mainEvent: true,  fighterA: "Sedo",        fighterB: "Johnny",    weightA: "Heavyweight", weightB: "Heavyweight", oddsA: 1.85, oddsB: 2.05, photoA: "images/fighter-a.jpg", photoB: "images/fighter-b.jpg" },
-  { discipline: "mma", order: 2, mainEvent: false, fighterA: "Boyka",       fighterB: "Endris",    weightA: "Heavyweight", weightB: "Heavyweight", oddsA: 1.75, oddsB: 2.10 },
-  { discipline: "mma", order: 3, mainEvent: false, fighterA: "Nikatehkina", fighterB: "Robel (Sky-Limit)", weightA: "75 KG", weightB: "75 KG", oddsA: 1.90, oddsB: 1.95 },
-  { discipline: "mma", order: 4, mainEvent: false, fighterA: "Titan",       fighterB: "Coach Kal", weightA: "75 KG", weightB: "75 KG", oddsA: 2.20, oddsB: 1.65 },
+  { discipline: "mma", order: 1, mainEvent: true,  fighterA: "Sedo",          fighterB: "Jhonny",        weightA: "Middleweight", weightB: "Middleweight", oddsA: 1.85, oddsB: 2.05, photoA: "images/fighter-a.jpg", photoB: "images/fighter-b.jpg" },
+  { discipline: "mma", order: 2, mainEvent: false, fighterA: "Elezar",        fighterB: "Kaleab",        weightA: "MMA", weightB: "MMA", oddsA: 1.80, oddsB: 2.00 },
+  { discipline: "mma", order: 3, mainEvent: false, fighterA: "Edris",         fighterB: "Boika",         weightA: "94 KG", weightB: "93 KG", oddsA: 1.75, oddsB: 2.10, photoA: "images/fighters/edris.jpg", photoB: "images/fighters/boika.jpg" },
+  { discipline: "mma", order: 4, mainEvent: false, fighterA: "Robel",         fighterB: "Nikatehilina",  weightA: "88 KG", weightB: "88 KG", oddsA: 1.90, oddsB: 1.95, photoA: "images/fighters/robel.jpg", photoB: "images/fighters/nikatehilina.jpg" },
 
-  { discipline: "boxing", order: 1, mainEvent: false, fighterA: "Abrhamalem",   fighterB: "Tyson (Haymanot Desalegn)", weightA: "63.5 KG", weightB: "63.5 KG", oddsA: 1.80, oddsB: 2.00 },
-  { discipline: "boxing", order: 2, mainEvent: false, fighterA: "Surafel Cheri", fighterB: "Desalegn", weightA: "54 KG", weightB: "54 KG", oddsA: 1.70, oddsB: 2.15 },
-  { discipline: "boxing", order: 3, mainEvent: false, fighterA: "Esubalew",     fighterB: "Biniyam",   weightA: "Lightweight", weightB: "Lightweight", oddsA: 1.95, oddsB: 1.85 },
-  { discipline: "boxing", order: 4, mainEvent: false, fighterA: "Abenezer",     fighterB: "Mesfin Biru", weightA: "71 KG", weightB: "71 KG", oddsA: 2.05, oddsB: 1.75 },
+  { discipline: "boxing", order: 1, mainEvent: false, fighterA: "Biniam",   fighterB: "Esubalew",  weightA: "Boxing", weightB: "Boxing", oddsA: 1.95, oddsB: 1.85 },
+  { discipline: "boxing", order: 2, mainEvent: false, fighterA: "Haymanot", fighterB: "Abreham",   weightA: "Boxing", weightB: "Boxing", oddsA: 1.80, oddsB: 2.00 },
+  { discipline: "boxing", order: 3, mainEvent: false, fighterA: "Desalegn", fighterB: "Surafel",   weightA: "Boxing", weightB: "Boxing", oddsA: 1.70, oddsB: 2.15 },
 
-  { discipline: "muaythai", order: 1, mainEvent: false, fighterA: "Rebik Sani", fighterB: "Sky Okony", weightA: "67 KG", weightB: "67 KG", oddsA: 1.90, oddsB: 1.90 },
-  { discipline: "muaythai", order: 2, mainEvent: false, fighterA: "Frezer",     fighterB: "Habtamu",   weightA: "63 KG", weightB: "63 KG", oddsA: 1.80, oddsB: 2.00 },
-  { discipline: "muaythai", order: 3, mainEvent: false, fighterA: "Zahara",     fighterB: "Yabsira",   weightA: "54 KG", weightB: "54 KG", oddsA: 2.10, oddsB: 1.70 },
+  { discipline: "muaythai", order: 1, mainEvent: false, fighterA: "Rebik",   fighterB: "Stephen",  weightA: "Muay Thai", weightB: "Muay Thai", oddsA: 1.90, oddsB: 1.90 },
+  { discipline: "muaythai", order: 2, mainEvent: false, fighterA: "Habtamu", fighterB: "Frezer",   weightA: "Muay Thai", weightB: "Muay Thai", oddsA: 1.80, oddsB: 2.00 },
+  { discipline: "muaythai", order: 3, mainEvent: false, fighterA: "Zahara",  fighterB: "Yabsira",  weightA: "Muay Thai", weightB: "Muay Thai", oddsA: 2.10, oddsB: 1.70 },
 ];
 
 async function listFights(req, res) {

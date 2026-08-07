@@ -1,6 +1,6 @@
 // ── COUNTDOWN TIMER ──────────────────────────────────────────────────────
 // PLACEHOLDER date — replace with the real event date/time once confirmed.
-const EVENT_DATE = new Date("2026-08-24T19:00:00+03:00").getTime();
+const EVENT_DATE = new Date("2026-08-29T10:00:00+03:00").getTime();
 
 function tickCountdown() {
   const el = document.getElementById("countdown");
@@ -75,3 +75,23 @@ function goToTickets() {
 function goToBetting() {
   window.location.href = "betting.html";
 }
+
+// ── TAP FEEDBACK ON BUTTONS ────────────────────────────────────────────
+// :active in CSS doesn't always fire reliably on touch devices (especially
+// on <a class="btn"> links), so give every .btn an immediate visual "press"
+// via touch/mouse listeners on top of the CSS :active state.
+(function () {
+  function press(e) {
+    const btn = e.target.closest(".btn");
+    if (btn) btn.classList.add("btn-pressed");
+  }
+  function release() {
+    document.querySelectorAll(".btn-pressed").forEach((b) => b.classList.remove("btn-pressed"));
+  }
+  document.addEventListener("touchstart", press, { passive: true });
+  document.addEventListener("touchend", release);
+  document.addEventListener("touchcancel", release);
+  document.addEventListener("mousedown", press);
+  document.addEventListener("mouseup", release);
+  document.addEventListener("mouseleave", release);
+})();

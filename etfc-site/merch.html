@@ -410,6 +410,7 @@
 <script src="js/auth.js"></script>
 <script src="js/partials.js"></script>
 <script src="js/main.js"></script>
+<script src="js/merch-products.js"></script>
 <script>
 let allProducts = [];
 let currentProduct = null;
@@ -449,15 +450,25 @@ async function loadProducts() {
       .where("active", "==", true)
       .orderBy("createdAt", "desc")
       .get();
-    allProducts = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    const firestoreProducts = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    // Use Firestore products if available, otherwise fall back to local seed data
+    allProducts = firestoreProducts.length > 0
+      ? firestoreProducts
+      : (typeof DEFAULT_MERCH_PRODUCTS !== "undefined" ? DEFAULT_MERCH_PRODUCTS : []);
     renderProducts();
   } catch (err) {
     console.error("loadProducts failed:", err);
-    document.getElementById("merchGrid").innerHTML = `
-      <div class="empty-state">
-        <div class="empty-icon">⚠️</div>
-        <p>Could not load products. Try refreshing.</p>
-      </div>`;
+    // On error, still show local products so the page isn't blank
+    allProducts = typeof DEFAULT_MERCH_PRODUCTS !== "undefined" ? DEFAULT_MERCH_PRODUCTS : [];
+    if (allProducts.length > 0) {
+      renderProducts();
+    } else {
+      document.getElementById("merchGrid").innerHTML = `
+        <div class="empty-state">
+          <div class="empty-icon">⚠️</div>
+          <p>Could not load products. Try refreshing.</p>
+        </div>`;
+    }
   }
 }
 

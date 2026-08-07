@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Sign Up — ETFC</title>
-<script>(function(){var t=localStorage.getItem("etfc_theme")||"light";document.documentElement.setAttribute("data-theme",t);})();</script>
+<script>(function(){var t=localStorage.getItem("etfc_theme")||"dark";document.documentElement.setAttribute("data-theme",t);})();</script>
 <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
@@ -45,7 +45,8 @@
       <p class="sub">Step 2 of 3</p>
       <div class="field">
         <label>Phone Number</label>
-        <input type="tel" id="phoneInput" placeholder="09XX XXX XXX">
+        <input type="tel" id="phoneInput" placeholder="09XX XXX XXX" inputmode="numeric" maxlength="10" autocomplete="tel">
+        <p class="field-hint" id="phoneHint">10 digits, starting with 09 or 07</p>
       </div>
       <button class="btn btn-primary btn-block" onclick="goToPasswordStep(event)">Next</button>
       <p class="auth-switch"><a href="#" onclick="showStep('authStepName')">&larr; Back</a></p>
