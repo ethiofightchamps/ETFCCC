@@ -317,19 +317,17 @@ function renderSelectionPanel() {
 
 function proceedToCheckout() {
   if (Object.keys(selectedSeats).length === 0) return;
-  requireAuth("buyTicket", () => {
-    const session = JSON.parse(localStorage.getItem("etfc_session") || "null");
-    if (session) {
-      const nameInput = document.getElementById("buyerNameInput");
-      const phoneInput = document.getElementById("buyerPhoneInput");
-      if (nameInput && !nameInput.value && session.name)
-        nameInput.value = session.name;
-      if (phoneInput && !phoneInput.value && session.phone)
-        phoneInput.value = session.phone;
-    }
-    document.getElementById("seatStep").style.display = "none";
-    document.getElementById("checkoutStep").style.display = "block";
-  });
+  const session = JSON.parse(localStorage.getItem("etfc_session") || "null");
+  if (session) {
+    const nameInput = document.getElementById("buyerNameInput");
+    const phoneInput = document.getElementById("buyerPhoneInput");
+    if (nameInput && !nameInput.value && session.name)
+      nameInput.value = session.name;
+    if (phoneInput && !phoneInput.value && session.phone)
+      phoneInput.value = session.phone;
+  }
+  document.getElementById("seatStep").style.display = "none";
+  document.getElementById("checkoutStep").style.display = "block";
 }
 
 document.addEventListener("DOMContentLoaded", async () => {

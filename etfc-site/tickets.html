@@ -451,7 +451,7 @@
         }
       }
 
-      async function submitOrder() {
+async function submitOrder() {
         const errEl = document.getElementById("submitError");
         const btn = document.getElementById("submitOrderBtn");
         errEl.style.display = "none";
@@ -478,12 +478,8 @@
           );
         if (!chosenFile)
           return showSubmitError("Upload your payment screenshot.");
-        if (!session)
-          return showSubmitError("Session expired — please sign in again.");
         if (Object.keys(selectedSeats).length === 0)
           return showSubmitError("No seats selected.");
-        if (!auth.currentUser)
-          return showSubmitError("Session expired — please sign in again.");
 
         const seats = Object.keys(selectedSeats);
         const totalAmount = Object.values(selectedSeats).reduce(
