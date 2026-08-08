@@ -1,10 +1,10 @@
 // ── SEAT MAP (Circular Arena Layout with Section Tabs) ────────────────────
-// Real ETFC venue layout — reduced capacity:
-//   VVIP Ringside  — 26 seats  — 100,000 ETB  (2 rings × 13 seats)
-//   VVIP Premium   — 26 seats  — 50,000 ETB   (2 rings × 13 seats)
-//   VVIP Normal    — 26 seats  — 30,000 ETB   (2 rings × 13 seats)
-//   VIP            — 52 seats  — 20,000 ETB   (4 rings × 13 seats)
-//   Early Bird     — 13 seats  — 6,000 ETB    (1 ring × 13 seats)
+// Real ETFC venue layout — reduced capacity (55% price reduction applied):
+//   VVIP Ringside  — 26 seats  — 45,000 ETB  (2 rings × 13 seats)
+//   VVIP Premium   — 26 seats  — 22,500 ETB  (2 rings × 13 seats)
+//   VVIP Normal    — 26 seats  — 13,500 ETB  (2 rings × 13 seats)
+//   VIP            — 52 seats  — 9,000 ETB   (4 rings × 13 seats)
+//   Early Bird     — 9 seats   — 2,700 ETB   (1 ring × 9 seats)
 //
 // Ringside and VIP are small enough to pick an exact seat, so they get the
 // clickable ring diagram below. Middle and Last Rows are general admission —
@@ -38,7 +38,7 @@ const SEAT_CONFIG = [
   {
     section: "VVIP Ringside",
     tier: "ringside",
-    price: 100000,
+    price: 45000,
     rings: 2,
     seatsPerRing: 13,
     radiusStart: 110,
@@ -47,7 +47,7 @@ const SEAT_CONFIG = [
   {
     section: "VVIP Premium",
     tier: "vip",
-    price: 50000,
+    price: 22500,
     rings: 2,
     seatsPerRing: 13,
     radiusStart: 175,
@@ -60,23 +60,23 @@ const GA_CONFIG = [
   {
     section: "VVIP Normal",
     tier: "vvip-normal",
-    price: 30000,
+    price: 13500,
     rings: 2,
     seatsPerRing: 13,
   },
   {
     section: "VIP",
     tier: "vip-std",
-    price: 20000,
+    price: 9000,
     rings: 4,
     seatsPerRing: 13,
   },
   {
     section: "Early Bird",
     tier: "ga",
-    price: 6000,
+    price: 2700,
     rings: 1,
-    seatsPerRing: 13,
+    seatsPerRing: 9,
   },
 ];
 
