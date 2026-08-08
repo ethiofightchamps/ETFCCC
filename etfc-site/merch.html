@@ -94,19 +94,25 @@
         width: 100%;
         aspect-ratio: 1;
         background: #111;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 56px;
         position: relative;
         overflow: hidden;
       }
       .merch-card-img img {
+        position: absolute;
+        top: 0;
+        left: 0;
         width: 100%;
         height: 100%;
         object-fit: cover;
         object-position: center top;
         display: block;
+      }
+      .merch-card-img .merch-emoji-placeholder {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        font-size: 56px;
       }
       .merch-offer-badge {
         position: absolute;
@@ -1047,7 +1053,11 @@
             return `
       <div class="merch-card" onclick="openMerchDetail('${p.id}')">
         <div class="merch-card-img">
-          ${img ? `<img src="${img}" alt="${p.name}" loading="lazy">` : "📦"}
+          ${
+            img
+              ? `<img src="${img}" alt="${p.name}" loading="lazy">`
+              : `<span class="merch-emoji-placeholder">📦</span>`
+          }
           ${onOffer ? '<div class="merch-offer-badge">Offer</div>' : ""}
           ${
             onOffer && p.basePrice
