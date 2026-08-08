@@ -41,6 +41,15 @@ service cloud.firestore {
       allow delete: if isAdmin();
     }
 
+    match /merchOrders/{orderId} {
+      allow create: if isSignedIn();
+      allow read: if isAdmin()
+        || (isSignedIn() && resource.data.userId == request.auth.uid)
+        || (isSignedIn() && resource.data.email == request.auth.token.email);
+      allow update: if isAdmin();
+      allow delete: if isAdmin();
+    }
+
     // Bets: same pattern
     match /bets/{betId} {
       allow create: if isSignedIn()

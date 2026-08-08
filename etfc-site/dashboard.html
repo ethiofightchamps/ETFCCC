@@ -313,6 +313,9 @@
   const EVENT_TIME_STR = "10:00 AM";
   const VENUE_STR = "Adwa Museum, Addis Ababa";
 
+  let ticketsUnsubscribe = null;
+  let merchUnsubscribe = null;
+
   function renderTicketQR(qrData, containerId) {
     const el = document.getElementById(containerId);
     if (!el) return;
@@ -332,140 +335,270 @@
     }
   }
 
-  async function loadDashboard(user) {
+  function renderTickets(docs) {
+    const ticketsEl = document.getElementById("ticketsContainer");
+    if (docs.length === 0) {
+      ticketsEl.innerHTML = `
+        <div class="empty-state">
+          <div class="empty-icon">🎟</div>
+          <p style="margin:0 0 16px;">No tickets yet</p>
+          <a href="tickets.html" class="btn btn-primary">Get Tickets</a>
+        </div>`;
+      localStorage.removeItem("etfc_pending_order");
+      return;
+    }
+
+    const hasConfirmed = docs.some(d => d.data().status === "confirmed");
+    if (hasConfirmed) localStorage.removeItem("etfc_pending_order");
+
+    ticketsEl.innerHTML = docs.map((doc, idx) => {
+      const o = doc.data();
+      const seats = (o.seats || []).join(", ") || "—";
+      const s = o.status || "pending";
+      const ticketCode = o.ticketCode || o.refCode || "—";
+      const date = o.createdAt ? new Date(o.createdAt.toMillis()).toLocaleDateString("en-GB", {day:"numeric",month:"short",year:"numeric"}) : "";
+      const qrId = `qr-${doc.id}-${idx}`;
+      const qrData = `${window.location.origin}/verify.html?code=${ticketCode}`;
+
+      setTimeout(() => renderTicketQR(qrData, qrId), 0);
+
+      // Approved/Confirmed: show ticket + action to go to ticket
+      // Rejected: show rejection message (not a ticket)
+      // Pending: show pending ticket
+      if (s === "rejected") {
+        return `
+          <div class="ticket-card rejected" style="border-color: var(--crimson);">
+            <div class="ticket-visual" style="background: linear-gradient(135deg, #2a0a0a 0%, #1a0505 50%, #0d0a0a 100%); border-bottom-color: var(--crimson);">
+              <div class="ticket-top">
+                <div class="ticket-logo">ET<span>FC</span></div>
+                <span class="ticket-badge rejected">REJECTED</span>
+              </div>
+              <div class="ticket-main" style="text-align: center; padding: 40px 20px;">
+                <div style="font-size: 48px; margin-bottom: 16px;">❌</div>
+                <div class="ticket-event-name" style="color: var(--crimson-bright); font-size: 24px;">Order Rejected</div>
+                <div style="color: var(--bone-dim); margin-top: 12px; line-height: 1.6;">
+                  Your ticket order was not approved. <br>
+                  <strong>Reason:</strong> ${o.rejectionReason || "Payment verification failed or seats no longer available."}
+                </div>
+                <a href="tickets.html" class="btn btn-primary" style="margin-top: 24px; display: inline-block;">Try Again</a>
+              </div>
+            </div>
+            <div class="ticket-footer" style="justify-content: center; color: var(--crimson-bright);">
+              ${o.buyerName || "Guest"} · ${date}
+            </div>
+          </div>`;
+      }
+
+      if (s === "confirmed") {
+        return `
+          <div class="ticket-card confirmed">
+            <div class="ticket-visual">
+              <div class="ticket-top">
+                <div class="ticket-logo">ET<span>FC</span></div>
+                <span class="ticket-badge ${BADGE_CLASS[s]}">${BADGE_LABEL[s]}</span>
+              </div>
+              <div class="ticket-main">
+                <div class="ticket-event-info">
+                  <div class="ticket-event-label">ETFC Fight Night</div>
+                  <div class="ticket-event-name">Adwa Museum</div>
+                  <div class="ticket-event-date">${EVENT_DATE_STR} &middot; ${EVENT_TIME_STR}</div>
+                </div>
+                <div class="ticket-qr-wrap" id="${qrId}"></div>
+              </div>
+            </div>
+            <div class="ticket-bottom">
+              <div class="ticket-field">
+                <div class="ticket-field-label">Seats</div>
+                <div class="ticket-field-value seats">${seats}</div>
+              </div>
+              <div class="ticket-field">
+                <div class="ticket-field-label">Section</div>
+                <div class="ticket-field-value">${(o.seats || [])[0]?.split("-")[0] || "—"}</div>
+              </div>
+              <div class="ticket-field">
+                <div class="ticket-field-label">Ticket Code</div>
+                <div class="ticket-field-value code">${ticketCode}</div>
+              </div>
+            </div>
+            <div class="ticket-sponsor-row">
+              <span class="ticket-sponsor-label">Presented by</span>
+              <img src="images/sponsors/mpesa.jpg" alt="M-Pesa">
+              <img src="images/sponsors/genatv.jpg" alt="Gena TV">
+              <img src="images/sponsors/sweatbox.jpg" alt="Sweat Box">
+              <img src="images/sponsors/gofere.jpg" alt="Gofere">
+            </div>
+            <div class="ticket-footer">
+              <span>${o.buyerName || "Guest"}</span>
+              <span class="ticket-footer-note">Present QR at entry · Non-transferable</span>
+            </div>
+            <div style="padding: 12px 24px; background: rgba(176,141,62,0.1); border-top: 1px solid rgba(176,141,62,0.3); text-align: center;">
+              <a href="verify.html?code=${ticketCode}" class="btn btn-primary" style="display: inline-block;">View Ticket / Verify</a>
+            </div>
+          </div>`;
+      }
+
+      // Pending
+      return `
+        <div class="ticket-card pending">
+          <div class="ticket-visual">
+            <div class="ticket-top">
+              <div class="ticket-logo">ET<span>FC</span></div>
+              <span class="ticket-badge ${BADGE_CLASS[s]}">${BADGE_LABEL[s]}</span>
+            </div>
+            <div class="ticket-main">
+              <div class="ticket-event-info">
+                <div class="ticket-event-label">ETFC Fight Night</div>
+                <div class="ticket-event-name">Adwa Museum</div>
+                <div class="ticket-event-date">${EVENT_DATE_STR} &middot; ${EVENT_TIME_STR}</div>
+              </div>
+              <div class="ticket-qr-wrap" id="${qrId}"></div>
+            </div>
+          </div>
+          <div class="ticket-bottom">
+            <div class="ticket-field">
+              <div class="ticket-field-label">Seats</div>
+              <div class="ticket-field-value seats">${seats}</div>
+            </div>
+            <div class="ticket-field">
+              <div class="ticket-field-label">Section</div>
+              <div class="ticket-field-value">${(o.seats || [])[0]?.split("-")[0] || "—"}</div>
+            </div>
+            <div class="ticket-field">
+              <div class="ticket-field-label">Ticket Code</div>
+              <div class="ticket-field-value code">${ticketCode}</div>
+            </div>
+          </div>
+          <div class="ticket-sponsor-row">
+            <span class="ticket-sponsor-label">Presented by</span>
+            <img src="images/sponsors/mpesa.jpg" alt="M-Pesa">
+            <img src="images/sponsors/genatv.jpg" alt="Gena TV">
+            <img src="images/sponsors/sweatbox.jpg" alt="Sweat Box">
+            <img src="images/sponsors/gofere.jpg" alt="Gofere">
+          </div>
+          <div class="ticket-footer">
+            <span>${o.buyerName || "Guest"}</span>
+            <span class="ticket-footer-note">Awaiting payment verification · Check back soon</span>
+          </div>
+        </div>`;
+    }).join("");
+  }
+
+  function renderMerchOrders(docs) {
+    const merchEl = document.getElementById("merchContainer");
+    if (!merchEl) return;
+
+    if (docs.length === 0) {
+      merchEl.innerHTML = `<div class="empty-state"><div class="empty-icon">🛍</div><p style="margin:0 0 16px;">No merch orders yet</p><a href="merch.html" class="btn btn-primary">Shop Merch</a></div>`;
+      return;
+    }
+
+    merchEl.innerHTML = docs.map(doc => {
+      const o = doc.data();
+      const s = o.status || "pending";
+      const date = o.createdAt ? new Date(o.createdAt.toMillis()).toLocaleDateString("en-GB",{day:"numeric",month:"short",year:"numeric"}) : "";
+
+      if (s === "rejected") {
+        return `
+          <div class="ticket-card rejected" style="border-color: var(--crimson); background: var(--obsidian-2);">
+            <div style="padding: 24px; display: flex; flex-direction: column; gap: 12px;">
+              <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                <div>
+                  <div style="font-weight: 600; color: var(--bone); font-size: 16px;">${o.productName || "—"}</div>
+                  <div style="font-size: 13px; color: var(--bone-dim);">${o.color || ""} / ${o.size || ""} × ${o.quantity || 1} · Ref: ${o.refCode || "—"}${date ? " · " + date : ""}</div>
+                </div>
+                <span class="status-pill rejected" style="background: rgba(179,20,28,0.2); color: var(--crimson-bright); border: 1px solid var(--crimson);">❌ Rejected</span>
+              </div>
+              <div style="color: var(--bone-dim); line-height: 1.6; background: rgba(179,20,28,0.1); padding: 16px; border-radius: 8px; border: 1px solid rgba(179,20,28,0.2);">
+                <strong>Order Rejected</strong><br>
+                Reason: ${o.rejectionReason || "Payment verification failed or item out of stock."}
+              </div>
+              <a href="merch.html" class="btn btn-primary" style="align-self: flex-start; margin-top: 8px;">Shop Again</a>
+            </div>
+          </div>`;
+      }
+
+      if (s === "confirmed") {
+        return `
+          <div class="ticket-card confirmed" style="background: var(--obsidian-2);">
+            <div style="padding: 24px; display: flex; flex-direction: column; gap: 12px;">
+              <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                <div>
+                  <div style="font-weight: 600; color: var(--bone); font-size: 16px;">${o.productName || "—"}</div>
+                  <div style="font-size: 13px; color: var(--bone-dim);">${o.color || ""} / ${o.size || ""} × ${o.quantity || 1} · Ref: ${o.refCode || "—"}${date ? " · " + date : ""}</div>
+                </div>
+                <span class="status-pill confirmed" style="background: rgba(176,141,62,0.2); color: var(--gold-bright); border: 1px solid var(--gold);">✅ Confirmed</span>
+              </div>
+              <div style="color: var(--gold-bright); background: rgba(176,141,62,0.1); padding: 16px; border-radius: 8px; border: 1px solid rgba(176,141,62,0.2);">
+                <strong>Order Approved!</strong> Your merch is being prepared for shipment.
+              </div>
+              <div style="display: flex; gap: 12px; flex-wrap: wrap; margin-top: 8px;">
+                <a href="dashboard.html" class="btn btn-primary" style="flex: 1; min-width: 140px; text-align: center;">View Orders</a>
+                <a href="merch.html" class="btn btn-outline" style="flex: 1; min-width: 140px; text-align: center;">Continue Shopping</a>
+              </div>
+            </div>
+          </div>`;
+      }
+
+      // Pending
+      return `
+        <div class="ticket-card pending" style="background: var(--obsidian-2);">
+          <div style="padding: 24px; display: flex; flex-direction: column; gap: 12px;">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+              <div>
+                <div style="font-weight: 600; color: var(--bone); font-size: 16px;">${o.productName || "—"}</div>
+                <div style="font-size: 13px; color: var(--bone-dim);">${o.color || ""} / ${o.size || ""} × ${o.quantity || 1} · Ref: ${o.refCode || "—"}${date ? " · " + date : ""}</div>
+              </div>
+              <span class="status-pill pending" style="background: rgba(176,141,62,0.2); color: var(--gold-bright); border: 1px solid var(--gold);">⏳ Pending</span>
+            </div>
+            <div style="color: var(--bone-dim); background: rgba(176,141,62,0.05); padding: 16px; border-radius: 8px; border: 1px dashed rgba(176,141,62,0.3);">
+              <strong>Awaiting Verification</strong><br>
+              Your payment is being reviewed. You'll see an update here automatically when approved.
+            </div>
+          </div>
+        </div>`;
+    }).join("");
+  }
+
+  function loadDashboard(user) {
     if (!user) return;
     document.getElementById("userEmailLabel").textContent = user.email || "";
     const db = firebase.firestore();
 
-    // ── Tickets ─────────────────────────────────────────────────────────────
-    const ticketsEl = document.getElementById("ticketsContainer");
-    try {
-      const snap = await db.collection("orders")
-        .where("userId", "==", user.uid)
-        .get();
+    // ── Tickets (real-time) ────────────────────────────────────────────────────
+    const ticketsQuery = db.collection("orders")
+      .where("userId", "==", user.uid);
 
-      let docs = snap.docs;
-      if (docs.length === 0) {
-        const snapEmail = await db.collection("orders")
-          .where("email", "==", user.email)
-          .get();
-        docs = snapEmail.docs;
-      }
-
-      docs.sort((a, b) => (b.data().createdAt?.toMillis?.() || 0) - (a.data().createdAt?.toMillis?.() || 0));
-
-      if (docs.length === 0) {
-        ticketsEl.innerHTML = `
-          <div class="empty-state">
-            <div class="empty-icon">🎟</div>
-            <p style="margin:0 0 16px;">No tickets yet</p>
-            <a href="tickets.html" class="btn btn-primary">Get Tickets</a>
-          </div>`;
-        localStorage.removeItem("etfc_pending_order");
-      } else {
-        const hasConfirmed = docs.some(d => d.data().status === "confirmed");
-        if (hasConfirmed) localStorage.removeItem("etfc_pending_order");
-
-        ticketsEl.innerHTML = docs.map((doc, idx) => {
-          const o = doc.data();
-          const seats = (o.seats || []).join(", ") || "—";
-          const s = o.status || "pending";
-          const ticketCode = o.ticketCode || o.refCode || "—";
-          const date = o.createdAt ? new Date(o.createdAt.toMillis()).toLocaleDateString("en-GB", {day:"numeric",month:"short",year:"numeric"}) : "";
-          const qrId = `qr-${doc.id}-${idx}`;
-          const qrData = `${window.location.origin}/verify.html?code=${ticketCode}`;
-
-          setTimeout(() => renderTicketQR(qrData, qrId), 0);
-
-          return `
-            <div class="ticket-card ${s}">
-              <div class="ticket-visual">
-                <div class="ticket-top">
-                  <div class="ticket-logo">ET<span>FC</span></div>
-                  <span class="ticket-badge ${BADGE_CLASS[s]}">${BADGE_LABEL[s]}</span>
-                </div>
-                <div class="ticket-main">
-                  <div class="ticket-event-info">
-                    <div class="ticket-event-label">ETFC Fight Night</div>
-                    <div class="ticket-event-name">Adwa Museum</div>
-                    <div class="ticket-event-date">${EVENT_DATE_STR} &middot; ${EVENT_TIME_STR}</div>
-                  </div>
-                  <div class="ticket-qr-wrap" id="${qrId}"></div>
-                </div>
-              </div>
-              <div class="ticket-bottom">
-                <div class="ticket-field">
-                  <div class="ticket-field-label">Seats</div>
-                  <div class="ticket-field-value seats">${seats}</div>
-                </div>
-                <div class="ticket-field">
-                  <div class="ticket-field-label">Section</div>
-                  <div class="ticket-field-value">${(o.seats || [])[0]?.split("-")[0] || "—"}</div>
-                </div>
-                <div class="ticket-field">
-                  <div class="ticket-field-label">Ticket Code</div>
-                  <div class="ticket-field-value code">${ticketCode}</div>
-                </div>
-              </div>
-              <div class="ticket-sponsor-row">
-                <span class="ticket-sponsor-label">Presented by</span>
-                <img src="images/sponsors/mpesa.jpg" alt="M-Pesa">
-                <img src="images/sponsors/genatv.jpg" alt="Gena TV">
-                <img src="images/sponsors/sweatbox.jpg" alt="Sweat Box">
-                <img src="images/sponsors/gofere.jpg" alt="Gofere">
-              </div>
-              <div class="ticket-footer">
-                <span>${o.buyerName || "Guest"}</span>
-                <span class="ticket-footer-note">Present QR at entry • Non-transferable</span>
-              </div>
-            </div>`;
-        }).join("");
-      }
-    } catch (err) {
-      ticketsEl.innerHTML = `<p style="color:var(--crimson-bright);">Could not load tickets — ${err.message}</p>`;
-      console.error("tickets:", err);
-    }
-  }
-
-  async function loadMerchOrders(user) {
-    const merchEl = document.getElementById("merchContainer");
-    if (!merchEl) return;
-    try {
-      const db = firebase.firestore();
-      const snap = await db.collection("merchOrders")
-        .where("userId", "==", user.uid)
-        .get();
+    if (ticketsUnsubscribe) ticketsUnsubscribe();
+    ticketsUnsubscribe = ticketsQuery.onSnapshot(snap => {
       let docs = snap.docs;
       if (docs.length === 0 && user.email) {
-        const snap2 = await db.collection("merchOrders").where("email", "==", user.email).get();
-        docs = snap2.docs;
+        // Fallback to email query - but onSnapshot on OR query needs composite index
+        // For now, just use userId query
       }
       docs.sort((a, b) => (b.data().createdAt?.toMillis?.() || 0) - (a.data().createdAt?.toMillis?.() || 0));
+      renderTickets(docs);
+    }, err => {
+      document.getElementById("ticketsContainer").innerHTML = `<p style="color:var(--crimson-bright);">Could not load tickets — ${err.message}</p>`;
+      console.error("tickets:", err);
+    });
 
-      if (docs.length === 0) {
-        merchEl.innerHTML = `<div class="empty-state"><div class="empty-icon">🛍</div><p style="margin:0 0 16px;">No merch orders yet</p><a href="merch.html" class="btn btn-primary">Shop Merch</a></div>`;
-        return;
-      }
-      const STATUS_ICON = { confirmed:"✅", rejected:"❌", pending:"⏳" };
-      const STATUS_LABEL = { confirmed:"Confirmed", rejected:"Rejected", pending:"Pending" };
-      merchEl.innerHTML = docs.map(doc => {
-        const o = doc.data();
-        const s = o.status || "pending";
-        const date = o.createdAt ? new Date(o.createdAt.toMillis()).toLocaleDateString("en-GB",{day:"numeric",month:"short",year:"numeric"}) : "";
-        return `<div class="ticket-card">
-          <div class="ticket-left">
-            <div class="ticket-seats">${o.productName || "—"}</div>
-            <div class="ticket-meta">${o.color || ""} / ${o.size || ""} × ${o.quantity || 1} &middot; Ref: ${o.refCode || "—"}${date ? " &middot; " + date : ""}</div>
-          </div>
-          <div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px;">
-            <span class="status-pill ${s}">${STATUS_ICON[s] || ""} ${STATUS_LABEL[s] || s}</span>
-            <span class="ticket-amount">${(o.totalAmount || 0).toLocaleString()} ETB</span>
-          </div>
-        </div>`;
-      }).join("");
-    } catch (err) {
+    // ── Merch Orders (real-time) ───────────────────────────────────────────────
+    const merchQuery = db.collection("merchOrders")
+      .where("userId", "==", user.uid);
+
+    if (merchUnsubscribe) merchUnsubscribe();
+    merchUnsubscribe = merchQuery.onSnapshot(snap => {
+      let docs = snap.docs;
+      docs.sort((a, b) => (b.data().createdAt?.toMillis?.() || 0) - (a.data().createdAt?.toMillis?.() || 0));
+      renderMerchOrders(docs);
+    }, err => {
       document.getElementById("merchContainer").innerHTML = `<p style="color:var(--crimson-bright);">Could not load merch orders — ${err.message}</p>`;
-    }
+      console.error("merch:", err);
+    });
+  }
+
+  function loadMerchOrders(user) {
+    // Now handled by real-time listener in loadDashboard
   }
 
   firebase.auth().onAuthStateChanged(user => {
@@ -473,8 +606,13 @@
       window.location.href = "login.html?redirect=dashboard.html";
     } else {
       loadDashboard(user);
-      loadMerchOrders(user);
     }
+  });
+
+  // Cleanup on page unload
+  window.addEventListener("beforeunload", () => {
+    if (ticketsUnsubscribe) ticketsUnsubscribe();
+    if (merchUnsubscribe) merchUnsubscribe();
   });
 </script>
 </body>
