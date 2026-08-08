@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
+    <link rel="icon" type="image/svg+xml" href="images/favicon.svg" />
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Betting — ETFC</title>
@@ -1027,7 +1028,8 @@
               <span class="bet-payout-net">${
                 s === "lost" || s === "rejected"
                   ? "—"
-                  : `Net: ${Number(netPayout).toLocaleString()} ETB`
+                  : 
+et: ${Number(netPayout).toLocaleString()} ETB`
               }</span>
               ${
                 s !== "lost" && s !== "rejected"
@@ -1114,3 +1116,5 @@
     </script>
   </body>
 </html>
+
+
