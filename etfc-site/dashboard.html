@@ -314,7 +314,9 @@
   const VENUE_STR = "Adwa Museum, Addis Ababa";
 
   let ticketsUnsubscribe = null;
+  let ticketsEmailUnsubscribe = null;
   let merchUnsubscribe = null;
+  let merchEmailUnsubscribe = null;
 
   function renderTicketQR(qrData, containerId) {
     const el = document.getElementById(containerId);
@@ -565,36 +567,76 @@
     const db = firebase.firestore();
 
     // ── Tickets (real-time) ────────────────────────────────────────────────────
-    const ticketsQuery = db.collection("orders")
-      .where("userId", "==", user.uid);
+    // Query by userId AND email (merge results) since some orders may have empty userId
+    const ticketsQueryByUid = db.collection("orders").where("userId", "==", user.uid);
+    const ticketsQueryByEmail = user.email ? db.collection("orders").where("email", "==", user.email) : null;
+
+    let ticketsByUid = [];
+    let ticketsByEmail = [];
 
     if (ticketsUnsubscribe) ticketsUnsubscribe();
-    ticketsUnsubscribe = ticketsQuery.onSnapshot(snap => {
-      let docs = snap.docs;
-      if (docs.length === 0 && user.email) {
-        // Fallback to email query - but onSnapshot on OR query needs composite index
-        // For now, just use userId query
+    if (ticketsEmailUnsubscribe) ticketsEmailUnsubscribe();
+
+    function mergeAndRenderTickets() {
+      // Merge and deduplicate by doc ID
+      const merged = [...ticketsByUid];
+      for (const doc of ticketsByEmail) {
+        if (!merged.some(d => d.id === doc.id)) merged.push(doc);
       }
-      docs.sort((a, b) => (b.data().createdAt?.toMillis?.() || 0) - (a.data().createdAt?.toMillis?.() || 0));
-      renderTickets(docs);
+      merged.sort((a, b) => (b.data().createdAt?.toMillis?.() || 0) - (a.data().createdAt?.toMillis?.() || 0));
+      renderTickets(merged);
+    }
+
+    ticketsUnsubscribe = ticketsQueryByUid.onSnapshot(snap => {
+      ticketsByUid = snap.docs;
+      mergeAndRenderTickets();
     }, err => {
-      document.getElementById("ticketsContainer").innerHTML = `<p style="color:var(--crimson-bright);">Could not load tickets — ${err.message}</p>`;
-      console.error("tickets:", err);
+      console.error("tickets (uid):", err);
     });
+
+    if (ticketsQueryByEmail) {
+      ticketsEmailUnsubscribe = ticketsQueryByEmail.onSnapshot(snap => {
+        ticketsByEmail = snap.docs;
+        mergeAndRenderTickets();
+      }, err => {
+        console.error("tickets (email):", err);
+      });
+    }
 
     // ── Merch Orders (real-time) ───────────────────────────────────────────────
-    const merchQuery = db.collection("merchOrders")
-      .where("userId", "==", user.uid);
+    const merchQueryByUid = db.collection("merchOrders").where("userId", "==", user.uid);
+    const merchQueryByEmail = user.email ? db.collection("merchOrders").where("email", "==", user.email) : null;
+
+    let merchByUid = [];
+    let merchByEmail = [];
 
     if (merchUnsubscribe) merchUnsubscribe();
-    merchUnsubscribe = merchQuery.onSnapshot(snap => {
-      let docs = snap.docs;
-      docs.sort((a, b) => (b.data().createdAt?.toMillis?.() || 0) - (a.data().createdAt?.toMillis?.() || 0));
-      renderMerchOrders(docs);
+    if (merchEmailUnsubscribe) merchEmailUnsubscribe();
+
+    function mergeAndRenderMerch() {
+      const merged = [...merchByUid];
+      for (const doc of merchByEmail) {
+        if (!merged.some(d => d.id === doc.id)) merged.push(doc);
+      }
+      merged.sort((a, b) => (b.data().createdAt?.toMillis?.() || 0) - (a.data().createdAt?.toMillis?.() || 0));
+      renderMerchOrders(merged);
+    }
+
+    merchUnsubscribe = merchQueryByUid.onSnapshot(snap => {
+      merchByUid = snap.docs;
+      mergeAndRenderMerch();
     }, err => {
-      document.getElementById("merchContainer").innerHTML = `<p style="color:var(--crimson-bright);">Could not load merch orders — ${err.message}</p>`;
-      console.error("merch:", err);
+      console.error("merch (uid):", err);
     });
+
+    if (merchQueryByEmail) {
+      merchEmailUnsubscribe = merchQueryByEmail.onSnapshot(snap => {
+        merchByEmail = snap.docs;
+        mergeAndRenderMerch();
+      }, err => {
+        console.error("merch (email):", err);
+      });
+    }
   }
 
   function loadMerchOrders(user) {
@@ -612,7 +654,9 @@
   // Cleanup on page unload
   window.addEventListener("beforeunload", () => {
     if (ticketsUnsubscribe) ticketsUnsubscribe();
+    if (ticketsEmailUnsubscribe) ticketsEmailUnsubscribe();
     if (merchUnsubscribe) merchUnsubscribe();
+    if (merchEmailUnsubscribe) merchEmailUnsubscribe();
   });
 </script>
 </body>
