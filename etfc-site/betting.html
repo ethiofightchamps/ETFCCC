@@ -347,17 +347,7 @@
               />
             </div>
             <div class="field">
-              <label
-                >Email
-                <span
-                  style="
-                    color: var(--bone-dim);
-                    font-size: 11px;
-                    font-weight: 400;
-                  "
-                  >(optional)</span
-                ></label
-              >
+              <label>Email</label>
               <input
                 type="email"
                 id="betBuyerEmailInput"
@@ -1037,8 +1027,7 @@
                     <span class="bet-payout-net">${
                       s === "lost" || s === "rejected"
                         ? "—"
-                        :
-      et: ${Number(netPayout).toLocaleString()} ETB`
+                        : `Net: ${Number(netPayout).toLocaleString()} ETB`
                     }</span>
                     ${
                       s !== "lost" && s !== "rejected"

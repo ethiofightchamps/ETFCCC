@@ -259,13 +259,7 @@
         </div>
 
         <div class="field">
-          <label
-            >Email
-            <span
-              style="color: var(--bone-dim); font-size: 11px; font-weight: 400"
-              >(optional — for order updates)</span
-            ></label
-          >
+          <label>Email</label>
           <input
             type="email"
             id="buyerEmailInput"
@@ -330,13 +324,15 @@
         <p class="text-dim mt-24">
           <span class="status-pill pending">Pending Verification</span>
         </p>
-        <p class="text-dim mt-24">
-          ETFC is reviewing your payment. Your QR e-ticket will appear in
-          <a href="dashboard.html" style="color: var(--gold-bright)"
-            >My Tickets</a
-          >
-          once approved.
+        <p class="text-dim mt-24" id="pendingWaitMsg">
+          ETFC is reviewing your payment. This page will update automatically
+          the moment it's approved — no need to reload.
         </p>
+      </div>
+
+      <!-- STEP 4: LIVE TICKET REVEAL (shown in-place once admin approves, no reload/navigation) -->
+      <div id="ticketReadyStep" style="display: none; max-width: 520px;">
+        <div id="ticketReadyMount"></div>
       </div>
     </div>
 
@@ -345,6 +341,7 @@
     <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
     <script src="js/firebase-config.js"></script>
     <script src="js/auth.js"></script>
     <script src="js/partials.js"></script>
@@ -363,6 +360,104 @@
         document.getElementById("seatStep").style.display = "none";
         document.getElementById("checkoutStep").style.display = "none";
         document.getElementById("pendingStep").style.display = "block";
+        if (savedOrder.orderId) listenForApproval(savedOrder.orderId);
+      }
+
+      const EVENT_DATE_STR = "August 27, 2026";
+      const EVENT_TIME_STR = "4:00 PM";
+
+      let approvalUnsubscribe = null;
+
+      // Live-updates the pending page the instant admin approves/rejects —
+      // no reload, no navigating to My Tickets.
+      function listenForApproval(orderId) {
+        if (!orderId) return;
+        if (approvalUnsubscribe) approvalUnsubscribe();
+
+        approvalUnsubscribe = db.collection("orders").doc(orderId).onSnapshot((snap) => {
+          if (!snap.exists) return;
+          const o = snap.data();
+
+          if (o.status === "confirmed") {
+            approvalUnsubscribe();
+            localStorage.removeItem("etfc_pending_order");
+            renderTicketReady(o);
+          } else if (o.status === "rejected") {
+            approvalUnsubscribe();
+            document.getElementById("pendingWaitMsg").innerHTML =
+              `<span style="color:var(--crimson-bright);">Your order was not approved${o.rejectionReason ? `: ${o.rejectionReason}` : "."}</span> ` +
+              `Please <a href="tickets.html" style="color:var(--gold-bright);">try again</a>.`;
+            document.querySelector("#pendingStep .status-pill").className = "status-pill rejected";
+            document.querySelector("#pendingStep .status-pill").textContent = "Rejected";
+            localStorage.removeItem("etfc_pending_order");
+          }
+        }, (err) => console.error("listenForApproval:", err));
+      }
+
+      function renderTicketQR(qrData, containerId) {
+        const el = document.getElementById(containerId);
+        if (!el) return;
+        el.innerHTML = "";
+        try {
+          new QRCode(el, {
+            text: qrData,
+            width: 104,
+            height: 104,
+            colorDark: "#0d0d0d",
+            colorLight: "#ffffff",
+            correctLevel: QRCode.CorrectLevel.M,
+          });
+        } catch (e) {
+          console.error("QR render failed:", e);
+        }
+      }
+
+      function renderTicketReady(o) {
+        const seats = (o.seats || []).join(", ") || "—";
+        const ticketCode = o.ticketCode || o.refCode || "—";
+        const qrData = `${window.location.origin}/verify.html?code=${ticketCode}`;
+        const qrId = "liveTicketQR";
+
+        document.getElementById("ticketReadyMount").innerHTML = `
+          <div class="ticket-card confirmed">
+            <div class="ticket-visual">
+              <div class="ticket-top">
+                <div class="ticket-logo">ET<span>FC</span></div>
+                <span class="ticket-badge">E-TICKET</span>
+              </div>
+              <div class="ticket-main">
+                <div class="ticket-event-info">
+                  <div class="ticket-event-label">ETFC Fight Night</div>
+                  <div class="ticket-event-name">Adwa Museum</div>
+                  <div class="ticket-event-date">${EVENT_DATE_STR} &middot; ${EVENT_TIME_STR}</div>
+                </div>
+                <div class="ticket-qr-wrap" id="${qrId}"></div>
+              </div>
+            </div>
+            <div class="ticket-bottom">
+              <div class="ticket-field">
+                <div class="ticket-field-label">Seats</div>
+                <div class="ticket-field-value seats">${seats}</div>
+              </div>
+              <div class="ticket-field">
+                <div class="ticket-field-label">Section</div>
+                <div class="ticket-field-value">${(o.seats || [])[0]?.split("-")[0] || "—"}</div>
+              </div>
+              <div class="ticket-field">
+                <div class="ticket-field-label">Ticket Code</div>
+                <div class="ticket-field-value code">${ticketCode}</div>
+              </div>
+            </div>
+          </div>
+          <p class="text-dim" style="text-align:center;">
+            Approved! Screenshot this or find it anytime under
+            <a href="dashboard.html" style="color:var(--gold-bright);">My Tickets</a>.
+          </p>
+        `;
+        renderTicketQR(qrData, qrId);
+
+        document.getElementById("pendingStep").style.display = "none";
+        document.getElementById("ticketReadyStep").style.display = "block";
       }
 
       let chosenFile = null;
@@ -570,12 +665,13 @@
           // Save so reload doesn't lose the pending state
           localStorage.setItem(
             "etfc_pending_order",
-            JSON.stringify({ refCode: data.refCode, ts: Date.now() })
+            JSON.stringify({ refCode: data.refCode, orderId: data.orderId, ts: Date.now() })
           );
 
           document.getElementById("refCode").textContent = data.refCode;
           document.getElementById("checkoutStep").style.display = "none";
           document.getElementById("pendingStep").style.display = "block";
+          listenForApproval(data.orderId);
         } catch (err) {
           showSubmitError(
             err.message ||
@@ -670,7 +766,7 @@
               </div>
               <div class="ticket-main">
                 <div class="ticket-event-info">
-                  <div class="ticket-event-name">Efrem Werku Muluneh</div>
+                  <div class="ticket-event-name">ETFC Fight Night</div>
                   <div class="ticket-event-meta">August 27, 2026 · 4:00 PM</div>
                   <div class="ticket-event-meta">Adwa Museum, Addis Ababa</div>
                 </div>
