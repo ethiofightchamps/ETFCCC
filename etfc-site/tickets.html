@@ -259,6 +259,21 @@
         </div>
 
         <div class="field">
+          <label
+            >Email
+            <span
+              style="color: var(--bone-dim); font-size: 11px; font-weight: 400"
+              >(optional — for order updates)</span
+            ></label
+          >
+          <input
+            type="email"
+            id="buyerEmailInput"
+            placeholder="you@example.com"
+          />
+        </div>
+
+        <div class="field">
           <label>Upload Payment Screenshot</label>
           <div
             class="upload-area"
@@ -451,7 +466,7 @@
         }
       }
 
-async function submitOrder() {
+      async function submitOrder() {
         const errEl = document.getElementById("submitError");
         const btn = document.getElementById("submitOrderBtn");
         errEl.style.display = "none";
@@ -462,6 +477,8 @@ async function submitOrder() {
         const buyerPhone = document
           .getElementById("buyerPhoneInput")
           .value.trim();
+        const buyerEmail =
+          document.getElementById("buyerEmailInput")?.value.trim() || "";
         const paymentMethod = document.getElementById(
           "selectedPaymentMethod"
         ).value;
@@ -471,11 +488,15 @@ async function submitOrder() {
 
         if (!buyerName) return showSubmitError("Enter your full name.");
         if (!buyerPhone) return showSubmitError("Enter your phone number.");
-        if (!paymentMethod) return showSubmitError("Select a payment method.");
         if (!/^(09|07)\d{8}$/.test(buyerPhone))
           return showSubmitError(
-            "Enter a valid Ethiopian phone number (e.g. 0912345678)."
+            "Enter a valid Ethiopian phone number starting with 09 or 07 (10 digits)."
           );
+        if (buyerEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(buyerEmail))
+          return showSubmitError(
+            "Enter a valid email address or leave it blank."
+          );
+        if (!paymentMethod) return showSubmitError("Select a payment method.");
         if (!chosenFile)
           return showSubmitError("Upload your payment screenshot.");
         if (Object.keys(selectedSeats).length === 0)
@@ -517,8 +538,8 @@ async function submitOrder() {
               buyerName,
               phone: buyerPhone,
               paymentMethod,
-              email: session.email || "",
-              userId: session.uid || "",
+              email: buyerEmail || session?.email || "",
+              userId: session?.uid || "",
               seats,
               totalAmount,
               screenshotUrl,
@@ -680,7 +701,7 @@ async function submitOrder() {
         loadMyTickets();
       }
 
-// ── ROTATING AD BANNER ─────────────────────────────────────────────────
+      // ── ROTATING AD BANNER ─────────────────────────────────────────────────
       const ADS = [
         {
           type: "ticket",
@@ -902,5 +923,3 @@ async function submitOrder() {
     </div>
   </body>
 </html>
-
-

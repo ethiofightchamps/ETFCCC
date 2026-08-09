@@ -346,6 +346,25 @@
                 autocomplete="tel"
               />
             </div>
+            <div class="field">
+              <label
+                >Email
+                <span
+                  style="
+                    color: var(--bone-dim);
+                    font-size: 11px;
+                    font-weight: 400;
+                  "
+                  >(optional)</span
+                ></label
+              >
+              <input
+                type="email"
+                id="betBuyerEmailInput"
+                placeholder="you@example.com"
+                autocomplete="email"
+              />
+            </div>
           </div>
 
           <!-- Screenshot Upload -->
@@ -438,683 +457,671 @@
     <script src="js/partials.js"></script>
     <script src="js/main.js"></script>
     <script>
-      const DISCIPLINE_LABELS = {
-        mma: "MMA",
-        boxing: "Boxing",
-        muaythai: "Muaythai",
-      };
-      const DISCIPLINE_ORDER = ["mma", "boxing", "muaythai"];
+            const DISCIPLINE_LABELS = {
+              mma: "MMA",
+              boxing: "Boxing",
+              muaythai: "Muaythai",
+            };
+            const DISCIPLINE_ORDER = ["mma", "boxing", "muaythai"];
 
-      // ── Load fights from Firestore (public read, per firestore.rules) ──
-      async function loadBettingPage() {
-        try {
-          const fightsSnap = await db.collection("fights").get();
+            // ── Load fights from Firestore (public read, per firestore.rules) ──
+            async function loadBettingPage() {
+              try {
+                const fightsSnap = await db.collection("fights").get();
 
-          document.getElementById("loadingMsg").style.display = "none";
+                document.getElementById("loadingMsg").style.display = "none";
 
-          if (fightsSnap.empty) {
-            document.getElementById(
-              "fightsMount"
-            ).innerHTML = `<p class="text-dim mt-24">No fight card loaded yet — check back soon.</p>`;
-            return;
-          }
+                if (fightsSnap.empty) {
+                  document.getElementById(
+                    "fightsMount"
+                  ).innerHTML = `<p class="text-dim mt-24">No fight card loaded yet — check back soon.</p>`;
+                  return;
+                }
 
-          const fights = fightsSnap.docs.map((doc) => ({
-            id: doc.id,
-            ...doc.data(),
-          }));
-          renderFights(fights);
-        } catch (err) {
-          console.error("loadBettingPage failed:", err);
-          document.getElementById("loadingMsg").style.display = "none";
-          document.getElementById("errorMsg").textContent =
-            "Could not load the fight card. Try refreshing.";
-          document.getElementById("errorMsg").style.display = "block";
-        }
-      }
-
-      function renderFights(fights) {
-        const byDiscipline = {};
-        fights.forEach((f) => {
-          byDiscipline[f.discipline] = byDiscipline[f.discipline] || [];
-          byDiscipline[f.discipline].push(f);
-        });
-
-        const disciplines = DISCIPLINE_ORDER.filter((d) => byDiscipline[d]);
-        Object.keys(byDiscipline).forEach((d) => {
-          if (!disciplines.includes(d)) disciplines.push(d);
-        });
-
-        const mount = document.getElementById("fightsMount");
-        mount.innerHTML = disciplines
-          .map((discipline) => {
-            const list = byDiscipline[discipline].sort(
-              (a, b) => a.order - b.order
-            );
-            const title =
-              discipline === "mma"
-                ? "Main Event &middot; MMA"
-                : DISCIPLINE_LABELS[discipline] || discipline;
-            return `
-        <section class="discipline-section">
-          <div class="section-head"><div class="section-title" style="font-size:20px;">${title}</div></div>
-          <div class="bout-list">
-            ${list.map((f) => boutRowHtml(f)).join("")}
-          </div>
-        </section>
-      `;
-          })
-          .join("");
-
-        // Wire up bet buttons via data-attributes (avoids string-escaping fighter names in onclick)
-        mount.querySelectorAll(".bet-btn").forEach((btn) => {
-          btn.addEventListener("click", () => {
-            openBetSlip(
-              btn.dataset.fightId,
-              btn.dataset.side,
-              btn.dataset.fighter,
-              parseFloat(btn.dataset.odds),
-              btn.dataset.discipline,
-              btn.dataset.order
-            );
-          });
-        });
-      }
-
-      function boutRowHtml(f) {
-        const boutLabel = f.mainEvent
-          ? "MAIN EVENT"
-          : `BOUT ${String(f.order).padStart(2, "0")}`;
-        const thumbA = f.photoA
-          ? ` style="background-image:url('${f.photoA}');background-size:cover;"`
-          : "";
-        const thumbB = f.photoB
-          ? ` style="background-image:url('${f.photoB}');background-size:cover;"`
-          : "";
-        const disciplineTag = f.discipline.toUpperCase();
-
-        return `
-      <article class="bout-card" data-fight-id="${f.id}">
-        <div class="bout-header">
-          <span class="bout-badge ${
-            f.mainEvent ? "main-event" : ""
-          }">${boutLabel}</span>
-          <span class="discipline-tag">${disciplineTag}</span>
-        </div>
-        <div class="matchup">
-          <div class="fighter-side">
-            <div class="fighter-thumb"${thumbA}></div>
-            <div class="fighter-info">
-              <span class="fighter-name">${f.fighterA}</span>
-              <span class="fighter-weight">${f.weightA || ""}</span>
-            </div>
-          </div>
-          <div class="vs-divider">VS</div>
-          <div class="fighter-side right">
-            <div class="fighter-info">
-              <span class="fighter-name">${f.fighterB}</span>
-              <span class="fighter-weight">${f.weightB || ""}</span>
-            </div>
-            <div class="fighter-thumb"${thumbB}></div>
-          </div>
-        </div>
-        <div class="bout-odds">
-          <div class="odds-column">
-            <div class="odds-label">ODDS</div>
-            <div class="odds-value">${Number(f.oddsA).toFixed(2)}</div>
-          </div>
-          <button class="btn btn-gold bet-btn" data-fight-id="${
-            f.id
-          }" data-side="A" data-fighter="${f.fighterA}" data-odds="${
-          f.oddsA
-        }" data-discipline="${f.discipline}" data-order="${
-          f.order
-        }">Bet</button>
-          <div class="odds-column">
-            <div class="odds-label">ODDS</div>
-            <div class="odds-value">${Number(f.oddsB).toFixed(2)}</div>
-          </div>
-          <button class="btn btn-gold bet-btn" data-fight-id="${
-            f.id
-          }" data-side="B" data-fighter="${f.fighterB}" data-odds="${
-          f.oddsB
-        }" data-discipline="${f.discipline}" data-order="${
-          f.order
-        }">Bet</button>
-        </div>
-      </article>
-    `;
-      }
-
-      // ── Bet slip modal (Accumulator) ──────────────────────────────────────────
-      let betLegs = []; // array of { fightId, side, fighterName, odds, discipline, order }
-      let chosenBetFile = null;
-      let minStake = 1;
-
-      function openBetSlip(
-        fightId,
-        side,
-        fighterName,
-        odds,
-        discipline,
-        order
-      ) {
-        requireAuth("placeBet", () => {
-          // Block same fight same side duplicate
-          const exactDup = betLegs.find(
-            (l) => l.fightId === fightId && l.side === side
-          );
-          if (exactDup) {
-            document.getElementById("betSlipModal").classList.add("open");
-            return;
-          }
-          // Block betting both sides of the same fight
-          const oppositeSide = betLegs.find(
-            (l) => l.fightId === fightId && l.side !== side
-          );
-          if (oppositeSide) {
-            alert("You can't bet on both fighters in the same match.");
-            return;
-          }
-
-          betLegs.push({ fightId, side, fighterName, odds, discipline, order });
-          chosenBetFile = null;
-          refreshBetSlip();
-
-          const session = JSON.parse(
-            localStorage.getItem("etfc_session") || "null"
-          );
-          if (session?.name)
-            document.getElementById("betBuyerNameInput").value = session.name;
-          document.getElementById("betBuyerPhoneInput").value =
-            session?.phone || "";
-
-          document.getElementById("betSlipModal").classList.add("open");
-        });
-      }
-
-      function closeBetSlip(clearAll = false) {
-        document.getElementById("betSlipModal").classList.remove("open");
-        // Always reset file + error
-        chosenBetFile = null;
-        document.getElementById("betUploadLabel").textContent =
-          "Tap to upload payment screenshot";
-        document.getElementById("betScreenshotInput").value = "";
-        const errEl = document.getElementById("betSubmitError");
-        if (errEl) errEl.style.display = "none";
-        // Reset submit button in case it was stuck
-        const btn = document.getElementById("submitBetBtn");
-        if (btn) {
-          btn.removeAttribute("disabled");
-          btn.textContent = "Submit Bet";
-        }
-        // If coming from success state (Done button), clear everything
-        if (clearAll) {
-          betLegs = [];
-          refreshBetSlip();
-          document.getElementById("betSlipForm").style.display = "block";
-          document.getElementById("betSlipPending").style.display = "none";
-          document.getElementById("betAmount").value = "";
-        }
-      }
-
-      // Allow clicking preview/indicator to open modal
-      document.addEventListener("click", (e) => {
-        if (
-          e.target.closest("#betSlipPreview") ||
-          e.target.closest("#floatingBetIndicator")
-        ) {
-          document.getElementById("betSlipModal").classList.add("open");
-        }
-      });
-
-      function removeLeg(index) {
-        betLegs.splice(index, 1);
-        refreshBetSlip();
-      }
-
-      function refreshBetSlip() {
-        const legsEl = document.getElementById("betSlipLegs");
-        const summaryEl = document.getElementById("betLegsSummary");
-        const payoutBreakdown = document.getElementById("payoutBreakdown");
-        const amountInput = document.getElementById("betAmount");
-        const minStakeHint = document.getElementById("minStakeHint");
-
-        // Update floating indicator
-        const floatingIndicator = document.getElementById(
-          "floatingBetIndicator"
-        );
-        const floatingLegCount = document.getElementById("floatingLegCount");
-        const betSlipPreview = document.getElementById("betSlipPreview");
-        const previewLegs = document.getElementById("previewLegs");
-        const previewOdds = document.getElementById("previewOdds");
-
-        if (betLegs.length === 0) {
-          legsEl.innerHTML = `<p class="empty-legs">Tap "Bet" on any fight to add it to your slip.</p>`;
-          summaryEl.style.display = "none";
-          payoutBreakdown.style.display = "none";
-          amountInput.value = "";
-          minStakeHint.style.display = "none";
-
-          if (floatingIndicator) floatingIndicator.style.display = "none";
-          if (betSlipPreview) betSlipPreview.style.display = "none";
-          return;
-        }
-
-        // Show floating indicator on mobile
-        if (floatingIndicator) floatingIndicator.style.display = "flex";
-        if (floatingLegCount) floatingLegCount.textContent = betLegs.length;
-        if (betSlipPreview) betSlipPreview.style.display = "block";
-
-        // Render legs list in modal
-        legsEl.innerHTML = betLegs
-          .map(
-            (leg, idx) => `
-      <div class="bet-leg-item">
-        <div class="bet-leg-info">
-          <span class="bet-leg-badge">${leg.discipline.toUpperCase()} ${
-              leg.order
-            }</span>
-          <span class="bet-leg-name">${leg.fighterName}</span>
-          <span class="bet-leg-odds">@ ${Number(leg.odds).toFixed(2)}</span>
-        </div>
-        <button class="btn btn-outline btn-sm remove-leg-btn" onclick="removeLeg(${idx})">Remove</button>
-      </div>
-    `
-          )
-          .join("");
-
-        // Render preview legs (compact)
-        if (previewLegs) {
-          previewLegs.innerHTML = betLegs
-            .map(
-              (leg) => `
-        <div class="preview-leg">
-          <span class="preview-leg-name">${leg.fighterName}</span>
-          <span class="preview-leg-odds">@ ${Number(leg.odds).toFixed(2)}</span>
-        </div>
-      `
-            )
-            .join("");
-        }
-        if (previewOdds) previewOdds.textContent = getCombinedOdds().toFixed(2);
-
-        summaryEl.style.display = "block";
-        updatePayoutDisplay();
-      }
-
-      function getCombinedOdds() {
-        return betLegs.reduce((acc, leg) => acc * Number(leg.odds), 1);
-      }
-
-      function updatePayoutDisplay() {
-        const stake = Number(document.getElementById("betAmount").value) || 0;
-        const combinedOdds = getCombinedOdds();
-        const gross = Math.round(stake * combinedOdds * 100) / 100;
-        const tax = Math.round(gross * 0.15 * 100) / 100;
-        const net = Math.round((gross - tax) * 100) / 100;
-
-        document.getElementById("combinedOddsDisplay").textContent =
-          combinedOdds.toFixed(2);
-        document.getElementById("grossPayoutDisplay").textContent =
-          gross.toLocaleString() + " ETB";
-        document.getElementById("taxDisplay").textContent =
-          tax.toLocaleString() + " ETB";
-        document.getElementById("netPayoutDisplay").textContent =
-          net.toLocaleString() + " ETB";
-
-        document.getElementById("grossPayout").textContent =
-          gross.toLocaleString() + " ETB";
-        document.getElementById("taxAmount").textContent =
-          tax.toLocaleString() + " ETB";
-        document.getElementById("netPayout").textContent =
-          net.toLocaleString() + " ETB";
-
-        document.getElementById("betLegsSummary").style.display = "block";
-        document.getElementById("payoutBreakdown").style.display = "block";
-      }
-
-      function calcPayout() {
-        updatePayoutDisplay();
-      }
-
-      function onBetScreenshotChosen(input) {
-        const file = input.files[0];
-        if (!file) return;
-        if (file.size > 5 * 1024 * 1024) {
-          showBetSubmitError(
-            "Screenshot is over 5MB — please choose a smaller image."
-          );
-          input.value = "";
-          return;
-        }
-        chosenBetFile = file;
-        document.getElementById(
-          "betUploadLabel"
-        ).textContent = `\u2713 ${file.name}`;
-      }
-
-      function showBetSubmitError(msg) {
-        const errEl = document.getElementById("betSubmitError");
-        errEl.textContent = msg;
-        errEl.style.display = "block";
-      }
-
-      async function submitBet() {
-        const errEl = document.getElementById("betSubmitError");
-        const btn = document.getElementById("submitBetBtn");
-        errEl.style.display = "none";
-
-        const stake = Number(document.getElementById("betAmount").value) || 0;
-        const buyerName = document
-          .getElementById("betBuyerNameInput")
-          .value.trim();
-        const buyerPhone = document
-          .getElementById("betBuyerPhoneInput")
-          .value.trim();
-        const paymentMethod = document.getElementById(
-          "selectedPaymentMethod"
-        ).value;
-        const session = JSON.parse(
-          localStorage.getItem("etfc_session") || "null"
-        );
-
-        if (betLegs.length === 0)
-          return showBetSubmitError("Add at least one fight to your bet slip.");
-        if (stake < minStake)
-          return showBetSubmitError(`Minimum stake is ${minStake} ETB.`);
-        if (!buyerName) return showBetSubmitError("Enter your full name.");
-        if (!buyerPhone) return showBetSubmitError("Enter your phone number.");
-        if (!/^(09|07)\d{8}$/.test(buyerPhone))
-          return showBetSubmitError(
-            "Enter a valid Ethiopian phone number (e.g. 0912345678)."
-          );
-        if (!chosenBetFile)
-          return showBetSubmitError("Upload your payment screenshot.");
-        if (!session)
-          return showBetSubmitError("Session expired — please sign in again.");
-        if (!auth.currentUser)
-          return showBetSubmitError("Session expired — please sign in again.");
-
-        btn.setAttribute("disabled", "true");
-        btn.textContent = "Uploading screenshot…";
-
-        try {
-          // Upload to Cloudinary (unsigned preset — no CORS issues, no credit card)
-          const formData = new FormData();
-          formData.append("file", chosenBetFile);
-          formData.append("upload_preset", "etfc_uploads");
-          formData.append("folder", "bet-screenshots");
-          const cloudRes = await fetch(
-            "https://api.cloudinary.com/v1_1/yryolq8j/image/upload",
-            {
-              method: "POST",
-              body: formData,
+                const fights = fightsSnap.docs.map((doc) => ({
+                  id: doc.id,
+                  ...doc.data(),
+                }));
+                renderFights(fights);
+              } catch (err) {
+                console.error("loadBettingPage failed:", err);
+                document.getElementById("loadingMsg").style.display = "none";
+                document.getElementById("errorMsg").textContent =
+                  "Could not load the fight card. Try refreshing.";
+                document.getElementById("errorMsg").style.display = "block";
+              }
             }
-          );
-          if (!cloudRes.ok)
-            throw new Error("Screenshot upload failed — please try again.");
-          const cloudData = await cloudRes.json();
-          const screenshotUrl = cloudData.secure_url;
 
-          btn.textContent = "Submitting…";
+            function renderFights(fights) {
+              const byDiscipline = {};
+              fights.forEach((f) => {
+                byDiscipline[f.discipline] = byDiscipline[f.discipline] || [];
+                byDiscipline[f.discipline].push(f);
+              });
 
-          const combinedOdds = getCombinedOdds();
-          const grossPayout = Math.round(stake * combinedOdds * 100) / 100;
-          const taxAmount = Math.round(grossPayout * 0.15 * 100) / 100;
-          const netPayout = Math.round((grossPayout - taxAmount) * 100) / 100;
+              const disciplines = DISCIPLINE_ORDER.filter((d) => byDiscipline[d]);
+              Object.keys(byDiscipline).forEach((d) => {
+                if (!disciplines.includes(d)) disciplines.push(d);
+              });
 
-          const res = await fetch("/api/create-bet", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              legs: betLegs.map((l) => ({
-                fightId: l.fightId,
-                side: l.side,
-                odds: l.odds,
-                fighterName: l.fighterName,
-              })),
-              stake,
-              buyerName,
-              phone: buyerPhone,
-              paymentMethod,
-              email: session.email || "",
-              userId: session.uid || "",
-              screenshotUrl,
-              combinedOdds,
-              grossPayout,
-              taxAmount,
-              netPayout,
-            }),
-          });
-          const data = await res.json();
-          if (!res.ok) throw new Error(data.error || "Could not submit bet.");
+              const mount = document.getElementById("fightsMount");
+              mount.innerHTML = disciplines
+                .map((discipline) => {
+                  const list = byDiscipline[discipline].sort(
+                    (a, b) => a.order - b.order
+                  );
+                  const title =
+                    discipline === "mma"
+                      ? "Main Event &middot; MMA"
+                      : DISCIPLINE_LABELS[discipline] || discipline;
+                  return `
+              <section class="discipline-section">
+                <div class="section-head"><div class="section-title" style="font-size:20px;">${title}</div></div>
+                <div class="bout-list">
+                  ${list.map((f) => boutRowHtml(f)).join("")}
+                </div>
+              </section>
+            `;
+                })
+                .join("");
 
-          // Clear bet slip on success
-          betLegs = [];
-          chosenBetFile = null;
+              // Wire up bet buttons via data-attributes (avoids string-escaping fighter names in onclick)
+              mount.querySelectorAll(".bet-btn").forEach((btn) => {
+                btn.addEventListener("click", () => {
+                  openBetSlip(
+                    btn.dataset.fightId,
+                    btn.dataset.side,
+                    btn.dataset.fighter,
+                    parseFloat(btn.dataset.odds),
+                    btn.dataset.discipline,
+                    btn.dataset.order
+                  );
+                });
+              });
+            }
 
-          betLegs = [];
-          chosenBetFile = null;
-          document.getElementById("betSlipForm").style.display = "none";
-          document.getElementById("betSlipPending").style.display = "block";
-          // Also reset the floating indicator
-          refreshBetSlip();
-        } catch (err) {
-          showBetSubmitError(
-            err.message ||
-              "Upload failed — check your connection and try again."
-          );
-          btn.removeAttribute("disabled");
-          btn.textContent = "Submit Bet";
-        }
-      }
+            function boutRowHtml(f) {
+              const boutLabel = f.mainEvent
+                ? "MAIN EVENT"
+                : `BOUT ${String(f.order).padStart(2, "0")}`;
+              const thumbA = f.photoA
+                ? ` style="background-image:url('${f.photoA}');background-size:cover;"`
+                : "";
+              const thumbB = f.photoB
+                ? ` style="background-image:url('${f.photoB}');background-size:cover;"`
+                : "";
+              const disciplineTag = f.discipline.toUpperCase();
 
-      // Load min stake from config on page load
-      async function loadMinStake() {
-        try {
-          const snap = await db.collection("config").doc("site").get();
-          if (snap.exists && snap.data().minStake) {
-            minStake = Number(snap.data().minStake);
-            const hint = document.getElementById("minStakeHint");
-            hint.textContent = `Minimum stake: ${minStake} ETB`;
-            hint.style.display = "block";
-            document.getElementById("betAmount").min = minStake;
-          }
-        } catch (err) {
-          console.warn("Could not load minStake:", err);
-        }
-      }
+              return `
+            <article class="bout-card" data-fight-id="${f.id}">
+              <div class="bout-header">
+                <span class="bout-badge ${
+                  f.mainEvent ? "main-event" : ""
+                }">${boutLabel}</span>
+                <span class="discipline-tag">${disciplineTag}</span>
+              </div>
+              <div class="matchup">
+                <div class="fighter-side">
+                  <div class="fighter-thumb"${thumbA}></div>
+                  <div class="fighter-info">
+                    <span class="fighter-name">${f.fighterA}</span>
+                    <span class="fighter-weight">${f.weightA || ""}</span>
+                  </div>
+                </div>
+                <div class="vs-divider">VS</div>
+                <div class="fighter-side right">
+                  <div class="fighter-info">
+                    <span class="fighter-name">${f.fighterB}</span>
+                    <span class="fighter-weight">${f.weightB || ""}</span>
+                  </div>
+                  <div class="fighter-thumb"${thumbB}></div>
+                </div>
+              </div>
+              <div class="bout-odds">
+                <div class="odds-column">
+                  <div class="odds-label">ODDS</div>
+                  <div class="odds-value">${Number(f.oddsA).toFixed(2)}</div>
+                </div>
+                <button class="btn btn-gold bet-btn" data-fight-id="${
+                  f.id
+                }" data-side="A" data-fighter="${f.fighterA}" data-odds="${
+                f.oddsA
+              }" data-discipline="${f.discipline}" data-order="${
+                f.order
+              }">Bet</button>
+                <div class="odds-column">
+                  <div class="odds-label">ODDS</div>
+                  <div class="odds-value">${Number(f.oddsB).toFixed(2)}</div>
+                </div>
+                <button class="btn btn-gold bet-btn" data-fight-id="${
+                  f.id
+                }" data-side="B" data-fighter="${f.fighterB}" data-odds="${
+                f.oddsB
+              }" data-discipline="${f.discipline}" data-order="${
+                f.order
+              }">Bet</button>
+              </div>
+            </article>
+          `;
+            }
 
-      // ── My Bets ────────────────────────────────────────────────────────────
-      const STATUS_ICON = {
-        confirmed: "⏳",
-        pending: "⏳",
-        won: "✅",
-        lost: "❌",
-        rejected: "❌",
-      };
-      const STATUS_LABEL = {
-        confirmed: "Awaiting Fight",
-        pending: "Pending Review",
-        won: "Won",
-        lost: "Lost",
-        rejected: "Rejected",
-      };
+            // ── Bet slip modal (Accumulator) ──────────────────────────────────────────
+            let betLegs = []; // array of { fightId, side, fighterName, odds, discipline, order }
+            let chosenBetFile = null;
+            let minStake = 1;
 
-      async function loadMyBets() {
-        const el = document.getElementById("myBetsContainer");
-        const user = auth.currentUser;
+            function openBetSlip(
+              fightId,
+              side,
+              fighterName,
+              odds,
+              discipline,
+              order
+            ) {
+              requireAuth("placeBet", () => {
+                // Block same fight same side duplicate
+                const exactDup = betLegs.find(
+                  (l) => l.fightId === fightId && l.side === side
+                );
+                if (exactDup) {
+                  document.getElementById("betSlipModal").classList.add("open");
+                  return;
+                }
+                // Block betting both sides of the same fight
+                const oppositeSide = betLegs.find(
+                  (l) => l.fightId === fightId && l.side !== side
+                );
+                if (oppositeSide) {
+                  alert("You can't bet on both fighters in the same match.");
+                  return;
+                }
 
-        if (!user) {
-          el.innerHTML = `<div class="empty-state"><div class="empty-icon">🔒</div><p style="margin:0;">Sign in to view your bets.</p></div>`;
-          return;
-        }
+                betLegs.push({ fightId, side, fighterName, odds, discipline, order });
+                chosenBetFile = null;
+                refreshBetSlip();
 
-        el.innerHTML = `<p class="text-dim">Loading…</p>`;
+                const session = JSON.parse(
+                  localStorage.getItem("etfc_session") || "null"
+                );
+                if (session?.name)
+                  document.getElementById("betBuyerNameInput").value = session.name;
+                document.getElementById("betBuyerPhoneInput").value =
+                  session?.phone || "";
 
-        try {
-          const snap = await db
-            .collection("bets")
-            .where("userId", "==", user.uid)
-            .get();
-          let docs = snap.docs;
-          if (docs.length === 0 && user.email) {
-            const snapEmail = await db
-              .collection("bets")
-              .where("email", "==", user.email)
-              .get();
-            docs = snapEmail.docs;
-          }
-          docs.sort(
-            (a, b) =>
-              (b.data().createdAt?.toMillis?.() || 0) -
-              (a.data().createdAt?.toMillis?.() || 0)
-          );
+                document.getElementById("betSlipModal").classList.add("open");
+              });
+            }
 
-          if (docs.length === 0) {
-            el.innerHTML = `<div class="empty-state"><div class="empty-icon">🥊</div><p style="margin:0;">No bets placed yet — pick a fighter above to get started.</p></div>`;
-            return;
-          }
+            function closeBetSlip(clearAll = false) {
+              document.getElementById("betSlipModal").classList.remove("open");
+              // Always reset file + error
+              chosenBetFile = null;
+              document.getElementById("betUploadLabel").textContent =
+                "Tap to upload payment screenshot";
+              document.getElementById("betScreenshotInput").value = "";
+              const errEl = document.getElementById("betSubmitError");
+              if (errEl) errEl.style.display = "none";
+              // Reset submit button in case it was stuck
+              const btn = document.getElementById("submitBetBtn");
+              if (btn) {
+                btn.removeAttribute("disabled");
+                btn.textContent = "Submit Bet";
+              }
+              // If coming from success state (Done button), clear everything
+              if (clearAll) {
+                betLegs = [];
+                refreshBetSlip();
+                document.getElementById("betSlipForm").style.display = "block";
+                document.getElementById("betSlipPending").style.display = "none";
+                document.getElementById("betAmount").value = "";
+              }
+            }
 
-          el.innerHTML = docs
-            .map((doc) => {
-              const b = doc.data();
-              const s = b.status || "pending";
+            // Allow clicking preview/indicator to open modal
+            document.addEventListener("click", (e) => {
+              if (
+                e.target.closest("#betSlipPreview") ||
+                e.target.closest("#floatingBetIndicator")
+              ) {
+                document.getElementById("betSlipModal").classList.add("open");
+              }
+            });
 
-              const legs =
-                b.legs ||
-                (b.fightId
-                  ? [
-                      {
-                        fightId: b.fightId,
-                        side: b.side,
-                        odds: b.odds,
-                        fighterName: b.fighterName,
-                      },
-                    ]
-                  : []);
-              const legsHtml = legs
+            function removeLeg(index) {
+              betLegs.splice(index, 1);
+              refreshBetSlip();
+            }
+
+            function refreshBetSlip() {
+              const legsEl = document.getElementById("betSlipLegs");
+              const summaryEl = document.getElementById("betLegsSummary");
+              const payoutBreakdown = document.getElementById("payoutBreakdown");
+              const amountInput = document.getElementById("betAmount");
+              const minStakeHint = document.getElementById("minStakeHint");
+
+              // Update floating indicator
+              const floatingIndicator = document.getElementById(
+                "floatingBetIndicator"
+              );
+              const floatingLegCount = document.getElementById("floatingLegCount");
+              const betSlipPreview = document.getElementById("betSlipPreview");
+              const previewLegs = document.getElementById("previewLegs");
+              const previewOdds = document.getElementById("previewOdds");
+
+              if (betLegs.length === 0) {
+                legsEl.innerHTML = `<p class="empty-legs">Tap "Bet" on any fight to add it to your slip.</p>`;
+                summaryEl.style.display = "none";
+                payoutBreakdown.style.display = "none";
+                amountInput.value = "";
+                minStakeHint.style.display = "none";
+
+                if (floatingIndicator) floatingIndicator.style.display = "none";
+                if (betSlipPreview) betSlipPreview.style.display = "none";
+                return;
+              }
+
+              // Show floating indicator on mobile
+              if (floatingIndicator) floatingIndicator.style.display = "flex";
+              if (floatingLegCount) floatingLegCount.textContent = betLegs.length;
+              if (betSlipPreview) betSlipPreview.style.display = "block";
+
+              // Render legs list in modal
+              legsEl.innerHTML = betLegs
                 .map(
-                  (leg) => `
-          <div class="bet-leg-row">
-            <span class="fighter">${leg.fighterName}</span>
-            <span class="odds"> @ ${Number(leg.odds).toFixed(2)}</span>
-          </div>
-        `
+                  (leg, idx) => `
+            <div class="bet-leg-item">
+              <div class="bet-leg-info">
+                <span class="bet-leg-badge">${leg.discipline.toUpperCase()} ${
+                    leg.order
+                  }</span>
+                <span class="bet-leg-name">${leg.fighterName}</span>
+                <span class="bet-leg-odds">@ ${Number(leg.odds).toFixed(2)}</span>
+              </div>
+              <button class="btn btn-outline btn-sm remove-leg-btn" onclick="removeLeg(${idx})">Remove</button>
+            </div>
+          `
                 )
                 .join("");
 
-              const combinedOdds = b.combinedOdds || b.odds || 0;
-              const grossPayout = b.grossPayout || b.potentialPayout || 0;
-              const taxAmount = b.taxAmount || 0;
-              const netPayout =
-                b.netPayout || grossPayout - taxAmount || grossPayout;
-
-              return `
-          <div class="bet-card ${s}">
-            <div class="bet-card-legs">
-              ${legsHtml || `<span class="text-dim">—</span>`}
-              <div class="bet-card-meta">Stake: ${(
-                b.stake || 0
-              ).toLocaleString()} ETB &middot; Combined Odds: ${Number(
-                combinedOdds
-              ).toFixed(2)} &middot; Ref: ${b.refCode || "—"}</div>
-            </div>
-            <div class="bet-card-result">
-              <span class="status-pill ${s}">${STATUS_ICON[s] || ""} ${
-                STATUS_LABEL[s] || s
-              }</span>
-              <span class="bet-payout-net">${
-                s === "lost" || s === "rejected"
-                  ? "—"
-                  : 
-et: ${Number(netPayout).toLocaleString()} ETB`
-              }</span>
-              ${
-                s !== "lost" && s !== "rejected"
-                  ? `<span class="bet-payout-detail">Gross: ${Number(
-                      grossPayout
-                    ).toLocaleString()} ETB &middot; Tax: ${Number(
-                      taxAmount
-                    ).toLocaleString()} ETB</span>`
-                  : ""
+              // Render preview legs (compact)
+              if (previewLegs) {
+                previewLegs.innerHTML = betLegs
+                  .map(
+                    (leg) => `
+              <div class="preview-leg">
+                <span class="preview-leg-name">${leg.fighterName}</span>
+                <span class="preview-leg-odds">@ ${Number(leg.odds).toFixed(2)}</span>
+              </div>
+            `
+                  )
+                  .join("");
               }
-            </div>
-          </div>`;
-            })
-            .join("");
-        } catch (err) {
-          el.innerHTML = `<p style="color:var(--crimson-bright);">Could not load bets — ${err.message}</p>`;
-          console.error("bets:", err);
-        }
-      }
+              if (previewOdds) previewOdds.textContent = getCombinedOdds().toFixed(2);
 
-      function openMyBetsModal() {
-        document.getElementById("myBetsModal").classList.add("open");
-        loadMyBets();
-      }
+              summaryEl.style.display = "block";
+              updatePayoutDisplay();
+            }
 
-      auth.onAuthStateChanged(() => loadMyBets());
+            function getCombinedOdds() {
+              return betLegs.reduce((acc, leg) => acc * Number(leg.odds), 1);
+            }
 
-      // Payment method phone numbers
-      const PAYMENT_NUMBERS = {
-        mpesa: "0725767614",
-        telebirr: "0983196199",
-      };
+            function updatePayoutDisplay() {
+              const stake = Number(document.getElementById("betAmount").value) || 0;
+              const combinedOdds = getCombinedOdds();
+              const gross = Math.round(stake * combinedOdds * 100) / 100;
+              const tax = Math.round(gross * 0.15 * 100) / 100;
+              const net = Math.round((gross - tax) * 100) / 100;
 
-      // Payment methods config
-      const PAYMENT_METHODS = [
-        {
-          id: "mpesa",
-          name: "M-Pesa",
-          icon: "/safaricom.png",
-          accountName: "Efrem Werku Muluneh",
-        },
-        {
-          id: "telebirr",
-          name: "Telebirr",
-          icon: "/telebirr.webp",
-          accountName: "ager",
-        },
-      ];
+              document.getElementById("combinedOddsDisplay").textContent =
+                combinedOdds.toFixed(2);
+              document.getElementById("grossPayoutDisplay").textContent =
+                gross.toLocaleString() + " ETB";
+              document.getElementById("taxDisplay").textContent =
+                tax.toLocaleString() + " ETB";
+              document.getElementById("netPayoutDisplay").textContent =
+                net.toLocaleString() + " ETB";
 
-      function selectPaymentMethod(methodId) {
-        const pm = PAYMENT_METHODS.find((p) => p.id === methodId);
-        if (!pm) return;
-        selectedPaymentMethod = methodId;
+              document.getElementById("grossPayout").textContent =
+                gross.toLocaleString() + " ETB";
+              document.getElementById("taxAmount").textContent =
+                tax.toLocaleString() + " ETB";
+              document.getElementById("netPayout").textContent =
+                net.toLocaleString() + " ETB";
 
-        // Update button styles
-        document.querySelectorAll(".payment-method-btn").forEach((btn) => {
-          btn.style.borderColor =
-            btn.dataset.method === methodId ? "var(--gold)" : "var(--border)";
-          btn.style.background =
-            btn.dataset.method === methodId
-              ? "rgba(176,141,62,0.1)"
-              : "var(--obsidian)";
-        });
+              document.getElementById("betLegsSummary").style.display = "block";
+              document.getElementById("payoutBreakdown").style.display = "block";
+            }
 
-        // Update hidden input
-        document.getElementById("selectedPaymentMethod").value = methodId;
+            function calcPayout() {
+              updatePayoutDisplay();
+            }
 
-        // Update bank details box
-        document.getElementById("betPayAccountName").textContent =
-          pm.accountName;
-        document.getElementById("betPayAccountNumber").textContent =
-          PAYMENT_NUMBERS[methodId] || "—";
-      }
+            function onBetScreenshotChosen(input) {
+              const file = input.files[0];
+              if (!file) return;
+              if (file.size > 5 * 1024 * 1024) {
+                showBetSubmitError(
+                  "Screenshot is over 5MB — please choose a smaller image."
+                );
+                input.value = "";
+                return;
+              }
+              chosenBetFile = file;
+              document.getElementById(
+                "betUploadLabel"
+              ).textContent = `\u2713 ${file.name}`;
+            }
 
-      document.addEventListener("DOMContentLoaded", () => {
-        // Pre-select M-Pesa on load
-        selectPaymentMethod("mpesa");
-      });
+            function showBetSubmitError(msg) {
+              const errEl = document.getElementById("betSubmitError");
+              errEl.textContent = msg;
+              errEl.style.display = "block";
+            }
 
-      let selectedPaymentMethod = "mpesa";
+            async function submitBet() {
+              const errEl = document.getElementById("betSubmitError");
+              const btn = document.getElementById("submitBetBtn");
+              errEl.style.display = "none";
 
-      loadBettingPage();
-      loadMinStake();
+              const stake = Number(document.getElementById("betAmount").value) || 0;
+              const buyerName = document.getElementById("betBuyerNameInput").value.trim();
+              const buyerPhone = document.getElementById("betBuyerPhoneInput").value.trim();
+              const buyerEmail = document.getElementById("betBuyerEmailInput")?.value.trim() || "";
+              const paymentMethod = document.getElementById("selectedPaymentMethod").value;
+              const session = JSON.parse(localStorage.getItem("etfc_session") || "null");
+
+              if (betLegs.length === 0)
+                return showBetSubmitError("Add at least one fight to your bet slip.");
+              if (stake < minStake)
+                return showBetSubmitError(`Minimum stake is ${minStake} ETB.`);
+              if (!buyerName) return showBetSubmitError("Enter your full name.");
+              if (!buyerPhone) return showBetSubmitError("Enter your phone number.");
+              if (!/^(09|07)\d{8}$/.test(buyerPhone))
+                return showBetSubmitError("Enter a valid Ethiopian phone number starting with 09 or 07 (10 digits).");
+              if (buyerEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(buyerEmail))
+                return showBetSubmitError("Enter a valid email address or leave it blank.");
+              if (!chosenBetFile)
+                return showBetSubmitError("Upload your payment screenshot.");
+                return showBetSubmitError("Session expired — please sign in again.");
+
+              btn.setAttribute("disabled", "true");
+              btn.textContent = "Uploading screenshot…";
+
+              try {
+                // Upload to Cloudinary (unsigned preset — no CORS issues, no credit card)
+                const formData = new FormData();
+                formData.append("file", chosenBetFile);
+                formData.append("upload_preset", "etfc_uploads");
+                formData.append("folder", "bet-screenshots");
+                const cloudRes = await fetch(
+                  "https://api.cloudinary.com/v1_1/yryolq8j/image/upload",
+                  {
+                    method: "POST",
+                    body: formData,
+                  }
+                );
+                if (!cloudRes.ok)
+                  throw new Error("Screenshot upload failed — please try again.");
+                const cloudData = await cloudRes.json();
+                const screenshotUrl = cloudData.secure_url;
+
+                btn.textContent = "Submitting…";
+
+                const combinedOdds = getCombinedOdds();
+                const grossPayout = Math.round(stake * combinedOdds * 100) / 100;
+                const taxAmount = Math.round(grossPayout * 0.15 * 100) / 100;
+                const netPayout = Math.round((grossPayout - taxAmount) * 100) / 100;
+
+                const res = await fetch("/api/create-bet", {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({
+                    legs: betLegs.map((l) => ({
+                      fightId: l.fightId,
+                      side: l.side,
+                      odds: l.odds,
+                      fighterName: l.fighterName,
+                    })),
+                    stake,
+                    buyerName,
+                    phone: buyerPhone,
+                    paymentMethod,
+                    email: buyerEmail || session?.email || "",
+                    userId: session?.uid || "",
+                    screenshotUrl,
+                    combinedOdds,
+                    grossPayout,
+                    taxAmount,
+                    netPayout,
+                  }),
+                });
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.error || "Could not submit bet.");
+
+                // Clear bet slip on success
+                betLegs = [];
+                chosenBetFile = null;
+
+                betLegs = [];
+                chosenBetFile = null;
+                document.getElementById("betSlipForm").style.display = "none";
+                document.getElementById("betSlipPending").style.display = "block";
+                // Also reset the floating indicator
+                refreshBetSlip();
+              } catch (err) {
+                showBetSubmitError(
+                  err.message ||
+                    "Upload failed — check your connection and try again."
+                );
+                btn.removeAttribute("disabled");
+                btn.textContent = "Submit Bet";
+              }
+            }
+
+            // Load min stake from config on page load
+            async function loadMinStake() {
+              try {
+                const snap = await db.collection("config").doc("site").get();
+                if (snap.exists && snap.data().minStake) {
+                  minStake = Number(snap.data().minStake);
+                  const hint = document.getElementById("minStakeHint");
+                  hint.textContent = `Minimum stake: ${minStake} ETB`;
+                  hint.style.display = "block";
+                  document.getElementById("betAmount").min = minStake;
+                }
+              } catch (err) {
+                console.warn("Could not load minStake:", err);
+              }
+            }
+
+            // ── My Bets ────────────────────────────────────────────────────────────
+            const STATUS_ICON = {
+              confirmed: "⏳",
+              pending: "⏳",
+              won: "✅",
+              lost: "❌",
+              rejected: "❌",
+            };
+            const STATUS_LABEL = {
+              confirmed: "Awaiting Fight",
+              pending: "Pending Review",
+              won: "Won",
+              lost: "Lost",
+              rejected: "Rejected",
+            };
+
+            async function loadMyBets() {
+              const el = document.getElementById("myBetsContainer");
+              const user = auth.currentUser;
+
+              if (!user) {
+                el.innerHTML = `<div class="empty-state"><div class="empty-icon">🔒</div><p style="margin:0;">Sign in to view your bets.</p></div>`;
+                return;
+              }
+
+              el.innerHTML = `<p class="text-dim">Loading…</p>`;
+
+              try {
+                const snap = await db
+                  .collection("bets")
+                  .where("userId", "==", user.uid)
+                  .get();
+                let docs = snap.docs;
+                if (docs.length === 0 && user.email) {
+                  const snapEmail = await db
+                    .collection("bets")
+                    .where("email", "==", user.email)
+                    .get();
+                  docs = snapEmail.docs;
+                }
+                docs.sort(
+                  (a, b) =>
+                    (b.data().createdAt?.toMillis?.() || 0) -
+                    (a.data().createdAt?.toMillis?.() || 0)
+                );
+
+                if (docs.length === 0) {
+                  el.innerHTML = `<div class="empty-state"><div class="empty-icon">🥊</div><p style="margin:0;">No bets placed yet — pick a fighter above to get started.</p></div>`;
+                  return;
+                }
+
+                el.innerHTML = docs
+                  .map((doc) => {
+                    const b = doc.data();
+                    const s = b.status || "pending";
+
+                    const legs =
+                      b.legs ||
+                      (b.fightId
+                        ? [
+                            {
+                              fightId: b.fightId,
+                              side: b.side,
+                              odds: b.odds,
+                              fighterName: b.fighterName,
+                            },
+                          ]
+                        : []);
+                    const legsHtml = legs
+                      .map(
+                        (leg) => `
+                <div class="bet-leg-row">
+                  <span class="fighter">${leg.fighterName}</span>
+                  <span class="odds"> @ ${Number(leg.odds).toFixed(2)}</span>
+                </div>
+              `
+                      )
+                      .join("");
+
+                    const combinedOdds = b.combinedOdds || b.odds || 0;
+                    const grossPayout = b.grossPayout || b.potentialPayout || 0;
+                    const taxAmount = b.taxAmount || 0;
+                    const netPayout =
+                      b.netPayout || grossPayout - taxAmount || grossPayout;
+
+                    return `
+                <div class="bet-card ${s}">
+                  <div class="bet-card-legs">
+                    ${legsHtml || `<span class="text-dim">—</span>`}
+                    <div class="bet-card-meta">Stake: ${(
+                      b.stake || 0
+                    ).toLocaleString()} ETB &middot; Combined Odds: ${Number(
+                      combinedOdds
+                    ).toFixed(2)} &middot; Ref: ${b.refCode || "—"}</div>
+                  </div>
+                  <div class="bet-card-result">
+                    <span class="status-pill ${s}">${STATUS_ICON[s] || ""} ${
+                      STATUS_LABEL[s] || s
+                    }</span>
+                    <span class="bet-payout-net">${
+                      s === "lost" || s === "rejected"
+                        ? "—"
+                        :
+      et: ${Number(netPayout).toLocaleString()} ETB`
+                    }</span>
+                    ${
+                      s !== "lost" && s !== "rejected"
+                        ? `<span class="bet-payout-detail">Gross: ${Number(
+                            grossPayout
+                          ).toLocaleString()} ETB &middot; Tax: ${Number(
+                            taxAmount
+                          ).toLocaleString()} ETB</span>`
+                        : ""
+                    }
+                  </div>
+                </div>`;
+                  })
+                  .join("");
+              } catch (err) {
+                el.innerHTML = `<p style="color:var(--crimson-bright);">Could not load bets — ${err.message}</p>`;
+                console.error("bets:", err);
+              }
+            }
+
+            function openMyBetsModal() {
+              document.getElementById("myBetsModal").classList.add("open");
+              loadMyBets();
+            }
+
+            auth.onAuthStateChanged(() => loadMyBets());
+
+            // Payment method phone numbers
+            const PAYMENT_NUMBERS = {
+              mpesa: "0725767614",
+              telebirr: "0983196199",
+            };
+
+            // Payment methods config
+            const PAYMENT_METHODS = [
+              {
+                id: "mpesa",
+                name: "M-Pesa",
+                icon: "/safaricom.png",
+                accountName: "Efrem Werku Muluneh",
+              },
+              {
+                id: "telebirr",
+                name: "Telebirr",
+                icon: "/telebirr.webp",
+                accountName: "ager",
+              },
+            ];
+
+            function selectPaymentMethod(methodId) {
+              const pm = PAYMENT_METHODS.find((p) => p.id === methodId);
+              if (!pm) return;
+              selectedPaymentMethod = methodId;
+
+              // Update button styles
+              document.querySelectorAll(".payment-method-btn").forEach((btn) => {
+                btn.style.borderColor =
+                  btn.dataset.method === methodId ? "var(--gold)" : "var(--border)";
+                btn.style.background =
+                  btn.dataset.method === methodId
+                    ? "rgba(176,141,62,0.1)"
+                    : "var(--obsidian)";
+              });
+
+              // Update hidden input
+              document.getElementById("selectedPaymentMethod").value = methodId;
+
+              // Update bank details box
+              document.getElementById("betPayAccountName").textContent =
+                pm.accountName;
+              document.getElementById("betPayAccountNumber").textContent =
+                PAYMENT_NUMBERS[methodId] || "—";
+            }
+
+            document.addEventListener("DOMContentLoaded", () => {
+              // Pre-select M-Pesa on load
+              selectPaymentMethod("mpesa");
+            });
+
+            let selectedPaymentMethod = "mpesa";
+
+            loadBettingPage();
+            loadMinStake();
     </script>
   </body>
 </html>
-
-

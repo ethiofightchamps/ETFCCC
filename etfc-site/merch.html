@@ -93,23 +93,26 @@
       }
       .merch-card-img {
         width: 100%;
+        aspect-ratio: 1;
         background: #111;
-        position: relative;
         overflow: hidden;
+        display: block;
+        position: relative;
       }
       .merch-card-img img {
         width: 100%;
-        height: auto;
-        object-fit: contain;
+        height: 100%;
+        object-fit: cover;
         object-position: center;
         display: block;
       }
       .merch-card-img .merch-emoji-placeholder {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
         font-size: 56px;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
       }
       .merch-offer-badge {
         position: absolute;
@@ -862,6 +865,24 @@
                 autocomplete="tel"
               />
             </div>
+            <div class="field">
+              <label
+                >Email
+                <span
+                  style="
+                    color: var(--bone-dim);
+                    font-size: 11px;
+                    font-weight: 400;
+                  "
+                  >(optional)</span
+                ></label
+              ><input
+                type="email"
+                id="merchBuyerEmail"
+                placeholder="you@example.com"
+                autocomplete="email"
+              />
+            </div>
           </div>
           <div class="checkout-section">
             <div class="checkout-title">Proof of Payment</div>
@@ -1345,6 +1366,8 @@
         const buyerPhone = document
           .getElementById("merchBuyerPhone")
           .value.trim();
+        const buyerEmail =
+          document.getElementById("merchBuyerEmail")?.value.trim() || "";
         const paymentMethod = document.getElementById(
           "selectedPaymentMethod"
         ).value;
@@ -1357,18 +1380,14 @@
           return showMerchCheckoutError("Enter your phone number.");
         if (!/^(09|07)\d{8}$/.test(buyerPhone))
           return showMerchCheckoutError(
-            "Enter a valid Ethiopian phone number (e.g. 0912345678)."
+            "Enter a valid Ethiopian phone number starting with 09 or 07 (10 digits)."
+          );
+        if (buyerEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(buyerEmail))
+          return showMerchCheckoutError(
+            "Enter a valid email address or leave it blank."
           );
         if (!chosenMerchFile)
           return showMerchCheckoutError("Upload your payment screenshot.");
-        if (!session)
-          return showMerchCheckoutError(
-            "Session expired — please sign in again."
-          );
-        if (!auth.currentUser)
-          return showMerchCheckoutError(
-            "Session expired — please sign in again."
-          );
 
         btn.setAttribute("disabled", "true");
         btn.textContent = "Uploading screenshot…";
@@ -1408,8 +1427,8 @@
               buyerName,
               phone: buyerPhone,
               paymentMethod,
-              email: session.email || "",
-              userId: session.uid || "",
+              email: buyerEmail || session?.email || "",
+              userId: session?.uid || "",
               screenshotUrl,
               unitPrice: price,
               totalAmount: total,
@@ -1442,5 +1461,3 @@
     </script>
   </body>
 </html>
-
-

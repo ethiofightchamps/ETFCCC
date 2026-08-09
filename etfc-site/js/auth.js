@@ -35,14 +35,9 @@ function backToChoice(e) {
 // in, runs onAuthed() immediately. Otherwise remembers what page/action was
 // in progress and sends the user to login.html; they're bounced back after.
 function requireAuth(actionKey, onAuthed) {
-  const isLoggedIn = !!localStorage.getItem("etfc_session");
-  if (isLoggedIn) {
-    onAuthed();
-    return;
-  }
-  sessionStorage.setItem("etfc_pending_action", actionKey);
-  sessionStorage.setItem("etfc_return_to", window.location.pathname + window.location.search);
-  window.location.href = "login.html";
+  // No login required — guests can buy tickets/merch/bets
+  // Just run the action directly
+  onAuthed();
 }
 
 // Call on page load if that page has a requireAuth() action, so it resumes
@@ -65,7 +60,10 @@ function redirectAfterAuth() {
 }
 
 function completeSignIn(sessionData) {
-  localStorage.setItem("etfc_session", JSON.stringify({ ...sessionData, ts: Date.now() }));
+  localStorage.setItem(
+    "etfc_session",
+    JSON.stringify({ ...sessionData, ts: Date.now() })
+  );
 }
 
 // Sessions created before uid was added to verify-otp's response are
@@ -113,7 +111,8 @@ async function signInWithGoogle() {
 function continueLoginWithEmail(e) {
   if (e) e.preventDefault();
   const email = document.getElementById("loginEmailInput").value.trim();
-  if (!isValidEmail(email)) return showToast("Enter a valid email address.", "error");
+  if (!isValidEmail(email))
+    return showToast("Enter a valid email address.", "error");
 
   document.getElementById("loginEmailDisplay").textContent = email;
   showStep("authStepLogin");
@@ -126,7 +125,8 @@ async function loginWithEmail(e) {
   const email = document.getElementById("loginEmailInput").value.trim();
   const password = document.getElementById("loginPasswordInput").value;
 
-  if (!isValidEmail(email)) return showToast("Enter a valid email address.", "error");
+  if (!isValidEmail(email))
+    return showToast("Enter a valid email address.", "error");
   if (!password) return showToast("Enter your password.", "error");
 
   try {
@@ -151,9 +151,12 @@ async function loginWithEmail(e) {
   } catch (err) {
     console.error("Email/password login failed:", err);
     let message = "Incorrect email or password.";
-    if (err.code === "auth/user-not-found") message = "No account found with that email.";
-    if (err.code === "auth/too-many-requests") message = "Too many attempts — try again later.";
-    if (err.code === "auth/invalid-email") message = "That email address looks invalid.";
+    if (err.code === "auth/user-not-found")
+      message = "No account found with that email.";
+    if (err.code === "auth/too-many-requests")
+      message = "Too many attempts — try again later.";
+    if (err.code === "auth/invalid-email")
+      message = "That email address looks invalid.";
     showToast(message, "error");
   }
 }
@@ -161,7 +164,8 @@ async function loginWithEmail(e) {
 async function sendPasswordReset(e) {
   if (e) e.preventDefault();
   const email = document.getElementById("loginEmailInput").value.trim();
-  if (!isValidEmail(email)) return showToast("Enter your email above first, then tap this.", "error");
+  if (!isValidEmail(email))
+    return showToast("Enter your email above first, then tap this.", "error");
 
   try {
     await auth.sendPasswordResetEmail(email);
@@ -176,7 +180,8 @@ async function sendPasswordReset(e) {
 function continueSignupWithEmail(e) {
   if (e) e.preventDefault();
   const email = document.getElementById("emailInput").value.trim();
-  if (!isValidEmail(email)) return showToast("Enter a valid email address.", "error");
+  if (!isValidEmail(email))
+    return showToast("Enter a valid email address.", "error");
 
   pendingSignup = { ...(pendingSignup || {}), email };
   showStep("authStepName");
@@ -188,7 +193,8 @@ function goToPhoneStep(e) {
   const name = document.getElementById("nameInput").value.trim();
 
   if (!name) return showToast("Enter your full name.", "error");
-  if (!pendingSignup) return showToast("Session expired — please start over.", "error");
+  if (!pendingSignup)
+    return showToast("Session expired — please start over.", "error");
 
   pendingSignup.name = name;
   showStep("authStepPhone");
@@ -205,9 +211,13 @@ function goToPasswordStep(e) {
 
   if (!phone) return showToast("Enter your phone number.", "error");
   if (!isValidEthiopianPhone(phone)) {
-    return showToast("Enter a valid 10-digit phone number starting with 09 or 07.", "error");
+    return showToast(
+      "Enter a valid 10-digit phone number starting with 09 or 07.",
+      "error"
+    );
   }
-  if (!pendingSignup) return showToast("Session expired — please start over.", "error");
+  if (!pendingSignup)
+    return showToast("Session expired — please start over.", "error");
 
   pendingSignup.phone = phone;
   showStep("authStepPassword");
@@ -221,14 +231,17 @@ document.addEventListener("input", (e) => {
 });
 
 function clearOtpBoxes() {
-  document.querySelectorAll("#authStepOtp input").forEach((input) => (input.value = ""));
+  document
+    .querySelectorAll("#authStepOtp input")
+    .forEach((input) => (input.value = ""));
   const first = document.querySelector("#authStepOtp input");
   if (first) first.focus();
 }
 
 async function submitSignupPassword(e) {
   if (e) e.preventDefault();
-  if (!pendingSignup) return showToast("Session expired — please start over.", "error");
+  if (!pendingSignup)
+    return showToast("Session expired — please start over.", "error");
 
   // Wipe any digits left over from a previous attempt so the boxes are
   // clean whether this is the first send or a resend.
@@ -237,7 +250,8 @@ async function submitSignupPassword(e) {
   const password = document.getElementById("passwordInput").value;
   const confirm = document.getElementById("passwordConfirmInput").value;
 
-  if (!password || password.length < 6) return showToast("Password must be at least 6 characters.", "error");
+  if (!password || password.length < 6)
+    return showToast("Password must be at least 6 characters.", "error");
   if (password !== confirm) return showToast("Passwords don't match.", "error");
 
   pendingSignup.password = password;
@@ -251,10 +265,14 @@ async function submitSignupPassword(e) {
       body: JSON.stringify({ name, phone, email }),
     });
     const data = await res.json();
-    if (!res.ok) throw new Error(data.error || "Could not send verification code.");
+    if (!res.ok)
+      throw new Error(data.error || "Could not send verification code.");
   } catch (err) {
     console.error("send-otp failed:", err);
-    showToast(err.message || "Could not send verification code. Try again.", "error");
+    showToast(
+      err.message || "Could not send verification code. Try again.",
+      "error"
+    );
     return;
   }
 
@@ -264,9 +282,13 @@ async function submitSignupPassword(e) {
 }
 
 async function verifyEmailOtp() {
-  const digits = [...document.querySelectorAll("#authStepOtp input")].map((i) => i.value).join("");
-  if (digits.length !== 6) return showToast("Enter the full 6-digit code.", "error");
-  if (!pendingSignup) return showToast("Session expired — please start over.", "error");
+  const digits = [...document.querySelectorAll("#authStepOtp input")]
+    .map((i) => i.value)
+    .join("");
+  if (digits.length !== 6)
+    return showToast("Enter the full 6-digit code.", "error");
+  if (!pendingSignup)
+    return showToast("Session expired — please start over.", "error");
 
   try {
     const res = await fetch("/api/verify-otp", {
@@ -282,7 +304,13 @@ async function verifyEmailOtp() {
     if (!res.ok) throw new Error(data.error || "Incorrect or expired code.");
 
     await auth.signInWithCustomToken(data.token);
-    completeSignIn({ name: data.name, phone: data.phone, email: data.email, uid: data.uid, method: "email" });
+    completeSignIn({
+      name: data.name,
+      phone: data.phone,
+      email: data.email,
+      uid: data.uid,
+      method: "email",
+    });
     showToast(`Welcome, ${data.name.split(" ")[0]}!`, "success");
   } catch (err) {
     console.error("verifyEmailOtp failed:", err);

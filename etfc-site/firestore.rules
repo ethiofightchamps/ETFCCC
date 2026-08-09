@@ -31,20 +31,17 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
 
-    // Orders: user can create, and read any order where their uid OR email matches
-    // Public read for confirmed tickets (verification page)
+    // Orders: public read allowed so verify.html works without login
+    // Guest create allowed (no auth required for ticket/merch purchases)
     match /orders/{orderId} {
-      allow create: if isSignedIn();
-      allow read: if isAdmin()
-        || (isSignedIn() && resource.data.userId == request.auth.uid)
-        || (isSignedIn() && resource.data.email == request.auth.token.email)
-        || (resource.data.status == "confirmed");
+      allow create: if true;
+      allow read: if true;
       allow update: if isAdmin();
       allow delete: if isAdmin();
     }
 
     match /merchOrders/{orderId} {
-      allow create: if isSignedIn();
+      allow create: if true;
       allow read: if isAdmin()
         || (isSignedIn() && resource.data.userId == request.auth.uid)
         || (isSignedIn() && resource.data.email == request.auth.token.email);
@@ -52,10 +49,9 @@ service cloud.firestore {
       allow delete: if isAdmin();
     }
 
-    // Bets: same pattern
+    // Bets: guests can place, signed-in users can read their own
     match /bets/{betId} {
-      allow create: if isSignedIn()
-        && get(/databases/$(database)/documents/config/site).data.bettingEnabled == true;
+      allow create: if true;
       allow read: if isAdmin()
         || (isSignedIn() && resource.data.userId == request.auth.uid)
         || (isSignedIn() && resource.data.email == request.auth.token.email);
