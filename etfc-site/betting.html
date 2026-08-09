@@ -418,14 +418,10 @@
         >
           <div class="success-icon">&#10003;</div>
           <h3>Bet Submitted!</h3>
-          <span class="status-pill pending">Pending Verification</span>
-          <p class="text-dim mt-24">
-            ETFC is reviewing your payment. Your bet goes live once approved —
-            check
-            <a href="dashboard.html" style="color: var(--gold-bright)"
-              >My Account</a
-            >
-            for status.
+          <span class="status-pill pending" id="betOrderStatusPill">Pending Verification</span>
+          <p class="text-dim mt-24" id="betOrderWaitMsg">
+            ETFC is reviewing your payment. This will update automatically
+            the moment it's approved — no need to reload.
           </p>
           <button
             class="btn btn-outline btn-block mt-24"
@@ -659,12 +655,48 @@
               }
               // If coming from success state (Done button), clear everything
               if (clearAll) {
+                if (betApprovalUnsubscribe) {
+                  betApprovalUnsubscribe();
+                  betApprovalUnsubscribe = null;
+                }
                 betLegs = [];
                 refreshBetSlip();
                 document.getElementById("betSlipForm").style.display = "block";
                 document.getElementById("betSlipPending").style.display = "none";
                 document.getElementById("betAmount").value = "";
               }
+            }
+
+            let betApprovalUnsubscribe = null;
+
+            // Live-updates the bet success panel the instant admin
+            // approves/rejects — no reload, no navigating to My Account.
+            function listenForBetApproval(betId) {
+              if (!betId) return;
+              if (betApprovalUnsubscribe) betApprovalUnsubscribe();
+
+              betApprovalUnsubscribe = db.collection("bets").doc(betId).onSnapshot((snap) => {
+                if (!snap.exists) return;
+                const o = snap.data();
+                const pill = document.getElementById("betOrderStatusPill");
+                const msg = document.getElementById("betOrderWaitMsg");
+
+                if (o.status === "confirmed") {
+                  betApprovalUnsubscribe();
+                  pill.className = "status-pill confirmed";
+                  pill.textContent = "Confirmed";
+                  msg.innerHTML =
+                    `<span style="color:var(--gold-bright);">Bet confirmed and live!</span> ` +
+                    `Ref: <strong>${o.refCode || "—"}</strong>`;
+                } else if (o.status === "rejected") {
+                  betApprovalUnsubscribe();
+                  pill.className = "status-pill rejected";
+                  pill.textContent = "Rejected";
+                  msg.innerHTML =
+                    `<span style="color:var(--crimson-bright);">Your bet was not approved${o.rejectionReason ? `: ${o.rejectionReason}` : "."}</span> ` +
+                    `Please try again.`;
+                }
+              }, (err) => console.error("listenForBetApproval:", err));
             }
 
             // Allow clicking preview/indicator to open modal
@@ -897,6 +929,7 @@
                 chosenBetFile = null;
                 document.getElementById("betSlipForm").style.display = "none";
                 document.getElementById("betSlipPending").style.display = "block";
+                listenForBetApproval(data.betId);
                 // Also reset the floating indicator
                 refreshBetSlip();
               } catch (err) {

@@ -935,13 +935,10 @@
         >
           <div class="success-icon">&#10003;</div>
           <h3>Order Submitted!</h3>
-          <span class="status-pill pending">Pending Verification</span>
-          <p class="text-dim mt-24">
-            ETFC is reviewing your payment. Check
-            <a href="dashboard.html" style="color: var(--gold-bright)"
-              >My Account</a
-            >
-            for status.
+          <span class="status-pill pending" id="merchOrderStatusPill">Pending Verification</span>
+          <p class="text-dim mt-24" id="merchOrderWaitMsg">
+            ETFC is reviewing your payment. This will update automatically
+            the moment it's approved — no need to reload.
           </p>
           <button
             class="btn btn-outline btn-block mt-24"
@@ -1225,10 +1222,46 @@
         });
       }
 
+      let merchApprovalUnsubscribe = null;
+
+      // Live-updates the merch success panel the instant admin
+      // approves/rejects — no reload, no navigating to My Account.
+      function listenForMerchApproval(orderId) {
+        if (!orderId) return;
+        if (merchApprovalUnsubscribe) merchApprovalUnsubscribe();
+
+        merchApprovalUnsubscribe = db.collection("merchOrders").doc(orderId).onSnapshot((snap) => {
+          if (!snap.exists) return;
+          const o = snap.data();
+          const pill = document.getElementById("merchOrderStatusPill");
+          const msg = document.getElementById("merchOrderWaitMsg");
+
+          if (o.status === "confirmed") {
+            merchApprovalUnsubscribe();
+            pill.className = "status-pill confirmed";
+            pill.textContent = "Confirmed";
+            msg.innerHTML =
+              `<span style="color:var(--gold-bright);">Order confirmed!</span> ETFC will reach out to arrange delivery/pickup. ` +
+              `Ref: <strong>${o.refCode || "—"}</strong>`;
+          } else if (o.status === "rejected") {
+            merchApprovalUnsubscribe();
+            pill.className = "status-pill rejected";
+            pill.textContent = "Rejected";
+            msg.innerHTML =
+              `<span style="color:var(--crimson-bright);">Your order was not approved${o.rejectionReason ? `: ${o.rejectionReason}` : "."}</span> ` +
+              `Please try again.`;
+          }
+        }, (err) => console.error("listenForMerchApproval:", err));
+      }
+
       function closeMerchCheckout(clearAll = false) {
         document.getElementById("merchCheckoutModal").classList.remove("open");
         document.body.style.overflow = "";
         if (clearAll) {
+          if (merchApprovalUnsubscribe) {
+            merchApprovalUnsubscribe();
+            merchApprovalUnsubscribe = null;
+          }
           chosenMerchFile = null;
           document.getElementById("merchScreenshotInput").value = "";
           document.getElementById("merchUploadLabel").textContent =
@@ -1436,6 +1469,7 @@
           ).style.display = "none";
           document.getElementById("merchCheckoutSuccess").style.display =
             "block";
+          listenForMerchApproval(data.orderId);
         } catch (err) {
           showMerchCheckoutError(
             err.message ||
