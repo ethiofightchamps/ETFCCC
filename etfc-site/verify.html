@@ -102,6 +102,7 @@
     <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-storage-compat.js"></script>
     <script src="js/firebase-config.js"></script>
     <script src="js/auth.js"></script>
     <script src="js/partials.js"></script>
@@ -112,64 +113,34 @@
       const ticketCode = urlParams.get("code");
 
       async function verifyTicket() {
-        async function verifyTicket() {
-          if (!ticketCode) {
-            showError("No ticket code in this link.");
-            return;
-          }
-          try {
-            const snap = await db
-              .collection("orders")
-              .where("ticketCode", "==", ticketCode)
-              .limit(1)
-              .get();
-            document.getElementById("verifyLoading").style.display = "none";
-            if (snap.empty) {
-              showError("Ticket not found: " + ticketCode);
-              return;
-            }
-            const order = snap.docs[0].data();
-            if (order.status !== "confirmed") {
-              showError(
-                "Ticket status is: " + order.status + " — not approved yet."
-              );
-              return;
-            }
-            document.getElementById("verifySuccess").style.display = "block";
-            document.getElementById("vTicketCode").textContent = ticketCode;
-            document.getElementById("vDate").textContent = order.createdAt
-              ? new Date(order.createdAt.toMillis()).toLocaleDateString(
-                  "en-GB",
-                  { day: "numeric", month: "short", year: "numeric" }
-                )
-              : "—";
-            document.getElementById("vSeats").textContent =
-              (order.seats || []).join(", ") || "—";
-            document.getElementById("vBuyer").textContent =
-              order.buyerName || "—";
-          } catch (err) {
-            showError("Verification failed: " + err.message);
-          }
+        console.log("Verifying ticket:", ticketCode);
+        if (!ticketCode) {
+          showError("No ticket code in this link.");
+          return;
         }
-
         try {
           const db = firebase.firestore();
 
           // First try querying by ticketCode field
+          console.log("Querying by ticketCode field...");
           let snap = await db
             .collection("orders")
             .where("ticketCode", "==", ticketCode)
             .limit(1)
             .get();
 
+          console.log("ticketCode query result:", snap.empty ? "empty" : "found", snap.docs.length);
+
           // If that fails (no index yet) or returns nothing, try querying by
           // refCode as a fallback — older orders may have only refCode set
           if (snap.empty) {
+            console.log("Querying by refCode field...");
             snap = await db
               .collection("orders")
               .where("refCode", "==", ticketCode)
               .limit(1)
               .get();
+            console.log("refCode query result:", snap.empty ? "empty" : "found", snap.docs.length);
           }
 
           document.getElementById("verifyLoading").style.display = "none";
@@ -180,6 +151,7 @@
           }
 
           const order = snap.docs[0].data();
+          console.log("Order found:", order.refCode, order.ticketCode, order.status);
 
           if (order.status !== "confirmed") {
             showError(
