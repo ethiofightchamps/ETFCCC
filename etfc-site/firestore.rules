@@ -32,11 +32,13 @@ service cloud.firestore {
     }
 
     // Orders: user can create, and read any order where their uid OR email matches
+    // Public read for confirmed tickets (verification page)
     match /orders/{orderId} {
       allow create: if isSignedIn();
       allow read: if isAdmin()
         || (isSignedIn() && resource.data.userId == request.auth.uid)
-        || (isSignedIn() && resource.data.email == request.auth.token.email);
+        || (isSignedIn() && resource.data.email == request.auth.token.email)
+        || (resource.data.status == "confirmed");
       allow update: if isAdmin();
       allow delete: if isAdmin();
     }
