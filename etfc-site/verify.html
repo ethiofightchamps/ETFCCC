@@ -54,35 +54,47 @@
   const ticketCode = urlParams.get("code");
 
   async function verifyTicket() {
-    if (!ticketCode || !ticketCode.startsWith("ETFC")) {
-      showError("Invalid ticket code format.");
+    if (!ticketCode) {
+      showError("No ticket code in this link.");
       return;
     }
 
     try {
       const db = firebase.firestore();
-      const snap = await db.collection("orders")
+
+      // First try querying by ticketCode field
+      let snap = await db.collection("orders")
         .where("ticketCode", "==", ticketCode)
         .limit(1)
         .get();
 
+      // If that fails (no index yet) or returns nothing, try querying by
+      // refCode as a fallback — older orders may have only refCode set
+      if (snap.empty) {
+        snap = await db.collection("orders")
+          .where("refCode", "==", ticketCode)
+          .limit(1)
+          .get();
+      }
+
       document.getElementById("verifyLoading").style.display = "none";
 
       if (snap.empty) {
-        showError("Ticket not found.");
+        showError(`Ticket code "${ticketCode}" not found.`);
         return;
       }
 
       const order = snap.docs[0].data();
+
       if (order.status !== "confirmed") {
-        showError(`Ticket is ${order.status} — not valid for entry.`);
+        showError(`Ticket status is "${order.status}" — not approved for entry yet.`);
         return;
       }
 
       // Success
       document.getElementById("verifySuccess").style.display = "block";
       document.getElementById("vTicketCode").textContent = ticketCode;
-      document.getElementById("vDate").textContent = order.createdAt 
+      document.getElementById("vDate").textContent = order.createdAt
         ? new Date(order.createdAt.toMillis()).toLocaleDateString("en-GB", {day:"numeric",month:"short",year:"numeric"})
         : "—";
       document.getElementById("vSeats").textContent = (order.seats || []).join(", ") || "—";
@@ -90,7 +102,37 @@
 
     } catch (err) {
       console.error("Verify failed:", err);
-      showError("Verification failed. Try again.");
+      // If it's a missing index error, try a simpler fallback
+      if (err.code === "failed-precondition" || err.message?.includes("index")) {
+        try {
+          // Fallback: get all confirmed orders and match client-side
+          // (only works at small scale — replace with index once created)
+          const db = firebase.firestore();
+          const allConfirmed = await db.collection("orders")
+            .where("status", "==", "confirmed")
+            .get();
+          const match = allConfirmed.docs.find(d => 
+            d.data().ticketCode === ticketCode || d.data().refCode === ticketCode
+          );
+          document.getElementById("verifyLoading").style.display = "none";
+          if (!match) {
+            showError(`Ticket "${ticketCode}" not found.`);
+            return;
+          }
+          const order = match.data();
+          document.getElementById("verifySuccess").style.display = "block";
+          document.getElementById("vTicketCode").textContent = ticketCode;
+          document.getElementById("vDate").textContent = order.createdAt
+            ? new Date(order.createdAt.toMillis()).toLocaleDateString("en-GB", {day:"numeric",month:"short",year:"numeric"})
+            : "—";
+          document.getElementById("vSeats").textContent = (order.seats || []).join(", ") || "—";
+          document.getElementById("vBuyer").textContent = order.buyerName || "—";
+        } catch (fallbackErr) {
+          showError("Verification failed — check your internet connection.");
+        }
+      } else {
+        showError("Verification failed: " + err.message);
+      }
     }
   }
 
