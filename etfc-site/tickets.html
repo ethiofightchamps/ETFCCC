@@ -207,37 +207,42 @@
         </p>
 
         <div class="checkout-section" style="margin-top: 24px">
-          <div class="checkout-title">Payment Method</div>
-          <button
-            type="button"
-            class="payment-method-trigger"
-            onclick="openPaymentMethodModal()"
-            id="paymentMethodTrigger"
-          >
-            <span class="pmt-placeholder">Select payment method</span>
-            <span class="pmt-chevron">›</span>
-          </button>
+          <div class="checkout-title">Send Payment To</div>
+          <p class="hint" style="margin-bottom:12px;">Transfer the total amount using any account below, then upload your screenshot.</p>
 
-          <div id="bankDetailsBox" style="display: none; margin-top: 12px">
-            <div class="bank-details">
-              <div class="bank-row">
-                <span>Account Name</span><span id="payAccountName">—</span>
-              </div>
-              <div class="bank-row">
-                <span>Number</span><span id="payAccountNumber">—</span>
-              </div>
-              <div class="bank-row highlight">
-                <span>Reference Code</span
-                ><span id="refCode" class="ref-code">ETFC-XXXXXX</span>
-              </div>
+          <!-- Telebirr -->
+          <div class="bank-details" style="display:flex;align-items:center;gap:14px;padding:14px 16px;margin-bottom:10px;">
+            <div style="width:40px;height:40px;background:#fff;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+              <img src="/telebirr.webp" alt="Telebirr" style="width:34px;height:34px;object-fit:contain;"/>
             </div>
-            <p class="hint">
-              Send the exact amount to the number above and include the
-              reference code.
-            </p>
+            <div style="flex:1;">
+              <div style="font-weight:700;font-size:14px;margin-bottom:2px;">Telebirr</div>
+              <div style="font-size:13px;color:var(--text-dim);">Getachew Fikadu Jirata</div>
+            </div>
+            <div style="font-family:var(--font-mono);font-size:15px;color:var(--gold-bright);font-weight:700;">0725767614</div>
           </div>
 
-          <input type="hidden" id="selectedPaymentMethod" value="" />
+          <!-- Mpesa -->
+          <div class="bank-details" style="display:flex;align-items:center;gap:14px;padding:14px 16px;margin-bottom:10px;">
+            <div style="width:40px;height:40px;background:#fff;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+              <img src="/safaricom.png" alt="M-Pesa" style="width:34px;height:34px;object-fit:contain;"/>
+            </div>
+            <div style="flex:1;">
+              <div style="font-weight:700;font-size:14px;margin-bottom:2px;">Safaricom M-Pesa</div>
+              <div style="font-size:13px;color:var(--text-dim);">Efrem Werku Muluneh</div>
+            </div>
+            <div style="font-family:var(--font-mono);font-size:15px;color:var(--gold-bright);font-weight:700;">0983196199</div>
+          </div>
+
+          <!-- Ref code -->
+          <div class="bank-details" style="padding:12px 16px;margin-bottom:8px;">
+            <div class="bank-row highlight">
+              <span>Reference Code</span>
+              <span id="refCode" class="ref-code">ETFC-XXXXXX</span>
+            </div>
+          </div>
+          <p class="hint">Include the reference code in your transfer note.</p>
+          <input type="hidden" id="selectedPaymentMethod" value="telebirr" />
         </div>
 
         <div class="field mt-24">
@@ -591,7 +596,7 @@
           return showSubmitError(
             "Enter a valid email address or leave it blank."
           );
-        if (!paymentMethod) return showSubmitError("Select a payment method.");
+        // payment method always set
         if (!chosenFile)
           return showSubmitError("Upload your payment screenshot.");
         if (Object.keys(selectedSeats).length === 0)

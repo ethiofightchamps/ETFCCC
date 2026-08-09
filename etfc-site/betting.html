@@ -209,120 +209,44 @@
             </div>
           </div>
 
-          <!-- Bank Details -->
+          <!-- Bank Details — always visible, no selection needed -->
           <div class="bet-section">
-            <div class="section-label">Payment Method</div>
-            <div
-              class="payment-methods-row"
-              style="
-                display: flex;
-                gap: 12px;
-                margin-bottom: 16px;
-                flex-wrap: wrap;
-              "
-            >
-              <button
-                type="button"
-                class="payment-method-btn"
-                data-method="mpesa"
-                onclick="selectPaymentMethod('mpesa')"
-                style="
-                  flex: 1;
-                  min-width: 140px;
-                  display: flex;
-                  flex-direction: column;
-                  align-items: center;
-                  gap: 8px;
-                  padding: 16px;
-                  background: var(--obsidian);
-                  border: 2px solid var(--border);
-                  border-radius: 12px;
-                  cursor: pointer;
-                  transition: border-color 0.15s, background 0.15s;
-                "
-              >
-                <img
-                  src="/safaricom.png"
-                  alt="M-Pesa"
-                  style="
-                    width: 48px;
-                    height: 48px;
-                    object-fit: contain;
-                    background: #fff;
-                    border-radius: 8px;
-                    padding: 4px;
-                  "
-                />
-                <div
-                  style="font-weight: 700; color: var(--bone); font-size: 14px"
-                >
-                  M-Pesa
-                </div>
-              </button>
-              <button
-                type="button"
-                class="payment-method-btn"
-                data-method="telebirr"
-                onclick="selectPaymentMethod('telebirr')"
-                style="
-                  flex: 1;
-                  min-width: 140px;
-                  display: flex;
-                  flex-direction: column;
-                  align-items: center;
-                  gap: 8px;
-                  padding: 16px;
-                  background: var(--obsidian);
-                  border: 2px solid var(--border);
-                  border-radius: 12px;
-                  cursor: pointer;
-                  transition: border-color 0.15s, background 0.15s;
-                "
-              >
-                <img
-                  src="/telebirr.webp"
-                  alt="Telebirr"
-                  style="
-                    width: 48px;
-                    height: 48px;
-                    object-fit: contain;
-                    background: #fff;
-                    border-radius: 8px;
-                    padding: 4px;
-                  "
-                />
-                <div
-                  style="font-weight: 700; color: var(--bone); font-size: 14px"
-                >
-                  Telebirr
-                </div>
-              </button>
+            <div class="section-label">Send Payment To</div>
+            <p class="hint" style="margin-bottom:12px;">Transfer the exact amount using any of the accounts below, then upload your screenshot.</p>
+
+            <!-- Telebirr -->
+            <div class="bank-details-card" style="margin-bottom:10px;display:flex;align-items:center;gap:14px;padding:14px 16px;">
+              <div style="width:40px;height:40px;background:#fff;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                <img src="/telebirr.webp" alt="Telebirr" style="width:34px;height:34px;object-fit:contain;"/>
+              </div>
+              <div style="flex:1;">
+                <div style="font-weight:700;font-size:14px;margin-bottom:2px;">Telebirr</div>
+                <div style="font-size:13px;color:var(--text-dim);">Getachew Fikadu Jirata</div>
+              </div>
+              <div style="font-family:var(--font-mono);font-size:15px;color:var(--gold-bright);font-weight:700;">0725767614</div>
             </div>
-            <div class="bank-details-card" style="margin-top: 12px">
-              <div class="detail-row">
-                <span>Account Name</span><span id="betPayAccountName">—</span>
+
+            <!-- Mpesa -->
+            <div class="bank-details-card" style="margin-bottom:10px;display:flex;align-items:center;gap:14px;padding:14px 16px;">
+              <div style="width:40px;height:40px;background:#fff;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                <img src="/safaricom.png" alt="M-Pesa" style="width:34px;height:34px;object-fit:contain;"/>
               </div>
-              <div class="detail-row">
-                <span>Number</span
-                ><span
-                  id="betPayAccountNumber"
-                  style="
-                    font-family: var(--font-mono);
-                    color: var(--gold-bright);
-                  "
-                  >—</span
-                >
+              <div style="flex:1;">
+                <div style="font-weight:700;font-size:14px;margin-bottom:2px;">Safaricom M-Pesa</div>
+                <div style="font-size:13px;color:var(--text-dim);">Efrem Werku Muluneh</div>
               </div>
+              <div style="font-family:var(--font-mono);font-size:15px;color:var(--gold-bright);font-weight:700;">0983196199</div>
+            </div>
+
+            <!-- Ref code -->
+            <div class="bank-details-card" style="padding:12px 16px;">
               <div class="detail-row highlight-row">
-                <span>Reference Code</span
-                ><span id="betRefCode" class="ref-code">ETFC-BET-XXXXXX</span>
+                <span>Reference Code</span>
+                <span id="betRefCode" class="ref-code">ETFC-BET-XXXXXX</span>
               </div>
             </div>
-            <p class="hint">
-              Select a payment method, send the exact amount, and include the
-              reference code.
-            </p>
-            <input type="hidden" id="selectedPaymentMethod" value="mpesa" />
+            <p class="hint" style="margin-top:8px;">Include the reference code in your transfer note.</p>
+            <input type="hidden" id="selectedPaymentMethod" value="telebirr" />
           </div>
 
           <!-- Personal Info -->
@@ -410,25 +334,21 @@
           </button>
         </div>
 
-        <!-- Success State -->
-        <div
-          id="betSlipPending"
-          class="modal-body success-state"
-          style="display: none"
-        >
-          <div class="success-icon">&#10003;</div>
-          <h3>Bet Submitted!</h3>
+        <!-- Pending State -->
+        <div id="betSlipPending" class="modal-body" style="display:none;padding:24px;text-align:center;">
+          <div style="font-size:48px;margin-bottom:16px;">⏳</div>
+          <h3 style="font-family:var(--font-display);font-size:22px;text-transform:uppercase;margin-bottom:12px;">Bet Submitted!</h3>
           <span class="status-pill pending" id="betOrderStatusPill">Pending Verification</span>
-          <p class="text-dim mt-24" id="betOrderWaitMsg">
-            ETFC is reviewing your payment. This will update automatically
-            the moment it's approved — no need to reload.
+          <p class="text-dim mt-24" id="betOrderWaitMsg" style="font-size:14px;line-height:1.6;">
+            ETFC is reviewing your payment. This page will update automatically the moment it's approved — no need to reload.
           </p>
-          <button
-            class="btn btn-outline btn-block mt-24"
-            onclick="closeBetSlip(true)"
-          >
-            Done
-          </button>
+          <button class="btn btn-outline btn-block mt-24" onclick="closeBetSlip(true)">Done</button>
+        </div>
+
+        <!-- Live Receipt — shown when admin approves -->
+        <div id="betReceiptStep" class="modal-body" style="display:none;padding:24px;">
+          <div id="betReceiptMount"></div>
+          <button class="btn btn-outline btn-block mt-24" onclick="closeBetSlip(true)">Done</button>
         </div>
       </div>
     </div>
@@ -669,8 +589,7 @@
 
             let betApprovalUnsubscribe = null;
 
-            // Live-updates the bet success panel the instant admin
-            // approves/rejects — no reload, no navigating to My Account.
+            // Live-updates the moment admin approves/rejects — shows full receipt
             function listenForBetApproval(betId) {
               if (!betId) return;
               if (betApprovalUnsubscribe) betApprovalUnsubscribe();
@@ -678,25 +597,70 @@
               betApprovalUnsubscribe = db.collection("bets").doc(betId).onSnapshot((snap) => {
                 if (!snap.exists) return;
                 const o = snap.data();
-                const pill = document.getElementById("betOrderStatusPill");
-                const msg = document.getElementById("betOrderWaitMsg");
 
                 if (o.status === "confirmed") {
                   betApprovalUnsubscribe();
-                  pill.className = "status-pill confirmed";
-                  pill.textContent = "Confirmed";
-                  msg.innerHTML =
-                    `<span style="color:var(--gold-bright);">Bet confirmed and live!</span> ` +
-                    `Ref: <strong>${o.refCode || "—"}</strong>`;
+                  renderBetReceipt(o);
                 } else if (o.status === "rejected") {
                   betApprovalUnsubscribe();
-                  pill.className = "status-pill rejected";
-                  pill.textContent = "Rejected";
-                  msg.innerHTML =
-                    `<span style="color:var(--crimson-bright);">Your bet was not approved${o.rejectionReason ? `: ${o.rejectionReason}` : "."}</span> ` +
-                    `Please try again.`;
+                  const pill = document.getElementById("betOrderStatusPill");
+                  const msg = document.getElementById("betOrderWaitMsg");
+                  if (pill) { pill.className = "status-pill rejected"; pill.textContent = "Rejected"; }
+                  if (msg) msg.innerHTML =
+                    `<span style="color:var(--crimson-bright);">Your bet was not approved${o.rejectionReason ? `: ${o.rejectionReason}` : "."}</span> Please try again.`;
                 }
               }, (err) => console.error("listenForBetApproval:", err));
+            }
+
+            function renderBetReceipt(o) {
+              const legs = o.legs || [];
+              const legsHtml = legs.map(l =>
+                `<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border);font-size:13px;">
+                  <span>${l.fighterName || l.side}</span>
+                  <span style="color:var(--gold-bright);">@ ${l.odds}x</span>
+                </div>`
+              ).join("");
+
+              const mount = document.getElementById("betReceiptMount");
+              mount.innerHTML = `
+                <div style="text-align:center;margin-bottom:20px;">
+                  <div style="font-size:48px;">🥊</div>
+                  <h3 style="font-family:var(--font-display);font-size:22px;text-transform:uppercase;margin:8px 0;">Bet Confirmed!</h3>
+                  <span class="status-pill confirmed">✅ Confirmed</span>
+                </div>
+                <div style="background:var(--obsidian);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:16px;">
+                  <div style="background:var(--crimson);padding:12px 16px;">
+                    <div style="font-family:var(--font-display);font-size:16px;color:#fff;letter-spacing:0.05em;">ETFC FIGHT NIGHT BET SLIP</div>
+                    <div style="font-size:11px;color:rgba(255,255,255,0.7);letter-spacing:2px;text-transform:uppercase;margin-top:2px;">Adwa 00 Museum — August 27</div>
+                  </div>
+                  <div style="padding:16px;">
+                    <div style="font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--text-dim);margin-bottom:8px;">Your Picks</div>
+                    ${legsHtml}
+                    <div style="margin-top:12px;display:flex;justify-content:space-between;font-size:13px;padding:6px 0;border-bottom:1px solid var(--border);">
+                      <span style="color:var(--text-dim);">Bettor</span><span>${o.buyerName || "—"}</span>
+                    </div>
+                    <div style="display:flex;justify-content:space-between;font-size:13px;padding:6px 0;border-bottom:1px solid var(--border);">
+                      <span style="color:var(--text-dim);">Stake</span><span>${(o.stake||0).toLocaleString()} ETB</span>
+                    </div>
+                    <div style="display:flex;justify-content:space-between;font-size:13px;padding:6px 0;border-bottom:1px solid var(--border);">
+                      <span style="color:var(--text-dim);">Combined Odds</span><span>${(o.combinedOdds||1).toFixed(2)}x</span>
+                    </div>
+                    <div style="display:flex;justify-content:space-between;font-size:13px;padding:6px 0;border-bottom:1px solid var(--border);">
+                      <span style="color:var(--text-dim);">Tax (15%)</span><span>- ${(o.taxAmount||0).toLocaleString()} ETB</span>
+                    </div>
+                    <div style="display:flex;justify-content:space-between;font-size:15px;font-weight:700;padding:10px 0;">
+                      <span>Potential Win</span><span style="color:var(--gold-bright);">${(o.netPayout||0).toLocaleString()} ETB</span>
+                    </div>
+                    <div style="display:flex;justify-content:space-between;font-size:13px;padding:6px 0;">
+                      <span style="color:var(--text-dim);">Ref</span>
+                      <span style="font-family:monospace;color:var(--gold-bright);">${o.refCode || "—"}</span>
+                    </div>
+                  </div>
+                </div>
+                <p style="font-size:12px;color:var(--text-dim);text-align:center;">Screenshot this for your records</p>`;
+
+              document.getElementById("betSlipPending").style.display = "none";
+              document.getElementById("betReceiptStep").style.display = "block";
             }
 
             // Allow clicking preview/indicator to open modal
@@ -865,7 +829,6 @@
                 return showBetSubmitError("Enter a valid email address or leave it blank.");
               if (!chosenBetFile)
                 return showBetSubmitError("Upload your payment screenshot.");
-                return showBetSubmitError("Session expired — please sign in again.");
 
               btn.setAttribute("disabled", "true");
               btn.textContent = "Uploading screenshot…";
