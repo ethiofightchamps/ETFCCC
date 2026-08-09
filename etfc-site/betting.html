@@ -209,129 +209,90 @@
             </div>
           </div>
 
-          <!-- Bank Details — always visible, no selection needed -->
-          <div class="bet-section">
-            <div class="section-label">Send Payment To</div>
-            <p class="hint" style="margin-bottom:12px;">Transfer the exact amount using any of the accounts below, then upload your screenshot.</p>
-
-            <!-- Telebirr -->
-            <div class="bank-details-card" style="margin-bottom:10px;display:flex;align-items:center;gap:14px;padding:14px 16px;">
-              <div style="width:40px;height:40px;background:#fff;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-                <img src="/telebirr.webp" alt="Telebirr" style="width:34px;height:34px;object-fit:contain;"/>
+          <!-- ── STEP 1: Name + Phone ── -->
+          <div id="betStep1">
+            <div class="bet-section">
+              <div class="section-label">Your Details</div>
+              <div class="field">
+                <label>Full Name</label>
+                <input type="text" id="betBuyerNameInput" placeholder="As it should appear on your bet slip" autocomplete="name"/>
               </div>
-              <div style="flex:1;">
-                <div style="font-weight:700;font-size:14px;margin-bottom:2px;">Telebirr</div>
-                <div style="font-size:13px;color:var(--text-dim);">Getachew Fikadu Jirata</div>
-              </div>
-              <div style="font-family:var(--font-mono);font-size:15px;color:var(--gold-bright);font-weight:700;">0725767614</div>
-            </div>
-
-            <!-- Mpesa -->
-            <div class="bank-details-card" style="margin-bottom:10px;display:flex;align-items:center;gap:14px;padding:14px 16px;">
-              <div style="width:40px;height:40px;background:#fff;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-                <img src="/safaricom.png" alt="M-Pesa" style="width:34px;height:34px;object-fit:contain;"/>
-              </div>
-              <div style="flex:1;">
-                <div style="font-weight:700;font-size:14px;margin-bottom:2px;">Safaricom M-Pesa</div>
-                <div style="font-size:13px;color:var(--text-dim);">Efrem Werku Muluneh</div>
-              </div>
-              <div style="font-family:var(--font-mono);font-size:15px;color:var(--gold-bright);font-weight:700;">0983196199</div>
-            </div>
-
-            <!-- Ref code -->
-            <div class="bank-details-card" style="padding:12px 16px;">
-              <div class="detail-row highlight-row">
-                <span>Reference Code</span>
-                <span id="betRefCode" class="ref-code">ETFC-BET-XXXXXX</span>
+              <div class="field">
+                <label>Phone Number</label>
+                <input type="tel" id="betBuyerPhoneInput" placeholder="e.g. 0912345678" autocomplete="tel"/>
               </div>
             </div>
-            <p class="hint" style="margin-top:8px;">Include the reference code in your transfer note.</p>
-            <input type="hidden" id="selectedPaymentMethod" value="telebirr" />
+            <p id="betStep1Error" class="error-msg" style="display:none;padding:0 24px 12px;color:var(--crimson-bright);"></p>
           </div>
 
-          <!-- Personal Info -->
-          <div class="bet-section">
-            <div class="section-label">Your Details</div>
-            <div class="field">
-              <label>Full Name</label>
-              <input
-                type="text"
-                id="betBuyerNameInput"
-                placeholder="As it should appear on your bet slip"
-                autocomplete="name"
-              />
+          <!-- ── STEP 2: Payment accounts + upload ── -->
+          <div id="betStep2" style="display:none;">
+            <div class="bet-section">
+              <div class="section-label">Deposit Payment</div>
+              <div id="betDepositInstruction" style="background:rgba(176,141,62,0.08);border:1px solid rgba(176,141,62,0.25);border-radius:10px;padding:12px 16px;margin-bottom:16px;font-size:14px;line-height:1.5;">
+                Deposit <strong id="betDepositAmount" style="color:var(--gold-bright);font-size:16px;"></strong> to one of the accounts below and send us the screenshot.
+              </div>
+
+              <!-- Telebirr -->
+              <div class="bank-details-card" style="margin-bottom:10px;display:flex;align-items:center;gap:14px;padding:14px 16px;">
+                <div style="width:44px;height:44px;border-radius:10px;overflow:hidden;flex-shrink:0;">
+                  <img src="/telebirr.jpg" alt="Telebirr" style="width:44px;height:44px;object-fit:cover;"/>
+                </div>
+                <div style="flex:1;">
+                  <div style="font-weight:700;font-size:14px;margin-bottom:2px;">Telebirr</div>
+                  <div style="font-size:13px;color:var(--text-dim);">Getachew Fikadu Jirata</div>
+                </div>
+                <div style="font-family:var(--font-mono);font-size:15px;color:var(--gold-bright);font-weight:700;">0725767614</div>
+              </div>
+
+              <!-- Mpesa -->
+              <div class="bank-details-card" style="margin-bottom:16px;display:flex;align-items:center;gap:14px;padding:14px 16px;">
+                <div style="width:44px;height:44px;border-radius:10px;overflow:hidden;flex-shrink:0;">
+                  <img src="/mpesa.png" alt="M-Pesa" style="width:44px;height:44px;object-fit:cover;"/>
+                </div>
+                <div style="flex:1;">
+                  <div style="font-weight:700;font-size:14px;margin-bottom:2px;">Safaricom M-Pesa</div>
+                  <div style="font-size:13px;color:var(--text-dim);">Efrem Werku Muluneh</div>
+                </div>
+                <div style="font-family:var(--font-mono);font-size:15px;color:var(--gold-bright);font-weight:700;">0983196199</div>
+              </div>
+
+              <!-- Ref -->
+              <div class="bank-details-card" style="padding:12px 16px;margin-bottom:8px;">
+                <div class="detail-row highlight-row">
+                  <span>Reference Code</span>
+                  <span id="betRefCode" class="ref-code">ETFC-BET-XXXXXX</span>
+                </div>
+              </div>
+              <p class="hint" style="margin-bottom:16px;">Include the reference code in your transfer note.</p>
+
+              <!-- Screenshot Upload -->
+              <div class="section-label">Upload Screenshot</div>
+              <div class="upload-area" onclick="document.getElementById('betScreenshotInput').click()">
+                <div class="upload-icon">&#128247;</div>
+                <span id="betUploadLabel">Tap to upload payment screenshot</span>
+                <span class="upload-hint">Max 5MB • JPG/PNG</span>
+                <input type="file" id="betScreenshotInput" accept="image/*" style="display:none" onchange="onBetScreenshotChosen(this)"/>
+              </div>
             </div>
-            <div class="field">
-              <label>Phone Number</label>
-              <input
-                type="tel"
-                id="betBuyerPhoneInput"
-                placeholder="e.g. 0912345678"
-                autocomplete="tel"
-              />
-            </div>
-            <div class="field">
-              <label>Email</label>
-              <input
-                type="email"
-                id="betBuyerEmailInput"
-                placeholder="you@example.com"
-                autocomplete="email"
-              />
-            </div>
+            <p id="betSubmitError" class="error-msg" style="display:none;padding:0 24px 12px;color:var(--crimson-bright);"></p>
           </div>
 
-          <!-- Screenshot Upload -->
-          <div class="bet-section">
-            <div class="section-label">Proof of Payment</div>
-            <div
-              class="upload-area"
-              onclick="document.getElementById('betScreenshotInput').click()"
-            >
-              <div class="upload-icon">&#128247;</div>
-              <span id="betUploadLabel">Tap to upload payment screenshot</span>
-              <span class="upload-hint">Max 5MB • JPG/PNG</span>
-              <input
-                type="file"
-                id="betScreenshotInput"
-                accept="image/*"
-                style="display: none"
-                onchange="onBetScreenshotChosen(this)"
-              />
-            </div>
-          </div>
-
-          <p id="betSubmitError" class="error-msg" style="display: none"></p>
+          <input type="hidden" id="selectedPaymentMethod" value="telebirr"/>
+          <input type="hidden" id="betBuyerEmailInput" value=""/>
         </div>
         <!-- end modal-body betSlipForm -->
-        <!-- Sticky Submit Button outside scroll area -->
-        <div
-          class="modal-footer"
-          style="
-            position: sticky;
-            bottom: 0;
-            padding: 16px 24px;
-            background: var(--obsidian-2, #111);
-            border-top: 1px solid var(--border);
-            z-index: 10;
-          "
-        >
-          <p
-            id="betSubmitError"
-            class="error-msg"
-            style="
-              display: none;
-              margin-bottom: 8px;
-              color: var(--crimson-bright);
-            "
-          ></p>
-          <button
-            class="btn btn-primary btn-block"
-            id="submitBetBtn"
-            onclick="submitBet()"
-          >
-            Submit Bet
-          </button>
+        <!-- Sticky footer — step-aware -->
+        <div class="modal-footer" style="position:sticky;bottom:0;padding:16px 24px;background:var(--obsidian-2,#111);border-top:1px solid var(--border);z-index:10;">
+          <!-- Step 1 footer -->
+          <div id="betFooterStep1">
+            <button class="btn btn-primary btn-block" onclick="betGoToStep2()">Next →</button>
+          </div>
+          <!-- Step 2 footer -->
+          <div id="betFooterStep2" style="display:none;">
+            <button class="btn btn-outline btn-sm" style="margin-bottom:10px;width:100%;" onclick="betGoToStep1()">← Back</button>
+            <button class="btn btn-primary btn-block" id="submitBetBtn" onclick="submitBet()">Submit Bet</button>
+          </div>
         </div>
 
         <!-- Pending State -->
@@ -340,7 +301,7 @@
           <h3 style="font-family:var(--font-display);font-size:22px;text-transform:uppercase;margin-bottom:12px;">Bet Submitted!</h3>
           <span class="status-pill pending" id="betOrderStatusPill">Pending Verification</span>
           <p class="text-dim mt-24" id="betOrderWaitMsg" style="font-size:14px;line-height:1.6;">
-            ETFC is reviewing your payment. This page will update automatically the moment it's approved — no need to reload.
+            ETFC is reviewing your payment. <strong style="color:var(--gold-bright);">Please do not close this page</strong> — it will update automatically the moment your bet is approved.
           </p>
           <button class="btn btn-outline btn-block mt-24" onclick="closeBetSlip(true)">Done</button>
         </div>
@@ -543,6 +504,10 @@
                 }
 
                 betLegs.push({ fightId, side, fighterName, odds, discipline, order });
+      // Always start at step 1 when opening
+      setTimeout(() => {
+        betGoToStep1();
+      }, 0);
                 chosenBetFile = null;
                 refreshBetSlip();
 
@@ -585,6 +550,34 @@
                 document.getElementById("betSlipPending").style.display = "none";
                 document.getElementById("betAmount").value = "";
               }
+            }
+
+            // ── 2-step bet slip navigation ────────────────────────────
+            function betGoToStep2() {
+              const name = document.getElementById("betBuyerNameInput").value.trim();
+              const phone = document.getElementById("betBuyerPhoneInput").value.trim();
+              const errEl = document.getElementById("betStep1Error");
+              if (!name) { errEl.textContent = "Enter your full name."; errEl.style.display = "block"; return; }
+              if (!phone) { errEl.textContent = "Enter your phone number."; errEl.style.display = "block"; return; }
+              if (!/^(09|07)\d{8}$/.test(phone)) { errEl.textContent = "Enter a valid Ethiopian number (09 or 07, 10 digits)."; errEl.style.display = "block"; return; }
+              errEl.style.display = "none";
+
+              // Show deposit amount from current stake
+              const stake = Number(document.getElementById("betAmount")?.value) || 0;
+              const amountEl = document.getElementById("betDepositAmount");
+              if (amountEl) amountEl.textContent = stake > 0 ? stake.toLocaleString() + " ETB" : "the exact amount";
+
+              document.getElementById("betStep1").style.display = "none";
+              document.getElementById("betStep2").style.display = "block";
+              document.getElementById("betFooterStep1").style.display = "none";
+              document.getElementById("betFooterStep2").style.display = "block";
+            }
+
+            function betGoToStep1() {
+              document.getElementById("betStep1").style.display = "block";
+              document.getElementById("betStep2").style.display = "none";
+              document.getElementById("betFooterStep1").style.display = "block";
+              document.getElementById("betFooterStep2").style.display = "none";
             }
 
             let betApprovalUnsubscribe = null;
