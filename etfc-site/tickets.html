@@ -217,7 +217,7 @@
             </div>
             <div style="flex:1;">
               <div style="font-weight:700;font-size:14px;margin-bottom:2px;">Telebirr</div>
-              <div style="font-size:13px;color:var(--text-dim);">Getachew Fikadu Jirata</div>
+              <div style="font-size:13px;color:var(--text-dim);">Ager</div>
             </div>
             <div style="font-family:var(--font-mono);font-size:15px;color:var(--gold-bright);font-weight:700;">0983196199</div>
           </div>
@@ -333,6 +333,12 @@
           ETFC is reviewing your payment. This page will update automatically
           the moment it's approved — no need to reload.
         </p>
+        <div style="margin-top: 24px; padding-top: 24px; border-top: 1px solid var(--border);">
+          <p class="text-dim" style="margin-bottom: 12px; font-size: 14px;">Want to get tickets for friends?</p>
+          <button class="btn btn-outline btn-block" onclick="showSeatStepAgain()">
+            + Buy More Tickets
+          </button>
+        </div>
       </div>
 
       <!-- STEP 4: LIVE TICKET REVEAL (shown in-place once admin approves, no reload/navigation) -->
@@ -366,6 +372,11 @@
         document.getElementById("checkoutStep").style.display = "none";
         document.getElementById("pendingStep").style.display = "block";
         if (savedOrder.orderId) listenForApproval(savedOrder.orderId);
+      } else {
+        // No pending order - show seat selection
+        document.getElementById("seatStep").style.display = "block";
+        document.getElementById("checkoutStep").style.display = "none";
+        document.getElementById("pendingStep").style.display = "none";
       }
 
       const EVENT_DATE_STR = "August 27, 2026";
@@ -397,6 +408,13 @@
             localStorage.removeItem("etfc_pending_order");
           }
         }, (err) => console.error("listenForApproval:", err));
+      }
+
+      // Show seat selection again while keeping pending order active
+      function showSeatStepAgain() {
+        document.getElementById("pendingStep").style.display = "none";
+        document.getElementById("seatStep").style.display = "block";
+        // Keep listening for approval in background
       }
 
       function renderTicketQR(qrData, containerId) {
@@ -919,7 +937,7 @@
           id: "telebirr",
           name: "Telebirr",
           icon: "/telebirr.webp",
-          accountName: "ager",
+          accountName: "Ager",
         },
       ];
 
