@@ -319,7 +319,7 @@
   let merchUnsubscribe = null;
   let merchEmailUnsubscribe = null;
 
-  function renderTicketQR(qrData, containerId) {
+function renderTicketQR(qrData, containerId) {
     const el = document.getElementById(containerId);
     if (!el) return;
     el.innerHTML = "";
@@ -336,6 +336,81 @@
       console.warn("QR generation failed:", e);
       el.innerHTML = `<div style="width:104px;height:104px;display:flex;align-items:center;justify-content:center;font-size:10px;color:#666;">QR Error</div>`;
     }
+  }
+
+  function downloadTicketImage(ticketCode, seats) {
+    // Create a canvas with the ticket design for download
+    const canvas = document.createElement("canvas");
+    const ctx = canvas.getContext("2d");
+    const scale = 2; // 2x for quality
+    canvas.width = 400 * scale;
+    canvas.height = 560 * scale;
+    ctx.scale(scale, scale);
+
+    // Draw background
+    const gradient = ctx.createLinearGradient(0, 0, 0, 560);
+    gradient.addColorStop(0, "#0d0d0d");
+    gradient.addColorStop(0.5, "#1a0505");
+    gradient.addColorStop(1, "#0d0d0d");
+    ctx.fillStyle = gradient;
+    ctx.fillRect(0, 0, 400, 560);
+
+    // Gold top border
+    ctx.fillStyle = "#b08d3e";
+    ctx.fillRect(0, 0, 400, 4);
+
+    // Header
+    ctx.fillStyle = "#b08d3e";
+    ctx.font = "bold 12px 'Oswald', sans-serif";
+    ctx.textAlign = "center";
+    ctx.fillText("E-TICKET · CONFIRMED", 200, 30);
+
+    ctx.fillStyle = "#fff";
+    ctx.font = "bold 24px 'Oswald', sans-serif";
+    ctx.fillText("ETFC FIGHT NIGHT", 200, 60);
+
+    ctx.fillStyle = "#999";
+    ctx.font = "11px 'Space Mono', monospace";
+    ctx.fillText("August 27, 2026 · 6:00 PM · Adwa Museum", 200, 80);
+
+    // Seats
+    ctx.fillStyle = "#999";
+    ctx.font = "10px 'Space Mono', monospace";
+    ctx.fillText("SEATS", 200, 120);
+    ctx.fillStyle = "#fff";
+    ctx.font = "bold 14px 'Space Mono', monospace";
+    ctx.fillText(seats, 200, 140);
+
+    // Ticket code
+    ctx.fillStyle = "#999";
+    ctx.font = "10px 'Space Mono', monospace";
+    ctx.fillText("TICKET CODE", 200, 170);
+    ctx.fillStyle = "#b08d3e";
+    ctx.font = "bold 16px 'Space Mono', monospace";
+    ctx.fillText(ticketCode, 200, 192);
+
+    // QR Code placeholder
+    ctx.fillStyle = "#fff";
+    ctx.fillRect(100, 220, 200, 200);
+    ctx.fillStyle = "#0d0d0d";
+    ctx.font = "12px 'Space Mono', monospace";
+    ctx.fillText("[QR CODE]", 200, 310);
+
+    // Sponsor row
+    ctx.fillStyle = "#999";
+    ctx.font = "9px 'Space Mono', monospace";
+    ctx.fillText("PRESENTED BY", 200, 340);
+
+    // Bottom info
+    ctx.fillStyle = "#b08d3e";
+    ctx.font = "11px 'Space Mono', monospace";
+    ctx.fillText("Present at entry · Non-transferable", 200, 400);
+
+    // Download
+    const link = document.createElement("a");
+    link.download = `ETFC-Ticket-${ticketCode}.png`;
+    link.href = canvas.toDataURL("image/png");
+    link.click();
   }
 
   function renderTickets(docs) {
@@ -392,7 +467,7 @@
           </div>`;
       }
 
-      if (s === "confirmed") {
+if (s === "confirmed") {
         return `
           <div class="ticket-card confirmed">
             <div class="ticket-visual">
@@ -434,8 +509,9 @@
               <span>${o.buyerName || "Guest"}</span>
               <span class="ticket-footer-note">Present QR at entry · Non-transferable</span>
             </div>
-            <div style="padding: 12px 24px; background: rgba(176,141,62,0.1); border-top: 1px solid rgba(176,141,62,0.3); text-align: center;">
+            <div style="padding: 12px 24px; background: rgba(176,141,62,0.1); border-top: 1px solid rgba(176,141,62,0.3); text-align: center; display: flex; gap: 8px; justify-content: center; flex-wrap: wrap;">
               <a href="verify.html?code=${ticketCode}" class="btn btn-primary" style="display: inline-block;">View Ticket / Verify</a>
+              <button class="btn btn-outline" onclick="downloadTicketImage('${ticketCode}', '${seats}')">📥 Download Ticket</button>
             </div>
           </div>`;
       }

@@ -376,36 +376,7 @@
         color: var(--gold-bright);
         font-weight: 700;
         white-space: nowrap;
-      }
-
-      .checkout-promo {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        padding: 12px 20px;
-        border-bottom: 1px solid var(--border);
-      }
-      .checkout-promo input {
-        flex: 1;
-        background: transparent;
-        border: none;
-        outline: none;
-        font-size: 14px;
-        color: var(--bone);
-        font-family: var(--font-body);
-      }
-      .checkout-promo input::placeholder {
-        color: var(--bone-dim);
-      }
-      .checkout-promo-label {
-        font-size: 13px;
-        color: var(--bone-dim);
-      }
-      .checkout-promo-add {
-        color: var(--gold-bright);
-        font-size: 20px;
-        cursor: pointer;
-      }
+        }
 
       .checkout-totals {
         padding: 12px 20px;
@@ -603,8 +574,8 @@
       </div>
     </div>
 
-    <!-- ── STEP 3: CHECKOUT ─────────────────────────────────────── -->
-    <div id="stepCheckout" style="display: none">
+    <!-- ── STEP 3a: BUYER DETAILS ────────────────────────────────── -->
+    <div id="stepBuyerDetails" style="display: none">
       <div
         style="
           padding: 14px 16px;
@@ -616,7 +587,7 @@
         "
       >
         <button
-          id="checkoutBackBtn"
+          id="buyerDetailsBackBtn"
           onclick="backToSeatmap()"
           style="
             background: none;
@@ -636,7 +607,7 @@
             text-transform: uppercase;
             color: var(--bone);
           "
-          >Checkout</span
+          >Your Details</span
         >
       </div>
 
@@ -646,72 +617,19 @@
       </div>
 
       <!-- Order summary rows injected here -->
-      <div id="checkoutOrderRows"></div>
-
-      <!-- Promo code -->
-      <div class="checkout-promo">
-        <span class="checkout-promo-label">Add Promo Code</span>
-        <input type="text" id="promoInput" placeholder="Enter code…" />
-        <span class="checkout-promo-add" onclick="applyPromo()">+</span>
-      </div>
+      <div id="buyerDetailsOrderRows"></div>
 
       <!-- Totals -->
       <div class="checkout-totals">
         <div class="checkout-total-row">
-          <span>Subtotal</span><span id="checkoutSubtotal">0 ETB</span>
-        </div>
-        <div class="checkout-total-row">
-          <span>Promo Code</span><span id="checkoutPromoDiscount">0 ETB</span>
+          <span>Subtotal</span><span id="buyerDetailsSubtotal">0 ETB</span>
         </div>
         <div class="checkout-total-row grand">
-          <span>Estimated Total</span><span id="checkoutTotal">0 ETB</span>
+          <span>Total</span><span id="buyerDetailsTotal">0 ETB</span>
         </div>
       </div>
 
       <p class="checkout-tac">Terms and Conditions accepted</p>
-
-      <!-- Payment methods -->
-      <div
-        style="
-          padding: 12px 20px 4px;
-          font-family: var(--font-mono);
-          font-size: 10px;
-          letter-spacing: 2px;
-          text-transform: uppercase;
-          color: var(--gold-bright);
-        "
-      >
-        Payment Method
-      </div>
-      <div class="payment-method-cards">
-        <button
-          class="pmc-btn active"
-          id="pmcMpesa"
-          onclick="selectCheckoutPayment('mpesa')"
-        >
-          <img src="/mpesa.png" alt="M-Pesa" />
-          <span>M-Pesa</span>
-        </button>
-        <button
-          class="pmc-btn"
-          id="pmcTelebirr"
-          onclick="selectCheckoutPayment('telebirr')"
-        >
-          <img src="/telebirr.jpg" alt="Telebirr" />
-          <span>Telebirr</span>
-        </button>
-      </div>
-      <div class="pmc-details" id="pmcDetails">
-        <div class="pmc-details-row">
-          <span>Account Name</span><span id="pmcName">Efrem Werku Muluneh</span>
-        </div>
-        <div class="pmc-details-row">
-          <span>Number</span><span id="pmcNumber">0725767614</span>
-        </div>
-        <div class="pmc-details-row ref">
-          <span>Reference Code</span><span id="pmcRef">ETFC-XXXXXX</span>
-        </div>
-      </div>
 
       <!-- Buyer details -->
       <div class="checkout-details">
@@ -733,46 +651,9 @@
             autocomplete="tel"
           />
         </div>
-        <div class="field">
-          <label
-            >Email
-            <span
-              style="font-size: 11px; color: var(--bone-dim); font-weight: 400"
-              >(optional — for order confirmation)</span
-            ></label
-          >
-          <input
-            type="email"
-            id="buyerEmail"
-            placeholder="you@example.com"
-            autocomplete="email"
-          />
-        </div>
-
-        <!-- Upload screenshot -->
-        <div class="field" style="margin-top: 16px">
-          <label>Payment Screenshot</label>
-          <div
-            class="upload-area"
-            id="uploadArea"
-            onclick="document.getElementById('screenshotFile').click()"
-          >
-            <div class="upload-icon">📷</div>
-            <span id="uploadLabel">Tap to upload proof of payment</span>
-            <span class="upload-hint">Max 5MB · JPG/PNG</span>
-            <img class="upload-preview" id="uploadPreview" alt="preview" />
-            <input
-              type="file"
-              id="screenshotFile"
-              accept="image/*"
-              style="display: none"
-              onchange="onFileChosen(this)"
-            />
-          </div>
-        </div>
 
         <p
-          id="checkoutError"
+          id="buyerDetailsError"
           style="
             color: var(--crimson-bright);
             font-size: 13px;
@@ -785,10 +666,168 @@
       <div style="padding: 16px 20px 80px">
         <button
           class="btn btn-primary btn-block"
-          id="completePurchaseBtn"
+          id="goToPaymentBtn"
+          onclick="goToPaymentStep()"
+        >
+          Continue to Payment
+        </button>
+      </div>
+    </div>
+
+    <!-- ── STEP 3b: PAYMENT & SCREENSHOT ─────────────────────────── -->
+    <div id="stepPayment" style="display: none">
+      <div
+        style="
+          padding: 14px 16px;
+          background: var(--obsidian-2);
+          border-bottom: 1px solid var(--border);
+          display: flex;
+          align-items: center;
+          gap: 12px;
+        "
+      >
+        <button
+          id="paymentBackBtn"
+          onclick="goToBuyerDetailsStep()"
+          style="
+            background: none;
+            border: none;
+            color: var(--bone-dim);
+            font-size: 22px;
+            cursor: pointer;
+            padding: 0;
+          "
+        >
+          ‹
+        </button>
+        <span
+          style="
+            font-family: var(--font-display);
+            font-size: 18px;
+            text-transform: uppercase;
+            color: var(--bone);
+          "
+          >Payment</span
+        >
+      </div>
+
+      <div class="checkout-event-header">
+        <div class="checkout-event-title">ETFC Adwa Fight Night</div>
+        <div class="checkout-event-meta">August 27, 2026 &middot; 6:00 PM</div>
+      </div>
+
+      <!-- Order summary rows injected here -->
+      <div id="paymentOrderRows"></div>
+
+      <!-- Totals -->
+      <div class="checkout-totals">
+        <div class="checkout-total-row">
+          <span>Subtotal</span><span id="paymentSubtotal">0 ETB</span>
+        </div>
+        <div class="checkout-total-row grand">
+          <span>Total</span><span id="paymentTotal">0 ETB</span>
+        </div>
+      </div>
+
+      <p class="checkout-tac">Terms and Conditions accepted</p>
+
+      <!-- Payment accounts - BOTH displayed -->
+      <div
+        style="
+          padding: 12px 20px 4px;
+          font-family: var(--font-mono);
+          font-size: 10px;
+          letter-spacing: 2px;
+          text-transform: uppercase;
+          color: var(--gold-bright);
+        "
+      >
+        Deposit to One of These Accounts
+      </div>
+
+      <div class="payment-accounts-grid" style="padding: 0 20px 16px; display: flex; flex-direction: column; gap: 12px;">
+        <!-- Telebirr Account -->
+        <div class="bank-details-card" style="display:flex;align-items:center;gap:14px;padding:14px 16px;background:var(--obsidian);border:1px solid var(--border);border-radius:10px;">
+          <div style="width:44px;height:44px;border-radius:10px;overflow:hidden;flex-shrink:0;">
+            <img src="/telebirr.jpg" alt="Telebirr" style="width:44px;height:44px;object-fit:cover;"/>
+          </div>
+          <div style="flex:1;">
+            <div style="font-weight:700;font-size:14px;margin-bottom:2px;">Telebirr</div>
+            <div style="font-size:13px;color:var(--bone-dim);">Ager</div>
+          </div>
+          <div style="font-family:var(--font-mono);font-size:15px;color:var(--gold-bright);font-weight:700;">0983196199</div>
+        </div>
+
+        <!-- M-Pesa Account -->
+        <div class="bank-details-card" style="display:flex;align-items:center;gap:14px;padding:14px 16px;background:var(--obsidian);border:1px solid var(--border);border-radius:10px;">
+          <div style="width:44px;height:44px;border-radius:10px;overflow:hidden;flex-shrink:0;">
+            <img src="/mpesa.png" alt="M-Pesa" style="width:44px;height:44px;object-fit:cover;"/>
+          </div>
+          <div style="flex:1;">
+            <div style="font-weight:700;font-size:14px;margin-bottom:2px;">Safaricom M-Pesa</div>
+            <div style="font-size:13px;color:var(--bone-dim);">Efrem Werku Muluneh</div>
+          </div>
+          <div style="font-family:var(--font-mono);font-size:15px;color:var(--gold-bright);font-weight:700;">0725767614</div>
+        </div>
+      </div>
+
+      <!-- Reference Code -->
+      <div class="bank-details-card" style="padding:12px 16px;margin:0 20px 16px;background:var(--obsidian);border:1px solid var(--border);border-radius:10px;">
+        <div class="detail-row highlight-row" style="display:flex;justify-content:space-between;align-items:center;">
+          <span style="color:var(--bone-dim);">Reference Code</span>
+          <span id="paymentRefCode" class="ref-code" style="font-family:var(--font-mono);font-size:14px;color:var(--crimson-bright);font-weight:700;letter-spacing:1px;">ETFC-XXXXXX</span>
+        </div>
+      </div>
+      <p class="hint" style="margin:0 20px 16px;font-size:12px;color:var(--bone-dim);">Include the reference code in your transfer note.</p>
+
+      <!-- Screenshot Upload -->
+      <div class="checkout-details" style="padding: 0 20px 20px;">
+        <div class="field">
+          <label>Payment Screenshot</label>
+          <div
+            class="upload-area"
+            id="paymentUploadArea"
+            onclick="document.getElementById('paymentScreenshotFile').click()"
+          >
+            <div class="upload-icon">📷</div>
+            <span id="paymentUploadLabel">Tap to upload proof of payment</span>
+            <span class="upload-hint">Max 5MB · JPG/PNG</span>
+            <img class="upload-preview" id="paymentUploadPreview" alt="preview" />
+            <input
+              type="file"
+              id="paymentScreenshotFile"
+              accept="image/*"
+              style="display: none"
+              onchange="onPaymentFileChosen(this)"
+            />
+          </div>
+        </div>
+
+        <p
+          id="paymentError"
+          style="
+            color: var(--crimson-bright);
+            font-size: 13px;
+            display: none;
+            margin-top: 10px;
+          "
+        ></p>
+      </div>
+
+      <div style="padding: 0 20px 80px">
+        <button
+          class="btn btn-outline btn-block"
+          style="margin-bottom: 10px;"
+          onclick="goToBuyerDetailsStep()"
+        >
+          ← Back
+        </button>
+        <button
+          class="btn btn-primary btn-block"
+          id="submitOrderBtn"
           onclick="submitOrder()"
         >
-          Complete Purchase
+          Submit Order
         </button>
       </div>
     </div>
@@ -915,15 +954,9 @@
       let selectedSeats = {};
       let currentTierId = null;
       let chosenFile = null;
-      let selectedPayment = "mpesa";
       let approvalUnsubscribe = null;
       const refCode =
         "ETFC-" + Math.random().toString(36).slice(2, 8).toUpperCase();
-
-      const PAYMENT_INFO = {
-        mpesa: { name: "Efrem Werku Muluneh", number: "0725767614" },
-        telebirr: { name: "Ager", number: "0983196199" },
-      };
 
       // ── STEP 1: TIER LIST ─────────────────────────────────────────
       function renderTierList() {
@@ -988,7 +1021,7 @@
         const gaOnly = seatmapTiers.length === 0;
 
         if (gaOnly) {
-          // Only early bird — skip straight to checkout
+          // Only early bird — go straight to buyer details
           selectedSeats = {};
           TIERS.filter((t) => !t.hasSeatmap).forEach((t) => {
             for (let i = 0; i < (tierQty[t.id] || 0); i++) {
@@ -1001,8 +1034,8 @@
               };
             }
           });
-          showStep("stepCheckout");
-          buildCheckoutUI();
+          showStep("stepBuyerDetails");
+          buildBuyerDetailsUI();
         } else {
           // Show seatmap for first seatmap tier
           currentTierId = seatmapTiers[0].id;
@@ -1125,7 +1158,7 @@
             (s) => s.tierId === tierId
           ).length;
           if (alreadyPicked >= needed) {
-            showMsg(
+            showPaymentError(
               "You've already selected " +
                 needed +
                 " seat(s) for this tier. Deselect one first."
@@ -1178,12 +1211,14 @@
             };
           }
         });
-        showStep("stepCheckout");
-        buildCheckoutUI();
+        showStep("stepBuyerDetails");
+        buildBuyerDetailsUI();
+        document.getElementById("tixFooterBar").classList.remove("visible");
       }
 
       function backToTiers() {
         showStep("stepTier");
+        document.getElementById("tixFooterBar").classList.add("visible");
       }
       function backToSeatmap() {
         // If there were seatmap tiers, go back there; otherwise back to tiers
@@ -1198,11 +1233,16 @@
           });
         } else {
           showStep("stepTier");
+          document.getElementById("tixFooterBar").classList.add("visible");
         }
       }
 
-      // ── STEP 3: CHECKOUT ──────────────────────────────────────────
-      function buildCheckoutUI() {
+      function backToBuyerDetails() {
+        showStep("stepBuyerDetails");
+      }
+
+// ── STEP 3a: BUYER DETAILS ────────────────────────────────────
+      function buildBuyerDetailsUI() {
         // Group seats by tier
         const byTier = {};
         Object.entries(selectedSeats).forEach(([id, s]) => {
@@ -1236,28 +1276,26 @@
               .filter((l) => !l.includes("auto"))
               .join(", ");
             return `
-      <div class="checkout-order-row">
-        <div class="checkout-tier-icon" style="background:${
-          BG_MAP[tierId] || "#555"
-        }">${ICON_MAP[tierId] || "🎟"}</div>
-        <div style="flex:1;min-width:0;">
-          <div class="checkout-order-name">${tier?.name || tierId}</div>
-          <div class="checkout-order-seats">${seats.length} ticket${
+        <div class="checkout-order-row">
+          <div class="checkout-tier-icon" style="background:${
+            BG_MAP[tierId] || "#555"
+          }">${ICON_MAP[tierId] || "🎟"}</div>
+          <div style="flex:1;min-width:0;">
+            <div class="checkout-order-name">${tier?.name || tierId}</div>
+            <div class="checkout-order-seats">${seats.length} ticket${
               seats.length > 1 ? "s" : ""
             }${seatLabels ? " · seats " + seatLabels : ""}</div>
-        </div>
-        <div class="checkout-order-price">${rowTotal.toLocaleString()} ETB</div>
-      </div>`;
+          </div>
+          <div class="checkout-order-price">${rowTotal.toLocaleString()} ETB</div>
+        </div>`;
           })
           .join("");
 
-        document.getElementById("checkoutOrderRows").innerHTML = rows;
-        document.getElementById("checkoutSubtotal").textContent =
+        document.getElementById("buyerDetailsOrderRows").innerHTML = rows;
+        document.getElementById("buyerDetailsSubtotal").textContent =
           subtotal.toLocaleString() + " ETB";
-        document.getElementById("checkoutPromoDiscount").textContent = "0 ETB";
-        document.getElementById("checkoutTotal").textContent =
+        document.getElementById("buyerDetailsTotal").textContent =
           subtotal.toLocaleString() + " ETB";
-        document.getElementById("pmcRef").textContent = refCode;
 
         // Pre-fill from session if logged in
         const session = JSON.parse(
@@ -1267,54 +1305,127 @@
           document.getElementById("buyerName").value = session.name;
         if (session?.phone)
           document.getElementById("buyerPhone").value = session.phone;
-        if (session?.email)
-          document.getElementById("buyerEmail").value = session.email;
-
-        selectCheckoutPayment("mpesa");
       }
 
-      function selectCheckoutPayment(method) {
-        selectedPayment = method;
-        document
-          .getElementById("pmcMpesa")
-          .classList.toggle("active", method === "mpesa");
-        document
-          .getElementById("pmcTelebirr")
-          .classList.toggle("active", method === "telebirr");
-        const info = PAYMENT_INFO[method];
-        document.getElementById("pmcName").textContent = info.name;
-        document.getElementById("pmcNumber").textContent = info.number;
+      function goToPaymentStep() {
+        const name = document.getElementById("buyerName").value.trim();
+        const phone = document.getElementById("buyerPhone").value.trim();
+        const errEl = document.getElementById("buyerDetailsError");
+
+        if (!name) {
+          errEl.textContent = "Enter your full name.";
+          errEl.style.display = "block";
+          return;
+        }
+        if (!phone) {
+          errEl.textContent = "Enter your phone number.";
+          errEl.style.display = "block";
+          return;
+        }
+        if (!/^(09|07)\d{8}$/.test(phone)) {
+          errEl.textContent = "Phone must start with 09 or 07 and be 10 digits.";
+          errEl.style.display = "block";
+          return;
+        }
+        errEl.style.display = "none";
+
+        // Hide footer bar when moving to payment
+        document.getElementById("tixFooterBar").classList.remove("visible");
+
+        buildPaymentUI();
+        showStep("stepPayment");
       }
 
-      function applyPromo() {
-        const code = document
-          .getElementById("promoInput")
-          .value.trim()
-          .toUpperCase();
-        if (!code) return;
-        showMsg("Promo code '" + code + "' is not valid.");
+      function goToBuyerDetailsStep() {
+        showStep("stepBuyerDetails");
       }
 
-      function onFileChosen(input) {
+      // ── STEP 3b: PAYMENT & SCREENSHOT ─────────────────────────────
+      function buildPaymentUI() {
+        // Group seats by tier
+        const byTier = {};
+        Object.entries(selectedSeats).forEach(([id, s]) => {
+          if (!byTier[s.tierId]) byTier[s.tierId] = [];
+          byTier[s.tierId].push(s);
+        });
+
+        const ICON_MAP = {
+          "vvip-ringside": "🏆",
+          "vvip-premium": "⭐",
+          "vvip-normal": "🎟",
+          vip: "💺",
+          "early-bird": "🐦",
+        };
+        const BG_MAP = {
+          "vvip-ringside": "#b08d3e",
+          "vvip-premium": "#b3141c",
+          "vvip-normal": "#8250c8",
+          vip: "#1e78c8",
+          "early-bird": "#1eb478",
+        };
+
+        let subtotal = 0;
+        const rows = Object.entries(byTier)
+          .map(([tierId, seats]) => {
+            const tier = TIERS.find((t) => t.id === tierId);
+            const rowTotal = seats.reduce((s, v) => s + v.price, 0);
+            subtotal += rowTotal;
+            const seatLabels = seats
+              .map((s) => s.label)
+              .filter((l) => !l.includes("auto"))
+              .join(", ");
+            return `
+        <div class="checkout-order-row">
+          <div class="checkout-tier-icon" style="background:${
+            BG_MAP[tierId] || "#555"
+          }">${ICON_MAP[tierId] || "🎟"}</div>
+          <div style="flex:1;min-width:0;">
+            <div class="checkout-order-name">${tier?.name || tierId}</div>
+            <div class="checkout-order-seats">${seats.length} ticket${
+              seats.length > 1 ? "s" : ""
+            }${seatLabels ? " · seats " + seatLabels : ""}</div>
+          </div>
+          <div class="checkout-order-price">${rowTotal.toLocaleString()} ETB</div>
+        </div>`;
+          })
+          .join("");
+
+        document.getElementById("paymentOrderRows").innerHTML = rows;
+        document.getElementById("paymentSubtotal").textContent =
+          subtotal.toLocaleString() + " ETB";
+        document.getElementById("paymentTotal").textContent =
+          subtotal.toLocaleString() + " ETB";
+        document.getElementById("paymentRefCode").textContent = refCode;
+
+        // Reset file input
+        chosenFile = null;
+        document.getElementById("paymentUploadLabel").textContent =
+          "Tap to upload proof of payment";
+        document.getElementById("paymentScreenshotFile").value = "";
+        document.getElementById("paymentUploadArea").classList.remove("has-file");
+        document.getElementById("paymentUploadPreview").src = "";
+      }
+
+      function onPaymentFileChosen(input) {
         const file = input.files[0];
         if (!file) return;
         if (file.size > 5 * 1024 * 1024) {
-          showMsg("Screenshot is over 5MB.");
+          showPaymentError("Screenshot is over 5MB.");
           input.value = "";
           return;
         }
         chosenFile = file;
-        document.getElementById("uploadLabel").textContent = "✓ " + file.name;
+        document.getElementById("paymentUploadLabel").textContent = "✓ " + file.name;
         const reader = new FileReader();
         reader.onload = (e) => {
-          document.getElementById("uploadPreview").src = e.target.result;
-          document.getElementById("uploadArea").classList.add("has-file");
+          document.getElementById("paymentUploadPreview").src = e.target.result;
+          document.getElementById("paymentUploadArea").classList.add("has-file");
         };
         reader.readAsDataURL(file);
       }
 
-      function showMsg(msg) {
-        const el = document.getElementById("checkoutError");
+      function showPaymentError(msg) {
+        const el = document.getElementById("paymentError");
         el.textContent = msg;
         el.style.display = "block";
         setTimeout(() => (el.style.display = "none"), 4000);
@@ -1323,18 +1434,15 @@
       async function submitOrder() {
         const name = document.getElementById("buyerName").value.trim();
         const phone = document.getElementById("buyerPhone").value.trim();
-        const email = document.getElementById("buyerEmail").value.trim();
-        if (!name) return showMsg("Enter your full name.");
-        if (!phone) return showMsg("Enter your phone number.");
+        if (!name) return showPaymentError("Enter your full name.");
+        if (!phone) return showPaymentError("Enter your phone number.");
         if (!/^(09|07)\d{8}$/.test(phone))
-          return showMsg("Phone must start with 09 or 07 and be 10 digits.");
-        if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
-          return showMsg("Enter a valid email or leave blank.");
-        if (!chosenFile) return showMsg("Upload your payment screenshot.");
+          return showPaymentError("Phone must start with 09 or 07 and be 10 digits.");
+        if (!chosenFile) return showPaymentError("Upload your payment screenshot.");
         if (Object.keys(selectedSeats).length === 0)
-          return showMsg("No seats selected.");
+          return showPaymentError("No seats selected.");
 
-        const btn = document.getElementById("completePurchaseBtn");
+        const btn = document.getElementById("submitOrderBtn");
         btn.disabled = true;
         btn.textContent = "Uploading…";
 
@@ -1371,8 +1479,8 @@
             body: JSON.stringify({
               buyerName: name,
               phone,
-              paymentMethod: selectedPayment,
-              email: email || session?.email || "",
+              paymentMethod: "both", // Both accounts shown
+              email: session?.email || "",
               userId: session?.uid || "",
               seats: [...seats, ...gaSeats],
               totalAmount,
@@ -1391,11 +1499,11 @@
           document.getElementById("tixFooterBar").classList.remove("visible");
           listenForApproval(data.orderId);
         } catch (err) {
-          showMsg(
+          showPaymentError(
             err.message || "Upload failed — check connection and try again."
           );
           btn.disabled = false;
-          btn.textContent = "Complete Purchase";
+          btn.textContent = "Submit Order";
         }
       }
 
@@ -1451,6 +1559,12 @@
       </div>
     </div>
     <p class="text-dim" style="text-align:center;margin-top:12px;font-size:13px;">✅ Screenshot this ticket — it's your entry pass.</p>
+    <div style="margin-top: 16px; display: flex; gap: 12px; justify-content: center;">
+      <button class="btn btn-primary" onclick="downloadTicketImage('${ticketCode}', '${seats}')">
+        📥 Download Ticket Image
+      </button>
+      <a href="verify.html?code=${ticketCode}" class="btn btn-outline">View Verification Page</a>
+    </div>
   `;
         try {
           new QRCode(document.getElementById("confirmedQR"), {
@@ -1462,6 +1576,81 @@
             correctLevel: QRCode.CorrectLevel.M,
           });
         } catch (e) {}
+      }
+
+      async function downloadTicketImage(ticketCode, seats) {
+        // Create a canvas with the ticket design for download
+        const canvas = document.createElement("canvas");
+        const ctx = canvas.getContext("2d");
+        const scale = 2; // 2x for quality
+        canvas.width = 400 * scale;
+        canvas.height = 560 * scale;
+        ctx.scale(scale, scale);
+
+        // Draw background
+        const gradient = ctx.createLinearGradient(0, 0, 0, 560);
+        gradient.addColorStop(0, "#0d0d0d");
+        gradient.addColorStop(0.5, "#1a0505");
+        gradient.addColorStop(1, "#0d0d0d");
+        ctx.fillStyle = gradient;
+        ctx.fillRect(0, 0, 400, 560);
+
+        // Gold top border
+        ctx.fillStyle = "#b08d3e";
+        ctx.fillRect(0, 0, 400, 4);
+
+        // Header
+        ctx.fillStyle = "#b08d3e";
+        ctx.font = "bold 12px 'Oswald', sans-serif";
+        ctx.textAlign = "center";
+        ctx.fillText("E-TICKET · CONFIRMED", 200, 30);
+
+        ctx.fillStyle = "#fff";
+        ctx.font = "bold 24px 'Oswald', sans-serif";
+        ctx.fillText("ETFC FIGHT NIGHT", 200, 60);
+
+        ctx.fillStyle = "#999";
+        ctx.font = "11px 'Space Mono', monospace";
+        ctx.fillText("August 27, 2026 · 6:00 PM · Adwa Museum", 200, 80);
+
+        // Seats
+        ctx.fillStyle = "#999";
+        ctx.font = "10px 'Space Mono', monospace";
+        ctx.fillText("SEATS", 200, 120);
+        ctx.fillStyle = "#fff";
+        ctx.font = "bold 14px 'Space Mono', monospace";
+        ctx.fillText(seats, 200, 140);
+
+        // Ticket code
+        ctx.fillStyle = "#999";
+        ctx.font = "10px 'Space Mono', monospace";
+        ctx.fillText("TICKET CODE", 200, 170);
+        ctx.fillStyle = "#b08d3e";
+        ctx.font = "bold 16px 'Space Mono', monospace";
+        ctx.fillText(ticketCode, 200, 192);
+
+        // QR Code placeholder
+        ctx.fillStyle = "#fff";
+        ctx.fillRect(100, 220, 200, 200);
+        ctx.fillStyle = "#0d0d0d";
+        ctx.font = "12px 'Space Mono', monospace";
+        ctx.fillText("[QR CODE]", 200, 310);
+
+        // Sponsor row
+        ctx.fillStyle = "#999";
+        ctx.font = "9px 'Space Mono', monospace";
+        ctx.fillText("PRESENTED BY", 200, 340);
+
+        // Bottom info
+        ctx.fillStyle = "#b08d3e";
+        ctx.font = "11px 'Space Mono', monospace";
+        ctx.fillText("Present at entry · Non-transferable", 200, 400);
+
+        // Download
+        const link = document.createElement("a");
+        link.download = `ETFC-Ticket-${ticketCode}.png`;
+        link.href = canvas.toDataURL("image/png");
+        link.click();
       }
 
       function resetToTiers() {
@@ -1481,12 +1670,16 @@
 
       // ── UTIL ──────────────────────────────────────────────────────
       function showStep(stepId) {
-        ["stepTier", "stepSeatmap", "stepCheckout", "stepPending"].forEach(
-          (id) => {
-            const el = document.getElementById(id);
-            if (el) el.style.display = id === stepId ? "block" : "none";
-          }
-        );
+        [
+          "stepTier",
+          "stepSeatmap",
+          "stepBuyerDetails",
+          "stepPayment",
+          "stepPending",
+        ].forEach((id) => {
+          const el = document.getElementById(id);
+          if (el) el.style.display = id === stepId ? "block" : "none";
+        });
         window.scrollTo(0, 0);
       }
 
