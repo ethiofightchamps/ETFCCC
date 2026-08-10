@@ -176,6 +176,9 @@
               class="selection-total"
               style="display: none"
             ></div>
+            <div class="text-dim" style="font-size: 12px; margin-top: 8px">
+              Ref: <span id="refCode" class="ref-code">ETFC-XXXXXX</span>
+            </div>
             <button
               id="checkoutBtn"
               class="btn btn-primary btn-block mt-24"
@@ -204,7 +207,9 @@
       >
         <div class="modal-header">
           <h3>Complete Your Payment</h3>
-          <span class="modal-close" onclick="closeCheckoutModal()">&times;</span>
+          <span class="modal-close" onclick="closeCheckoutModal()"
+            >&times;</span
+          >
         </div>
         <div
           class="modal-body"
@@ -213,47 +218,142 @@
         >
           <!-- Step 1: User Details -->
           <div id="checkoutStep1">
-            <p class="text-dim" style="margin-bottom: 24px; padding: 0 24px;">
-              Transfer the total amount to one of the accounts below, then upload your
-              payment screenshot. Your ticket confirms once ETFC verifies the
-              transfer — usually within a few hours.
+            <p class="text-dim" style="margin-bottom: 24px; padding: 0 24px">
+              Transfer the total amount to one of the accounts below, then
+              upload your payment screenshot. Your ticket confirms once ETFC
+              verifies the transfer — usually within a few hours.
             </p>
 
             <div class="checkout-section">
               <div class="checkout-title">Send Payment To</div>
 
               <!-- Telebirr -->
-              <div class="bank-details" style="display:flex;align-items:center;gap:14px;padding:14px 16px;margin-bottom:10px;">
-                <div style="width:44px;height:44px;border-radius:10px;overflow:hidden;flex-shrink:0;">
-                  <img src="/telebirr.jpg" alt="Telebirr" style="width:44px;height:44px;object-fit:cover;border-radius:10px;"/>
+              <div
+                class="bank-details"
+                style="
+                  display: flex;
+                  align-items: center;
+                  gap: 14px;
+                  padding: 14px 16px;
+                  margin-bottom: 10px;
+                "
+              >
+                <div
+                  style="
+                    width: 44px;
+                    height: 44px;
+                    border-radius: 10px;
+                    overflow: hidden;
+                    flex-shrink: 0;
+                  "
+                >
+                  <img
+                    src="/telebirr.jpg"
+                    alt="Telebirr"
+                    style="
+                      width: 44px;
+                      height: 44px;
+                      object-fit: cover;
+                      border-radius: 10px;
+                    "
+                  />
                 </div>
-                <div style="flex:1;">
-                  <div style="font-weight:700;font-size:14px;margin-bottom:2px;">Telebirr</div>
-                  <div style="font-size:13px;color:var(--text-dim);">Ager</div>
+                <div style="flex: 1">
+                  <div
+                    style="
+                      font-weight: 700;
+                      font-size: 14px;
+                      margin-bottom: 2px;
+                    "
+                  >
+                    Telebirr
+                  </div>
+                  <div style="font-size: 13px; color: var(--text-dim)">
+                    Ager
+                  </div>
                 </div>
-                <div style="font-family:var(--font-mono);font-size:15px;color:var(--gold-bright);font-weight:700;">0983196199</div>
+                <div
+                  style="
+                    font-family: var(--font-mono);
+                    font-size: 15px;
+                    color: var(--gold-bright);
+                    font-weight: 700;
+                  "
+                >
+                  0983196199
+                </div>
               </div>
 
               <!-- Mpesa -->
-              <div class="bank-details" style="display:flex;align-items:center;gap:14px;padding:14px 16px;margin-bottom:10px;">
-                <div style="width:44px;height:44px;border-radius:10px;overflow:hidden;flex-shrink:0;">
-                  <img src="/mpesa.png" alt="M-Pesa" style="width:44px;height:44px;object-fit:cover;border-radius:50%;"/>
+              <div
+                class="bank-details"
+                style="
+                  display: flex;
+                  align-items: center;
+                  gap: 14px;
+                  padding: 14px 16px;
+                  margin-bottom: 10px;
+                "
+              >
+                <div
+                  style="
+                    width: 44px;
+                    height: 44px;
+                    border-radius: 10px;
+                    overflow: hidden;
+                    flex-shrink: 0;
+                  "
+                >
+                  <img
+                    src="/mpesa.png"
+                    alt="M-Pesa"
+                    style="
+                      width: 44px;
+                      height: 44px;
+                      object-fit: cover;
+                      border-radius: 50%;
+                    "
+                  />
                 </div>
-                <div style="flex:1;">
-                  <div style="font-weight:700;font-size:14px;margin-bottom:2px;">Safaricom M-Pesa</div>
-                  <div style="font-size:13px;color:var(--text-dim);">Efrem Werku Muluneh</div>
+                <div style="flex: 1">
+                  <div
+                    style="
+                      font-weight: 700;
+                      font-size: 14px;
+                      margin-bottom: 2px;
+                    "
+                  >
+                    Safaricom M-Pesa
+                  </div>
+                  <div style="font-size: 13px; color: var(--text-dim)">
+                    Efrem Werku Muluneh
+                  </div>
                 </div>
-                <div style="font-family:var(--font-mono);font-size:15px;color:var(--gold-bright);font-weight:700;">0725767614</div>
+                <div
+                  style="
+                    font-family: var(--font-mono);
+                    font-size: 15px;
+                    color: var(--gold-bright);
+                    font-weight: 700;
+                  "
+                >
+                  0725767614
+                </div>
               </div>
 
               <!-- Ref code -->
-              <div class="bank-details" style="padding:12px 16px;margin-bottom:8px;">
+              <div
+                class="bank-details"
+                style="padding: 12px 16px; margin-bottom: 8px"
+              >
                 <div class="bank-row highlight">
                   <span>Reference Code</span>
                   <span id="modalRefCode" class="ref-code">ETFC-XXXXXX</span>
                 </div>
               </div>
-              <p class="hint" style="margin-bottom: 24px;">Include the reference code in your transfer note.</p>
+              <p class="hint" style="margin-bottom: 24px">
+                Include the reference code in your transfer note.
+              </p>
             </div>
 
             <div class="field mt-24">
@@ -285,11 +385,27 @@
           </div>
 
           <!-- Step 2: Upload Screenshot -->
-          <div id="checkoutStep2" style="display: none;">
+          <div id="checkoutStep2" style="display: none">
             <div class="checkout-section">
               <div class="checkout-title">Upload Screenshot</div>
-              <div id="checkoutDepositInstruction" style="background:rgba(176,141,62,0.08);border:1px solid rgba(176,141,62,0.25);border-radius:10px;padding:12px 16px;margin-bottom:16px;font-size:14px;line-height:1.5;">
-                Deposit <strong id="checkoutDepositAmount" style="color:var(--gold-bright);font-size:16px;"></strong> to one of the accounts above and send us the screenshot.
+              <div
+                id="checkoutDepositInstruction"
+                style="
+                  background: rgba(176, 141, 62, 0.08);
+                  border: 1px solid rgba(176, 141, 62, 0.25);
+                  border-radius: 10px;
+                  padding: 12px 16px;
+                  margin-bottom: 16px;
+                  font-size: 14px;
+                  line-height: 1.5;
+                "
+              >
+                Deposit
+                <strong
+                  id="checkoutDepositAmount"
+                  style="color: var(--gold-bright); font-size: 16px"
+                ></strong>
+                to one of the accounts above and send us the screenshot.
               </div>
             </div>
 
@@ -318,7 +434,16 @@
               </div>
             </div>
 
-            <p id="submitError" class="text-dim" style="color: var(--crimson-bright); display: none; margin-top: 10px; padding: 0 24px;"></p>
+            <p
+              id="submitError"
+              class="text-dim"
+              style="
+                color: var(--crimson-bright);
+                display: none;
+                margin-top: 10px;
+                padding: 0 24px;
+              "
+            ></p>
           </div>
 
           <input type="hidden" id="selectedPaymentMethod" value="telebirr" />
@@ -326,36 +451,108 @@
         <!-- end modal-body -->
 
         <!-- Sticky footer — step-aware -->
-        <div class="modal-footer" style="position:sticky;bottom:0;padding:16px 24px;background:var(--obsidian-2);border-top:1px solid var(--border);z-index:10;">
+        <div
+          class="modal-footer"
+          style="
+            position: sticky;
+            bottom: 0;
+            padding: 16px 24px;
+            background: var(--obsidian-2);
+            border-top: 1px solid var(--border);
+            z-index: 10;
+          "
+        >
           <!-- Step 1 footer -->
           <div id="checkoutFooterStep1">
-            <button class="btn btn-primary btn-block" onclick="checkoutGoToStep2()">Next →</button>
+            <button
+              class="btn btn-primary btn-block"
+              onclick="checkoutGoToStep2()"
+            >
+              Next →
+            </button>
           </div>
           <!-- Step 2 footer -->
-          <div id="checkoutFooterStep2" style="display:none;">
-            <button class="btn btn-outline btn-sm" style="margin-bottom:10px;width:100%;" onclick="checkoutGoToStep1()">← Back</button>
-            <button class="btn btn-primary btn-block" id="submitOrderBtn" onclick="submitOrder()">Submit Order</button>
+          <div id="checkoutFooterStep2" style="display: none">
+            <button
+              class="btn btn-outline btn-sm"
+              style="margin-bottom: 10px; width: 100%"
+              onclick="checkoutGoToStep1()"
+            >
+              ← Back
+            </button>
+            <button
+              class="btn btn-primary btn-block"
+              id="submitOrderBtn"
+              onclick="submitOrder()"
+            >
+              Submit Order
+            </button>
           </div>
         </div>
 
         <!-- Pending State -->
-        <div id="checkoutPending" class="modal-body" style="display:none;padding:24px;text-align:center;">
-          <div style="font-size:48px;margin-bottom:16px;">&#9203;</div>
-          <h3 style="font-family:var(--font-display);font-size:22px;text-transform:uppercase;margin-bottom:12px;">Order Submitted</h3>
-          <span class="status-pill pending" id="checkoutOrderStatusPill">Pending Verification</span>
-          <p class="text-dim mt-24" id="checkoutWaitMsg" style="font-size:14px;line-height:1.6;">
-            ETFC is reviewing your payment. <strong style="color:var(--gold-bright);">Please do not close this page</strong> — it will update automatically the moment your order is approved.
+        <div
+          id="checkoutPending"
+          class="modal-body"
+          style="display: none; padding: 24px; text-align: center"
+        >
+          <div style="font-size: 48px; margin-bottom: 16px">&#9203;</div>
+          <h3
+            style="
+              font-family: var(--font-display);
+              font-size: 22px;
+              text-transform: uppercase;
+              margin-bottom: 12px;
+            "
+          >
+            Order Submitted
+          </h3>
+          <span class="status-pill pending" id="checkoutOrderStatusPill"
+            >Pending Verification</span
+          >
+          <p
+            class="text-dim mt-24"
+            id="checkoutWaitMsg"
+            style="font-size: 14px; line-height: 1.6"
+          >
+            ETFC is reviewing your payment.
+            <strong style="color: var(--gold-bright)"
+              >Please do not close this page</strong
+            >
+            — it will update automatically the moment your order is approved.
           </p>
-          <div style="margin-top: 24px; padding-top: 24px; border-top: 1px solid var(--border);">
-            <p class="text-dim" style="margin-bottom: 12px; font-size: 14px;">Want to get tickets for friends?</p>
-            <button class="btn btn-outline btn-block" onclick="showSeatStepAgain()">+ Buy More Tickets</button>
+          <div
+            style="
+              margin-top: 24px;
+              padding-top: 24px;
+              border-top: 1px solid var(--border);
+            "
+          >
+            <p class="text-dim" style="margin-bottom: 12px; font-size: 14px">
+              Want to get tickets for friends?
+            </p>
+            <button
+              class="btn btn-outline btn-block"
+              onclick="showSeatStepAgain()"
+            >
+              + Buy More Tickets
+            </button>
           </div>
         </div>
 
         <!-- Live Receipt — shown when admin approves -->
-        <div id="checkoutReceiptStep" class="modal-body" style="display:none;padding:24px;">
+        <div
+          id="checkoutReceiptStep"
+          class="modal-body"
+          style="display: none; padding: 24px"
+        >
           <div id="checkoutReceiptMount"></div>
-          <button class="btn btn-outline btn-block mt-24" onclick="closeCheckoutModal(true)">Done</button>
+          <button
+            class="btn btn-outline btn-block mt-24"
+            onclick="closeCheckoutModal(true)"
+          >
+            Done
+          </button>
         </div>
       </div>
     </div>
@@ -381,7 +578,8 @@
       );
       if (savedOrder && savedOrder.refCode) {
         document.getElementById("refCode").textContent = savedOrder.refCode;
-        document.getElementById("modalRefCode").textContent = savedOrder.refCode;
+        document.getElementById("modalRefCode").textContent =
+          savedOrder.refCode;
         if (savedOrder.orderId) {
           openCheckoutModal();
           checkoutShowPending(savedOrder.orderId, savedOrder.refCode);
@@ -429,7 +627,9 @@
         if (!name) return showCheckoutError("Enter your full name.");
         if (!phone) return showCheckoutError("Enter your phone number.");
         if (!/^(09|07)\d{8}$/.test(phone))
-          return showCheckoutError("Enter a valid Ethiopian phone number (e.g. 0912345678).");
+          return showCheckoutError(
+            "Enter a valid Ethiopian phone number (e.g. 0912345678)."
+          );
         if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
           return showCheckoutError("Enter a valid email address.");
 
@@ -438,8 +638,12 @@
         document.getElementById("checkoutFooterStep1").style.display = "none";
         document.getElementById("checkoutFooterStep2").style.display = "block";
 
-        const total = Object.values(selectedSeats).reduce((sum, s) => sum + s.price, 0);
-        document.getElementById("checkoutDepositAmount").textContent = total.toLocaleString() + " ETB";
+        const total = Object.values(selectedSeats).reduce(
+          (sum, s) => sum + s.price,
+          0
+        );
+        document.getElementById("checkoutDepositAmount").textContent =
+          total.toLocaleString() + " ETB";
       }
 
       function showCheckoutError(msg) {
@@ -462,24 +666,34 @@
         if (!orderId) return;
         if (approvalUnsubscribe) approvalUnsubscribe();
 
-        approvalUnsubscribe = db.collection("orders").doc(orderId).onSnapshot((snap) => {
-          if (!snap.exists) return;
-          const o = snap.data();
+        approvalUnsubscribe = db
+          .collection("orders")
+          .doc(orderId)
+          .onSnapshot(
+            (snap) => {
+              if (!snap.exists) return;
+              const o = snap.data();
 
-          if (o.status === "confirmed") {
-            approvalUnsubscribe();
-            localStorage.removeItem("etfc_pending_order");
-            renderCheckoutTicketReady(o);
-          } else if (o.status === "rejected") {
-            approvalUnsubscribe();
-            document.getElementById("checkoutWaitMsg").innerHTML =
-              `<span style="color:var(--crimson-bright);">Your order was not approved${o.rejectionReason ? `: ${o.rejectionReason}` : "."}</span> ` +
-              `Please <a href="tickets.html" style="color:var(--gold-bright);">try again</a>.`;
-            document.getElementById("checkoutOrderStatusPill").className = "status-pill rejected";
-            document.getElementById("checkoutOrderStatusPill").textContent = "Rejected";
-            localStorage.removeItem("etfc_pending_order");
-          }
-        }, (err) => console.error("listenForApproval:", err));
+              if (o.status === "confirmed") {
+                approvalUnsubscribe();
+                localStorage.removeItem("etfc_pending_order");
+                renderCheckoutTicketReady(o);
+              } else if (o.status === "rejected") {
+                approvalUnsubscribe();
+                document.getElementById("checkoutWaitMsg").innerHTML =
+                  `<span style="color:var(--crimson-bright);">Your order was not approved${
+                    o.rejectionReason ? `: ${o.rejectionReason}` : "."
+                  }</span> ` +
+                  `Please <a href="tickets.html" style="color:var(--gold-bright);">try again</a>.`;
+                document.getElementById("checkoutOrderStatusPill").className =
+                  "status-pill rejected";
+                document.getElementById("checkoutOrderStatusPill").textContent =
+                  "Rejected";
+                localStorage.removeItem("etfc_pending_order");
+              }
+            },
+            (err) => console.error("listenForApproval:", err)
+          );
       }
 
       // Show seat selection again while keeping pending order active
@@ -535,7 +749,9 @@
               </div>
               <div class="ticket-field">
                 <div class="ticket-field-label">Section</div>
-                <div class="ticket-field-value">${(o.seats || [])[0]?.split("-")[0] || "—"}</div>
+                <div class="ticket-field-value">${
+                  (o.seats || [])[0]?.split("-")[0] || "—"
+                }</div>
               </div>
               <div class="ticket-field">
                 <div class="ticket-field-label">Ticket Code</div>
@@ -552,7 +768,6 @@
 
         document.getElementById("checkoutPending").style.display = "none";
         document.getElementById("checkoutReceiptStep").style.display = "block";
-      }
       }
 
       let chosenFile = null;
@@ -573,9 +788,13 @@
         if (isVisualMapSection) {
           if (mapEl) mapEl.style.display = "";
           if (gaEl) gaEl.style.display = "none";
+          const gaHead = document.querySelector(".ga-picker-head");
+          if (gaHead) gaHead.style.display = "none";
           if (typeof renderSeatMap === "function") renderSeatMap(section);
         } else {
           if (mapEl) mapEl.style.display = "none";
+          const gaHead = document.querySelector(".ga-picker-head");
+          if (gaHead) gaHead.style.display = "";
           if (gaEl) {
             gaEl.style.display = "block";
             renderGaSection(section);
@@ -758,7 +977,11 @@
           // Save so reload doesn't lose the pending state
           localStorage.setItem(
             "etfc_pending_order",
-            JSON.stringify({ refCode: data.refCode, orderId: data.orderId, ts: Date.now() })
+            JSON.stringify({
+              refCode: data.refCode,
+              orderId: data.orderId,
+              ts: Date.now(),
+            })
           );
 
           document.getElementById("refCode").textContent = data.refCode;
@@ -1052,6 +1275,8 @@
       document.addEventListener("DOMContentLoaded", () => {
         renderAd(0);
         adTimer = setInterval(nextAd, 5000);
+        // Initialize section state — hides GA picker, shows seat map correctly
+        switchSection("VVIP Ringside");
       });
     </script>
 
