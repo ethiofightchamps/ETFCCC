@@ -559,7 +559,7 @@
           style="display: flex; gap: 10px; margin-bottom: 12px; flex-wrap: wrap"
           id="seatFilters"
         ></div>
-        <div class="seat-grid" id="seatGrid"></div>
+        <div id="seatGrid" style="display:block;width:100%;"></div>
       </div>
 
       <div class="seatmap-selected-bar">
@@ -568,7 +568,7 @@
           <strong id="seatmapSelectedTotal">0 ETB</strong>
         </div>
         <button
-          class="btn btn-primary btn-sm"
+          class="btn btn-primary btn-block"
           id="seatmapContinueBtn"
           onclick="goToCheckout()"
           disabled
@@ -723,7 +723,7 @@
         <strong id="footerTotal">0 ETB</strong>
       </div>
       <button class="btn btn-primary tix-footer-btn" onclick="onContinueFromTiers()">
-        Choose Seats
+        Continue
       </button>
     </div>
 
@@ -854,7 +854,7 @@
         {
           id: "early-bird",
           name: "Early Bird Tickets",
-          price: 6000,
+          price: 4000,
           icon: "earlybird",
           emoji: "🐦",
           sub: "General admission · No seat map",
@@ -954,11 +954,9 @@
           showStep("stepBuyerDetails");
           buildBuyerDetailsUI();
         } else {
-          // Show seatmap for first seatmap tier
-          currentTierId = seatmapTiers[0].id;
+          // Show seatmap for all selected seatmap tiers
           showStep("stepSeatmap");
           renderArenaMap();
-          renderSeatList();
         }
       }
 
@@ -1028,7 +1026,7 @@
 
           // Section header for this tier
           allHtml += `
-            <div class="tier-seat-section" style="margin-bottom:24px;">
+            <div class="tier-seat-section" style="margin-bottom:24px;width:100%;display:block;clear:both;">
               <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;padding:10px 12px;background:var(--obsidian);border-radius:8px;border:1px solid var(--border);">
                 <div class="tier-icon ${tier.icon}" style="width:32px;height:32px;font-size:16px;">${tier.emoji}</div>
                 <div style="flex:1;">
@@ -1037,7 +1035,7 @@
                 </div>
                 <div style="font-family:var(--font-mono);font-size:13px;color:var(--gold-bright);">${tier.price.toLocaleString()} ETB each</div>
               </div>
-              <div class="seat-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(44px,1fr));gap:8px;">
+              <div class="seat-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(44px,1fr));gap:8px;width:100%;">
           `;
 
           if (seatNumbers.length === 0) {
@@ -1161,6 +1159,12 @@
         const mainTier = activeSeatmapTiers[0];
         document.getElementById("seatmapTitle").textContent = mainTier.name;
 
+        // Update the seat list title with summary
+        const totalNeeded = activeSeatmapTiers.reduce((sum, t) => sum + (tierQty[t.id] || 0), 0);
+        const totalPicked = Object.keys(selectedSeats).length;
+        document.getElementById("seatListTitle").textContent = 
+          `Select Your Seats · ${totalPicked}/${totalNeeded} selected across ${activeSeatmapTiers.length} tier${activeSeatmapTiers.length > 1 ? "s" : ""}`;
+
         // Update the selected bar with total across all tiers
         const totalCount = Object.keys(selectedSeats).length;
         const totalPrice = Object.values(selectedSeats).reduce((s, v) => s + v.price, 0);
@@ -1193,22 +1197,6 @@
             return;
           }
 
-          // Check if user is selecting from a different tier than their "first choice"
-          const otherTierSeats = Object.values(selectedSeats).filter(s => s.tierId !== tierId);
-          if (otherTierSeats.length > 0) {
-            // Get the "first" tier they selected from (the one with seats already picked)
-            const firstTierId = otherTierSeats[0].tierId;
-            const firstTier = TIERS.find(t => t.id === firstTierId);
-            const currentTier = TIERS.find(t => t.id === tierId);
-            
-            if (firstTier && currentTier && firstTierId !== tierId) {
-              const confirmMsg = `You already have ${otherTierSeats.length} seat(s) selected for ${firstTier.name}.\n\nSelecting ${currentTier.name} means you're upgrading/mixing ticket types.\n\nDo you want to continue?`;
-              if (!confirm(confirmMsg)) {
-                return;
-              }
-            }
-          }
-
           selectedSeats[seatId] = {
             tierId,
             price,
@@ -1216,7 +1204,8 @@
             tier: tier?.tier || "",
           };
         }
-1219:       }
+        renderArenaMap(); // Re-render to update button states
+      }
 
       function goToCheckout() {
         // Add early bird auto-seats
@@ -1228,19 +1217,17 @@
               price: t.price,
               label: `${t.name} #${i + 1}`,
               tier: t.tier,
-            };
-          }
-        });
-        showStep("stepBuyerDetails");
-        buildBuyerDetailsUI();
-        document.getElementById("tixFooterBar").classList.remove("visible");
-      }
+};
+        }
+      });
+      showStep("stepBuyerDetails");
+      buildBuyerDetailsUI();
+    }
 
-      function backToTiers() {
-        showStep("stepTier");
-        document.getElementById("tixFooterBar").classList.add("visible");
-      }
-      function backToSeatmap() {
+    function backToTiers() {
+      showStep("stepTier");
+    }
+    function backToSeatmap() {
         // If there were seatmap tiers, go back there; otherwise back to tiers
         const hasSeatmap = TIERS.some(
           (t) => t.hasSeatmap && (tierQty[t.id] || 0) > 0
@@ -1251,9 +1238,9 @@
           Object.keys(selectedSeats).forEach((id) => {
             if (id.includes("-auto-")) delete selectedSeats[id];
           });
+          renderArenaMap();
         } else {
           showStep("stepTier");
-          document.getElementById("tixFooterBar").classList.add("visible");
         }
       }
 
@@ -1482,7 +1469,6 @@
           );
           closePaymentModal();
           showStep("stepPending");
-          document.getElementById("tixFooterBar").classList.remove("visible");
           listenForApproval(data.orderId);
         } catch (err) {
           showPaymentError(
@@ -1660,6 +1646,8 @@
           const el = document.getElementById(id);
           if (el) el.style.display = id === stepId ? "block" : "none";
         });
+        // Hide footer bar except on tier selection step
+        document.getElementById("tixFooterBar").classList.toggle("visible", stepId === "stepTier");
         window.scrollTo(0, 0);
       }
 
