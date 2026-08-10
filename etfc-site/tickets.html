@@ -13,548 +13,846 @@
     </script>
     <link rel="stylesheet" href="css/style.css" />
     <style>
-      /* VVIP Ringside active tab */
-      .section-tab.active[data-section="VVIP Ringside"] {
-        background: linear-gradient(
-          135deg,
-          var(--gold) 0%,
-          #c8960a 100%
-        ) !important;
-        border-color: var(--gold) !important;
-        color: #1a1508 !important;
-        box-shadow: 0 4px 16px rgba(176, 141, 62, 0.3);
+      /* ── TICKET SELECTION PAGE ─────────────────────────────── */
+      .tix-page {
+        max-width: 520px;
+        margin: 0 auto;
+        padding: 0 0 80px;
       }
-      /* VVIP Premium active tab */
-      .section-tab.active[data-section="VVIP Premium"] {
+
+      .tix-event-banner {
         background: linear-gradient(
           135deg,
-          var(--crimson) 0%,
-          #8b0f15 100%
-        ) !important;
-        border-color: var(--crimson) !important;
-        color: #fff !important;
-        box-shadow: 0 4px 16px rgba(179, 20, 28, 0.3);
+          #0d0d0d 0%,
+          #1a0505 60%,
+          #0d0d0d 100%
+        );
+        border-bottom: 2px solid var(--crimson);
+        padding: 0;
+        position: relative;
+        overflow: hidden;
       }
-      /* Inactive states */
-      .section-tab[data-section="VVIP Ringside"]:not(.active) {
-        background: linear-gradient(
-          135deg,
-          rgba(176, 141, 62, 0.15),
-          rgba(176, 141, 62, 0.05)
-        ) !important;
-        border-color: var(--gold) !important;
-        color: var(--gold-bright) !important;
+      .tix-event-banner img {
+        width: 100%;
+        height: 160px;
+        object-fit: cover;
+        object-position: center top;
+        display: block;
+        opacity: 0.55;
       }
-      .section-tab[data-section="VVIP Premium"]:not(.active) {
+      .tix-event-info {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        padding: 12px 16px;
         background: linear-gradient(
-          135deg,
-          rgba(179, 20, 28, 0.15),
-          rgba(179, 20, 28, 0.05)
-        ) !important;
-        border-color: var(--crimson) !important;
-        color: var(--crimson-bright) !important;
+          to top,
+          rgba(0, 0, 0, 0.92) 0%,
+          transparent 100%
+        );
+      }
+      .tix-event-title {
+        font-family: var(--font-display);
+        font-size: 22px;
+        color: #fff;
+        text-transform: uppercase;
+        line-height: 1.1;
+        margin-bottom: 2px;
+      }
+      .tix-event-meta {
+        font-size: 12px;
+        color: var(--bone-dim);
+      }
+
+      /* ── TIER LIST (image 1 style) ─────────────────────────── */
+      .tier-list {
+        padding: 0 16px;
+        margin-top: 16px;
+      }
+      .tier-row {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 14px 0;
+        border-bottom: 1px solid var(--border);
+      }
+      .tier-row:last-child {
+        border-bottom: none;
+      }
+      .tier-icon {
+        width: 44px;
+        height: 44px;
+        border-radius: 10px;
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 20px;
+      }
+      .tier-icon.ringside {
+        background: linear-gradient(135deg, #b08d3e, #7a5f20);
+      }
+      .tier-icon.premium {
+        background: linear-gradient(135deg, #b3141c, #7a0a10);
+      }
+      .tier-icon.normal {
+        background: linear-gradient(135deg, #8250c8, #4a2080);
+      }
+      .tier-icon.vip {
+        background: linear-gradient(135deg, #1e78c8, #0a4a90);
+      }
+      .tier-icon.earlybird {
+        background: linear-gradient(135deg, #1eb478, #0a6a44);
+      }
+      .tier-info {
+        flex: 1;
+        min-width: 0;
+      }
+      .tier-name {
+        font-weight: 700;
+        font-size: 15px;
+        color: var(--bone);
+        margin-bottom: 1px;
+      }
+      .tier-price {
+        font-family: var(--font-mono);
+        font-size: 13px;
+        color: var(--gold-bright);
+        font-weight: 700;
+      }
+      .tier-sub {
+        font-size: 11px;
+        color: var(--bone-dim);
+        margin-top: 1px;
+      }
+      .tier-stepper {
+        display: flex;
+        align-items: center;
+        gap: 0;
+        flex-shrink: 0;
+      }
+      .tier-btn {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        border: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+        font-weight: 700;
+        cursor: pointer;
+        background: var(--obsidian-3);
+        color: var(--bone-dim);
+        transition: all 0.15s;
+      }
+      .tier-btn.minus {
+        background: rgba(255, 255, 255, 0.08);
+      }
+      .tier-btn.plus {
+        background: var(--crimson);
+        color: #fff;
+      }
+      .tier-btn.plus:hover {
+        background: var(--crimson-bright);
+      }
+      .tier-btn:disabled {
+        opacity: 0.3;
+        cursor: not-allowed;
+      }
+      .tier-qty {
+        min-width: 28px;
+        text-align: center;
+        font-weight: 700;
+        font-size: 15px;
+        color: var(--bone);
+      }
+
+      .tix-footer-bar {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        z-index: 50;
+        background: var(--obsidian-2);
+        border-top: 1px solid var(--border);
+        padding: 12px 16px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        transform: translateY(100%);
+        transition: transform 0.25s ease;
+      }
+      .tix-footer-bar.visible {
+        transform: translateY(0);
+      }
+      .tix-footer-summary {
+        font-size: 13px;
+      }
+      .tix-footer-summary strong {
+        display: block;
+        font-size: 16px;
+        font-family: var(--font-mono);
+        color: var(--gold-bright);
+      }
+      .tix-footer-btn {
+        flex-shrink: 0;
+      }
+
+      /* ── SEAT MAP MODAL ────────────────────────────────────── */
+      .seatmap-modal {
+        max-width: 560px;
+        width: 96%;
+      }
+      .seatmap-modal-body {
+        padding: 0;
+      }
+      .seatmap-svg-wrap {
+        width: 100%;
+        background: #1a0a0a;
+        border-bottom: 1px solid var(--border);
+        overflow: hidden;
+        position: relative;
+      }
+      .seatmap-svg-wrap svg {
+        width: 100%;
+        height: auto;
+        display: block;
+      }
+      .seatmap-seat-list {
+        padding: 16px;
+      }
+      .seatmap-seat-list-title {
+        font-family: var(--font-mono);
+        font-size: 10px;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        color: var(--bone-dim);
+        margin-bottom: 12px;
+      }
+      .seat-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(56px, 1fr));
+        gap: 8px;
+      }
+      .seat-btn {
+        aspect-ratio: 1;
+        border-radius: 50%;
+        border: 2px solid var(--border);
+        background: var(--obsidian-2);
+        color: var(--bone-dim);
+        font-size: 10px;
+        font-family: var(--font-mono);
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.12s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .seat-btn.available {
+        border-color: var(--border);
+        background: var(--obsidian-2);
+        color: var(--bone-dim);
+      }
+      .seat-btn.selected {
+        border-color: var(--success);
+        background: rgba(63, 143, 95, 0.25);
+        color: var(--success);
+      }
+      .seat-btn.sold {
+        border-color: var(--border);
+        background: #1a1a1a;
+        color: #333;
+        cursor: not-allowed;
+        text-decoration: line-through;
+      }
+      .seat-btn.ringside.available {
+        border-color: var(--gold);
+        color: var(--gold-bright);
+      }
+      .seat-btn.premium.available {
+        border-color: var(--crimson);
+        color: var(--crimson-bright);
+      }
+      .seat-btn.normal.available {
+        border-color: #8250c8;
+        color: #a070e8;
+      }
+      .seat-btn.vip-std.available {
+        border-color: #1e78c8;
+        color: #4aa0e8;
+      }
+
+      .seatmap-legend {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+        padding: 0 16px 12px;
+        font-size: 11px;
+        color: var(--bone-dim);
+      }
+      .seatmap-legend .dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        display: inline-block;
+        margin-right: 4px;
+      }
+      .seatmap-selected-bar {
+        padding: 12px 16px;
+        background: var(--obsidian-3);
+        border-top: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        position: sticky;
+        bottom: 0;
+      }
+      .seatmap-selected-info {
+        font-size: 13px;
+        color: var(--bone-dim);
+      }
+      .seatmap-selected-info strong {
+        color: var(--bone);
+        font-family: var(--font-mono);
+      }
+
+      /* ── CHECKOUT MODAL ────────────────────────────────────── */
+      .checkout-modal {
+        max-width: 480px;
+        width: 96%;
+      }
+      .checkout-event-header {
+        background: linear-gradient(135deg, #0d0d0d, #1a0505);
+        padding: 16px 20px;
+        border-bottom: 1px solid var(--border);
+      }
+      .checkout-event-title {
+        font-family: var(--font-display);
+        font-size: 20px;
+        color: #fff;
+        text-transform: uppercase;
+      }
+      .checkout-event-meta {
+        font-size: 12px;
+        color: var(--bone-dim);
+        margin-top: 2px;
+      }
+      .checkout-order-row {
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+        padding: 16px 20px;
+        border-bottom: 1px solid var(--border);
+      }
+      .checkout-tier-icon {
+        width: 44px;
+        height: 44px;
+        border-radius: 10px;
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+      }
+      .checkout-order-name {
+        font-weight: 700;
+        font-size: 14px;
+        color: var(--bone);
+      }
+      .checkout-order-seats {
+        font-size: 12px;
+        color: var(--bone-dim);
+        margin-top: 2px;
+      }
+      .checkout-order-price {
+        margin-left: auto;
+        font-family: var(--font-mono);
+        font-size: 15px;
+        color: var(--gold-bright);
+        font-weight: 700;
+        white-space: nowrap;
+      }
+
+      .checkout-promo {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 12px 20px;
+        border-bottom: 1px solid var(--border);
+      }
+      .checkout-promo input {
+        flex: 1;
+        background: transparent;
+        border: none;
+        outline: none;
+        font-size: 14px;
+        color: var(--bone);
+        font-family: var(--font-body);
+      }
+      .checkout-promo input::placeholder {
+        color: var(--bone-dim);
+      }
+      .checkout-promo-label {
+        font-size: 13px;
+        color: var(--bone-dim);
+      }
+      .checkout-promo-add {
+        color: var(--gold-bright);
+        font-size: 20px;
+        cursor: pointer;
+      }
+
+      .checkout-totals {
+        padding: 12px 20px;
+        border-bottom: 1px solid var(--border);
+      }
+      .checkout-total-row {
+        display: flex;
+        justify-content: space-between;
+        font-size: 13px;
+        color: var(--bone-dim);
+        margin-bottom: 6px;
+      }
+      .checkout-total-row.grand {
+        font-weight: 700;
+        font-size: 16px;
+        color: var(--bone);
+        margin-top: 8px;
+        padding-top: 8px;
+        border-top: 1px solid var(--border);
+      }
+      .checkout-total-row.grand span:last-child {
+        color: var(--gold-bright);
+        font-family: var(--font-mono);
+      }
+
+      .checkout-details {
+        padding: 16px 20px;
+      }
+      .checkout-tac {
+        font-size: 12px;
+        color: var(--bone-dim);
+        padding: 10px 20px;
+        border-top: 1px solid var(--border);
+      }
+
+      .payment-method-cards {
+        display: flex;
+        gap: 10px;
+        margin: 12px 20px;
+      }
+      .pmc-btn {
+        flex: 1;
+        padding: 12px 8px;
+        border-radius: 10px;
+        border: 2px solid var(--border);
+        background: var(--obsidian);
+        cursor: pointer;
+        transition: all 0.15s;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 6px;
+      }
+      .pmc-btn.active {
+        border-color: var(--gold);
+        background: rgba(176, 141, 62, 0.1);
+      }
+      .pmc-btn img {
+        width: 36px;
+        height: 36px;
+        object-fit: contain;
+        border-radius: 6px;
+        background: #fff;
+        padding: 2px;
+      }
+      .pmc-btn span {
+        font-size: 12px;
+        font-weight: 700;
+        color: var(--bone);
+      }
+
+      .pmc-details {
+        margin: 0 20px 12px;
+        background: var(--obsidian);
+        border: 1px dashed var(--gold);
+        border-radius: 8px;
+        padding: 12px 14px;
+        font-family: var(--font-mono);
+        font-size: 12px;
+      }
+      .pmc-details-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 4px 0;
+        color: var(--bone-dim);
+      }
+      .pmc-details-row span:last-child {
+        color: var(--gold-bright);
+        font-weight: 700;
+      }
+      .pmc-details-row.ref span:last-child {
+        color: var(--crimson-bright);
+        letter-spacing: 1px;
       }
     </style>
   </head>
   <body>
     <div id="nav-mount" data-active="tickets"></div>
 
-    <div class="container" style="padding-top: 48px">
-      <div class="page-header" style="margin-bottom: 24px">
-        <div>
-          <div class="section-eyebrow">Fight Night Seating</div>
-          <div
-            class="section-title"
-            style="font-size: 38px; margin-bottom: 4px"
-          >
-            Choose Your Seats
+    <!-- ── STEP 1: TIER SELECTION ──────────────────────────────── -->
+    <div id="stepTier">
+      <div class="tix-event-banner">
+        <img
+          src="images/hero-banner.jpg"
+          alt="ETFC Fight Night"
+          onerror="this.style.display='none'"
+        />
+        <div class="tix-event-info">
+          <div class="tix-event-title">ETFC Adwa Fight Night</div>
+          <div class="tix-event-meta">
+            August 27, 2026 &middot; 6:00 PM &middot; Adwa Memorial Museum
           </div>
-        </div>
-        <div style="display: flex; align-items: center; gap: 12px">
-          <button class="btn btn-outline btn-sm" onclick="openMyTicketsModal()">
-            My Tickets
-          </button>
         </div>
       </div>
 
-      <!-- ROTATING AD BANNER — Early Bird first, then merch items -->
+      <div class="tier-list" id="tierList"></div>
+    </div>
+
+    <!-- ── STEP 2: SEAT MAP ─────────────────────────────────────── -->
+    <div id="stepSeatmap" style="display: none">
       <div
-        id="ticketAdBanner"
         style="
-          margin-bottom: 24px;
-          border-radius: 12px;
-          overflow: hidden;
-          cursor: pointer;
-          position: relative;
+          padding: 14px 16px;
+          background: var(--obsidian-2);
+          border-bottom: 1px solid var(--border);
+          display: flex;
+          align-items: center;
+          gap: 12px;
         "
-      ></div>
+      >
+        <button
+          onclick="backToTiers()"
+          style="
+            background: none;
+            border: none;
+            color: var(--bone-dim);
+            font-size: 22px;
+            cursor: pointer;
+            padding: 0;
+          "
+        >
+          ‹
+        </button>
+        <span
+          id="seatmapTitle"
+          style="
+            font-family: var(--font-display);
+            font-size: 18px;
+            text-transform: uppercase;
+            color: var(--bone);
+          "
+        ></span>
+      </div>
 
-      <!-- STEP 1: SEAT SELECTION -->
-      <div id="seatStep">
-        <!-- Section Tabs (VVIP Ringside & VVIP Premium only — these are the only sections
-         small enough to pick an exact seat on the map below. All other sections use
-         the quantity stepper for General Admission.) -->
-        <div class="section-tabs" id="sectionTabs" role="tablist">
-          <button
-            class="section-tab active"
-            role="tab"
-            data-section="VVIP Ringside"
-            onclick="switchSection('VVIP Ringside')"
-          >
-            VVIP Ringside
-          </button>
-          <button
-            class="section-tab"
-            role="tab"
-            data-section="VVIP Premium"
-            onclick="switchSection('VVIP Premium')"
-          >
-            VVIP Premium
-          </button>
-          <button
-            class="section-tab"
-            role="tab"
-            data-section="VVIP Normal"
-            onclick="switchSection('VVIP Normal')"
-          >
-            VVIP Normal
-          </button>
-          <button
-            class="section-tab"
-            role="tab"
-            data-section="VIP"
-            onclick="switchSection('VIP')"
-          >
-            VIP
-          </button>
-          <button
-            class="section-tab"
-            role="tab"
-            data-section="Early Bird"
-            onclick="switchSection('Early Bird')"
-          >
-            Early Bird
-          </button>
+      <!-- SVG Arena Map -->
+      <div class="seatmap-svg-wrap" id="arenaWrap">
+        <!-- rendered by JS -->
+      </div>
+
+      <div class="seatmap-legend">
+        <span
+          ><span class="dot" style="background: var(--gold)"></span>VVIP
+          Ringside</span
+        >
+        <span
+          ><span class="dot" style="background: var(--crimson)"></span>VVIP
+          Premium</span
+        >
+        <span
+          ><span class="dot" style="background: #8250c8"></span>VVIP
+          Normal</span
+        >
+        <span><span class="dot" style="background: #1e78c8"></span>VIP</span>
+        <span
+          ><span class="dot" style="background: var(--success)"></span
+          >Selected</span
+        >
+        <span><span class="dot" style="background: #333"></span>Sold</span>
+      </div>
+
+      <!-- Seat list below map -->
+      <div class="seatmap-seat-list">
+        <div class="seatmap-seat-list-title" id="seatListTitle">
+          Select Your Seat
         </div>
+        <div
+          style="display: flex; gap: 10px; margin-bottom: 12px; flex-wrap: wrap"
+          id="seatFilters"
+        ></div>
+        <div class="seat-grid" id="seatGrid"></div>
+      </div>
 
-        <div class="grid-2 seat-select-grid" style="align-items: start">
-          <div>
-            <div class="venue-map">
-              <div id="seatMapMount"></div>
-              <div class="seat-legend">
-                <div class="item">
-                  <span class="swatch ringside"></span>VVIP Ringside
-                </div>
-                <div class="item">
-                  <span class="swatch vip"></span>VVIP Premium
-                </div>
-                <div class="item">
-                  <span class="swatch selected"></span>Selected
-                </div>
-                <div class="item"><span class="swatch sold"></span>Sold</div>
-              </div>
-            </div>
+      <div class="seatmap-selected-bar">
+        <div class="seatmap-selected-info">
+          Selected: <strong id="seatmapSelectedCount">0</strong> &nbsp;·&nbsp;
+          <strong id="seatmapSelectedTotal">0 ETB</strong>
+        </div>
+        <button
+          class="btn btn-primary btn-sm"
+          id="seatmapContinueBtn"
+          onclick="goToCheckout()"
+          disabled
+        >
+          Continue
+        </button>
+      </div>
+    </div>
 
-            <!-- General Admission (VVIP Normal, VIP, Early Bird): all use quantity
-         stepper since individual seat picking isn't practical for these sections. -->
-            <div class="ga-picker-head">
-              <div class="section-eyebrow" style="margin-bottom: 0">
-                Quantity Selector
-              </div>
-              <p class="text-dim" style="font-size: 12px; margin: 4px 0 0">
-                Tap + to add a seat — we'll assign the best available one for
-                you.
-              </p>
-            </div>
-            <div class="tier-picker-mobile" id="gaPickerMount"></div>
-          </div>
-          <div class="selection-panel">
-            <h3>Your Seats</h3>
-            <div id="selectionPanelBody"></div>
-            <div
-              id="selectionTotal"
-              class="selection-total"
-              style="display: none"
-            ></div>
-            <div class="text-dim" style="font-size: 12px; margin-top: 8px">
-              Ref: <span id="refCode" class="ref-code">ETFC-XXXXXX</span>
-            </div>
-            <button
-              id="checkoutBtn"
-              class="btn btn-primary btn-block mt-24"
-              onclick="openCheckoutModal()"
-              disabled
-            >
-              Continue to Checkout
-            </button>
-          </div>
+    <!-- ── STEP 3: CHECKOUT ─────────────────────────────────────── -->
+    <div id="stepCheckout" style="display: none">
+      <div
+        style="
+          padding: 14px 16px;
+          background: var(--obsidian-2);
+          border-bottom: 1px solid var(--border);
+          display: flex;
+          align-items: center;
+          gap: 12px;
+        "
+      >
+        <button
+          id="checkoutBackBtn"
+          onclick="backToSeatmap()"
+          style="
+            background: none;
+            border: none;
+            color: var(--bone-dim);
+            font-size: 22px;
+            cursor: pointer;
+            padding: 0;
+          "
+        >
+          ‹
+        </button>
+        <span
+          style="
+            font-family: var(--font-display);
+            font-size: 18px;
+            text-transform: uppercase;
+            color: var(--bone);
+          "
+          >Checkout</span
+        >
+      </div>
+
+      <div class="checkout-event-header">
+        <div class="checkout-event-title">ETFC Adwa Fight Night</div>
+        <div class="checkout-event-meta">August 27, 2026 &middot; 6:00 PM</div>
+      </div>
+
+      <!-- Order summary rows injected here -->
+      <div id="checkoutOrderRows"></div>
+
+      <!-- Promo code -->
+      <div class="checkout-promo">
+        <span class="checkout-promo-label">Add Promo Code</span>
+        <input type="text" id="promoInput" placeholder="Enter code…" />
+        <span class="checkout-promo-add" onclick="applyPromo()">+</span>
+      </div>
+
+      <!-- Totals -->
+      <div class="checkout-totals">
+        <div class="checkout-total-row">
+          <span>Subtotal</span><span id="checkoutSubtotal">0 ETB</span>
+        </div>
+        <div class="checkout-total-row">
+          <span>Promo Code</span><span id="checkoutPromoDiscount">0 ETB</span>
+        </div>
+        <div class="checkout-total-row grand">
+          <span>Estimated Total</span><span id="checkoutTotal">0 ETB</span>
         </div>
       </div>
+
+      <p class="checkout-tac">Terms and Conditions accepted</p>
+
+      <!-- Payment methods -->
+      <div
+        style="
+          padding: 12px 20px 4px;
+          font-family: var(--font-mono);
+          font-size: 10px;
+          letter-spacing: 2px;
+          text-transform: uppercase;
+          color: var(--gold-bright);
+        "
+      >
+        Payment Method
+      </div>
+      <div class="payment-method-cards">
+        <button
+          class="pmc-btn active"
+          id="pmcMpesa"
+          onclick="selectCheckoutPayment('mpesa')"
+        >
+          <img src="/mpesa.png" alt="M-Pesa" />
+          <span>M-Pesa</span>
+        </button>
+        <button
+          class="pmc-btn"
+          id="pmcTelebirr"
+          onclick="selectCheckoutPayment('telebirr')"
+        >
+          <img src="/telebirr.jpg" alt="Telebirr" />
+          <span>Telebirr</span>
+        </button>
+      </div>
+      <div class="pmc-details" id="pmcDetails">
+        <div class="pmc-details-row">
+          <span>Account Name</span><span id="pmcName">Efrem Werku Muluneh</span>
+        </div>
+        <div class="pmc-details-row">
+          <span>Number</span><span id="pmcNumber">0725767614</span>
+        </div>
+        <div class="pmc-details-row ref">
+          <span>Reference Code</span><span id="pmcRef">ETFC-XXXXXX</span>
+        </div>
+      </div>
+
+      <!-- Buyer details -->
+      <div class="checkout-details">
+        <div class="field">
+          <label>Full Name</label>
+          <input
+            type="text"
+            id="buyerName"
+            placeholder="Your full name"
+            autocomplete="name"
+          />
+        </div>
+        <div class="field">
+          <label>Phone Number</label>
+          <input
+            type="tel"
+            id="buyerPhone"
+            placeholder="e.g. 0912345678"
+            autocomplete="tel"
+          />
+        </div>
+        <div class="field">
+          <label
+            >Email
+            <span
+              style="font-size: 11px; color: var(--bone-dim); font-weight: 400"
+              >(optional — for order confirmation)</span
+            ></label
+          >
+          <input
+            type="email"
+            id="buyerEmail"
+            placeholder="you@example.com"
+            autocomplete="email"
+          />
+        </div>
+
+        <!-- Upload screenshot -->
+        <div class="field" style="margin-top: 16px">
+          <label>Payment Screenshot</label>
+          <div
+            class="upload-area"
+            id="uploadArea"
+            onclick="document.getElementById('screenshotFile').click()"
+          >
+            <div class="upload-icon">📷</div>
+            <span id="uploadLabel">Tap to upload proof of payment</span>
+            <span class="upload-hint">Max 5MB · JPG/PNG</span>
+            <img class="upload-preview" id="uploadPreview" alt="preview" />
+            <input
+              type="file"
+              id="screenshotFile"
+              accept="image/*"
+              style="display: none"
+              onchange="onFileChosen(this)"
+            />
+          </div>
+        </div>
+
+        <p
+          id="checkoutError"
+          style="
+            color: var(--crimson-bright);
+            font-size: 13px;
+            display: none;
+            margin-top: 10px;
+          "
+        ></p>
+      </div>
+
+      <div style="padding: 16px 20px 80px">
+        <button
+          class="btn btn-primary btn-block"
+          id="completePurchaseBtn"
+          onclick="submitOrder()"
+        >
+          Complete Purchase
+        </button>
+      </div>
+    </div>
+
+    <!-- ── STEP 4: PENDING / SUCCESS ─────────────────────────────── -->
+    <div
+      id="stepPending"
+      style="display: none; text-align: center; padding: 60px 24px"
+    >
+      <div style="font-size: 56px; margin-bottom: 16px">⏳</div>
+      <div
+        style="
+          font-family: var(--font-display);
+          font-size: 24px;
+          text-transform: uppercase;
+          margin-bottom: 8px;
+        "
+      >
+        Order Submitted
+      </div>
+      <span class="status-pill pending">Pending Verification</span>
+      <p
+        class="text-dim"
+        style="margin-top: 20px; line-height: 1.6; font-size: 14px"
+      >
+        ETFC is reviewing your payment — usually within a few hours.<br />
+        <strong style="color: var(--gold-bright)">Keep this page open</strong>
+        to see your ticket the moment it's approved.
+      </p>
+      <div id="pendingTicketMount" style="margin-top: 32px"></div>
+      <button
+        class="btn btn-outline"
+        style="margin-top: 24px"
+        onclick="resetToTiers()"
+      >
+        + Buy More Tickets
+      </button>
     </div>
 
     <div id="footer-mount"></div>
 
-    <!-- CHECKOUT MODAL (like betting betSlipModal) -->
-    <div class="modal-overlay" id="checkoutModal">
-      <div
-        class="modal modal-bet-slip"
-        style="
-          display: flex;
-          flex-direction: column;
-          max-height: 90vh;
-          overflow: hidden;
-        "
-      >
-        <div class="modal-header">
-          <h3>Complete Your Payment</h3>
-          <span class="modal-close" onclick="closeCheckoutModal()"
-            >&times;</span
-          >
-        </div>
-        <div
-          class="modal-body"
-          id="checkoutModalBody"
-          style="overflow-y: auto; flex: 1; padding-bottom: 80px"
-        >
-          <!-- Step 1: User Details -->
-          <div id="checkoutStep1">
-            <p class="text-dim" style="margin-bottom: 24px; padding: 0 24px">
-              Transfer the total amount to one of the accounts below, then
-              upload your payment screenshot. Your ticket confirms once ETFC
-              verifies the transfer — usually within a few hours.
-            </p>
-
-            <div class="checkout-section">
-              <div class="checkout-title">Send Payment To</div>
-
-              <!-- Telebirr -->
-              <div
-                class="bank-details"
-                style="
-                  display: flex;
-                  align-items: center;
-                  gap: 14px;
-                  padding: 14px 16px;
-                  margin-bottom: 10px;
-                "
-              >
-                <div
-                  style="
-                    width: 44px;
-                    height: 44px;
-                    border-radius: 10px;
-                    overflow: hidden;
-                    flex-shrink: 0;
-                  "
-                >
-                  <img
-                    src="/telebirr.jpg"
-                    alt="Telebirr"
-                    style="
-                      width: 44px;
-                      height: 44px;
-                      object-fit: cover;
-                      border-radius: 10px;
-                    "
-                  />
-                </div>
-                <div style="flex: 1">
-                  <div
-                    style="
-                      font-weight: 700;
-                      font-size: 14px;
-                      margin-bottom: 2px;
-                    "
-                  >
-                    Telebirr
-                  </div>
-                  <div style="font-size: 13px; color: var(--text-dim)">
-                    Ager
-                  </div>
-                </div>
-                <div
-                  style="
-                    font-family: var(--font-mono);
-                    font-size: 15px;
-                    color: var(--gold-bright);
-                    font-weight: 700;
-                  "
-                >
-                  0983196199
-                </div>
-              </div>
-
-              <!-- Mpesa -->
-              <div
-                class="bank-details"
-                style="
-                  display: flex;
-                  align-items: center;
-                  gap: 14px;
-                  padding: 14px 16px;
-                  margin-bottom: 10px;
-                "
-              >
-                <div
-                  style="
-                    width: 44px;
-                    height: 44px;
-                    border-radius: 10px;
-                    overflow: hidden;
-                    flex-shrink: 0;
-                  "
-                >
-                  <img
-                    src="/mpesa.png"
-                    alt="M-Pesa"
-                    style="
-                      width: 44px;
-                      height: 44px;
-                      object-fit: cover;
-                      border-radius: 50%;
-                    "
-                  />
-                </div>
-                <div style="flex: 1">
-                  <div
-                    style="
-                      font-weight: 700;
-                      font-size: 14px;
-                      margin-bottom: 2px;
-                    "
-                  >
-                    Safaricom M-Pesa
-                  </div>
-                  <div style="font-size: 13px; color: var(--text-dim)">
-                    Efrem Werku Muluneh
-                  </div>
-                </div>
-                <div
-                  style="
-                    font-family: var(--font-mono);
-                    font-size: 15px;
-                    color: var(--gold-bright);
-                    font-weight: 700;
-                  "
-                >
-                  0725767614
-                </div>
-              </div>
-
-              <!-- Ref code -->
-              <div
-                class="bank-details"
-                style="padding: 12px 16px; margin-bottom: 8px"
-              >
-                <div class="bank-row highlight">
-                  <span>Reference Code</span>
-                  <span id="modalRefCode" class="ref-code">ETFC-XXXXXX</span>
-                </div>
-              </div>
-              <p class="hint" style="margin-bottom: 24px">
-                Include the reference code in your transfer note.
-              </p>
-            </div>
-
-            <div class="field mt-24">
-              <label>Full Name</label>
-              <input
-                type="text"
-                id="buyerNameInput"
-                placeholder="As it should appear on your ticket"
-              />
-            </div>
-
-            <div class="field">
-              <label>Phone Number</label>
-              <input
-                type="tel"
-                id="buyerPhoneInput"
-                placeholder="e.g. 0912345678"
-              />
-            </div>
-
-            <div class="field">
-              <label>Email</label>
-              <input
-                type="email"
-                id="buyerEmailInput"
-                placeholder="you@example.com"
-              />
-            </div>
-          </div>
-
-          <!-- Step 2: Upload Screenshot -->
-          <div id="checkoutStep2" style="display: none">
-            <div class="checkout-section">
-              <div class="checkout-title">Upload Screenshot</div>
-              <div
-                id="checkoutDepositInstruction"
-                style="
-                  background: rgba(176, 141, 62, 0.08);
-                  border: 1px solid rgba(176, 141, 62, 0.25);
-                  border-radius: 10px;
-                  padding: 12px 16px;
-                  margin-bottom: 16px;
-                  font-size: 14px;
-                  line-height: 1.5;
-                "
-              >
-                Deposit
-                <strong
-                  id="checkoutDepositAmount"
-                  style="color: var(--gold-bright); font-size: 16px"
-                ></strong>
-                to one of the accounts above and send us the screenshot.
-              </div>
-            </div>
-
-            <div class="field">
-              <label>Upload Payment Screenshot</label>
-              <div
-                class="upload-area"
-                id="screenshotUploadArea"
-                onclick="document.getElementById('screenshotInput').click()"
-              >
-                <div class="upload-icon">&#128247;</div>
-                <span id="uploadLabel">Tap to upload proof of payment</span>
-                <span class="upload-hint">Max 5MB • JPG/PNG</span>
-                <img
-                  class="upload-preview"
-                  id="screenshotPreview"
-                  alt="Screenshot preview"
-                />
-                <input
-                  type="file"
-                  id="screenshotInput"
-                  accept="image/*"
-                  style="display: none"
-                  onchange="onScreenshotChosen(this)"
-                />
-              </div>
-            </div>
-
-            <p
-              id="submitError"
-              class="text-dim"
-              style="
-                color: var(--crimson-bright);
-                display: none;
-                margin-top: 10px;
-                padding: 0 24px;
-              "
-            ></p>
-          </div>
-
-          <input type="hidden" id="selectedPaymentMethod" value="telebirr" />
-        </div>
-        <!-- end modal-body -->
-
-        <!-- Sticky footer — step-aware -->
-        <div
-          class="modal-footer"
-          style="
-            position: sticky;
-            bottom: 0;
-            padding: 16px 24px;
-            background: var(--obsidian-2);
-            border-top: 1px solid var(--border);
-            z-index: 10;
-          "
-        >
-          <!-- Step 1 footer -->
-          <div id="checkoutFooterStep1">
-            <button
-              class="btn btn-primary btn-block"
-              onclick="checkoutGoToStep2()"
-            >
-              Next →
-            </button>
-          </div>
-          <!-- Step 2 footer -->
-          <div id="checkoutFooterStep2" style="display: none">
-            <button
-              class="btn btn-outline btn-sm"
-              style="margin-bottom: 10px; width: 100%"
-              onclick="checkoutGoToStep1()"
-            >
-              ← Back
-            </button>
-            <button
-              class="btn btn-primary btn-block"
-              id="submitOrderBtn"
-              onclick="submitOrder()"
-            >
-              Submit Order
-            </button>
-          </div>
-        </div>
-
-        <!-- Pending State -->
-        <div
-          id="checkoutPending"
-          class="modal-body"
-          style="display: none; padding: 24px; text-align: center"
-        >
-          <div style="font-size: 48px; margin-bottom: 16px">&#9203;</div>
-          <h3
-            style="
-              font-family: var(--font-display);
-              font-size: 22px;
-              text-transform: uppercase;
-              margin-bottom: 12px;
-            "
-          >
-            Order Submitted
-          </h3>
-          <span class="status-pill pending" id="checkoutOrderStatusPill"
-            >Pending Verification</span
-          >
-          <p
-            class="text-dim mt-24"
-            id="checkoutWaitMsg"
-            style="font-size: 14px; line-height: 1.6"
-          >
-            ETFC is reviewing your payment.
-            <strong style="color: var(--gold-bright)"
-              >Please do not close this page</strong
-            >
-            — it will update automatically the moment your order is approved.
-          </p>
-          <div
-            style="
-              margin-top: 24px;
-              padding-top: 24px;
-              border-top: 1px solid var(--border);
-            "
-          >
-            <p class="text-dim" style="margin-bottom: 12px; font-size: 14px">
-              Want to get tickets for friends?
-            </p>
-            <button
-              class="btn btn-outline btn-block"
-              onclick="showSeatStepAgain()"
-            >
-              + Buy More Tickets
-            </button>
-          </div>
-        </div>
-
-        <!-- Live Receipt — shown when admin approves -->
-        <div
-          id="checkoutReceiptStep"
-          class="modal-body"
-          style="display: none; padding: 24px"
-        >
-          <div id="checkoutReceiptMount"></div>
-          <button
-            class="btn btn-outline btn-block mt-24"
-            onclick="closeCheckoutModal(true)"
-          >
-            Done
-          </button>
-        </div>
+    <!-- Footer buy bar -->
+    <div class="tix-footer-bar" id="tixFooterBar">
+      <div class="tix-footer-summary">
+        <span id="footerTicketCount">0 Tickets</span>
+        <strong id="footerTotal">0 ETB</strong>
       </div>
+      <button
+        class="btn btn-primary tix-footer-btn"
+        onclick="onContinueFromTiers()"
+      >
+        Continue
+      </button>
     </div>
 
     <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
@@ -565,107 +863,758 @@
     <script src="js/auth.js"></script>
     <script src="js/partials.js"></script>
     <script src="js/main.js"></script>
-    <script src="js/seatmap.js"></script>
     <script>
-      document.getElementById("refCode").textContent =
-        "ETFC-" + Math.random().toString(36).slice(2, 8).toUpperCase();
-      document.getElementById("modalRefCode").textContent =
-        "ETFC-" + Math.random().toString(36).slice(2, 8).toUpperCase();
+      // ── TIER CONFIG ────────────────────────────────────────────────
+      const TIERS = [
+        {
+          id: "vvip-ringside",
+          name: "VVIP Ringside Tickets",
+          price: 100000,
+          icon: "ringside",
+          emoji: "🏆",
+          sub: "Includes seat selection",
+          hasSeatmap: true,
+          tier: "ringside",
+        },
+        {
+          id: "vvip-premium",
+          name: "VVIP Premium Tickets",
+          price: 50000,
+          icon: "premium",
+          emoji: "⭐",
+          sub: "Includes seat selection",
+          hasSeatmap: true,
+          tier: "vip",
+        },
+        {
+          id: "vvip-normal",
+          name: "VVIP Normal Tickets",
+          price: 30000,
+          icon: "normal",
+          emoji: "🎟",
+          sub: "Includes seat selection",
+          hasSeatmap: true,
+          tier: "vvip-normal",
+        },
+        {
+          id: "vip",
+          name: "VIP Tickets",
+          price: 20000,
+          icon: "vip",
+          emoji: "💺",
+          sub: "Includes seat selection",
+          hasSeatmap: true,
+          tier: "vip-std",
+        },
+        {
+          id: "early-bird",
+          name: "Early Bird Tickets",
+          price: 6000,
+          icon: "earlybird",
+          emoji: "🐦",
+          sub: "General admission · No seat map",
+          hasSeatmap: false,
+          tier: "ga",
+        },
+      ];
 
-      // If user already submitted an order this session, show pending in modal
-      const savedOrder = JSON.parse(
-        localStorage.getItem("etfc_pending_order") || "null"
-      );
-      if (savedOrder && savedOrder.refCode) {
-        document.getElementById("refCode").textContent = savedOrder.refCode;
-        document.getElementById("modalRefCode").textContent =
-          savedOrder.refCode;
-        if (savedOrder.orderId) {
-          openCheckoutModal();
-          checkoutShowPending(savedOrder.orderId, savedOrder.refCode);
-        }
-      }
+      // qty selected per tier
+      const tierQty = {};
+      TIERS.forEach((t) => (tierQty[t.id] = 0));
 
-      const EVENT_DATE_STR = "August 27, 2026";
-      const EVENT_TIME_STR = "4:00 PM";
-
+      // seats picked on the seatmap { seatId: { tierId, price, label } }
+      let selectedSeats = {};
+      let currentTierId = null;
+      let chosenFile = null;
+      let selectedPayment = "mpesa";
       let approvalUnsubscribe = null;
+      const refCode =
+        "ETFC-" + Math.random().toString(36).slice(2, 8).toUpperCase();
 
-      // Modal open/close
-      function openCheckoutModal() {
-        document.getElementById("checkoutModal").classList.add("open");
-        checkoutGoToStep1();
+      const PAYMENT_INFO = {
+        mpesa: { name: "Efrem Werku Muluneh", number: "0725767614" },
+        telebirr: { name: "Ager", number: "0983196199" },
+      };
+
+      // ── STEP 1: TIER LIST ─────────────────────────────────────────
+      function renderTierList() {
+        document.getElementById("tierList").innerHTML = TIERS.map(
+          (t) => `
+    <div class="tier-row">
+      <div class="tier-icon ${t.icon}">${t.emoji}</div>
+      <div class="tier-info">
+        <div class="tier-name">${t.name}</div>
+        <div class="tier-price">${t.price.toLocaleString()} ETB</div>
+        <div class="tier-sub">${t.sub}</div>
+      </div>
+      <div class="tier-stepper">
+        <button class="tier-btn minus" onclick="changeTierQty('${
+          t.id
+        }',-1)" id="minus-${t.id}" disabled>−</button>
+        <span class="tier-qty" id="qty-${t.id}">0</span>
+        <button class="tier-btn plus" onclick="changeTierQty('${
+          t.id
+        }',1)" id="plus-${t.id}">+</button>
+      </div>
+    </div>
+  `
+        ).join("");
       }
 
-      function closeCheckoutModal(force) {
-        if (!force && approvalUnsubscribe) {
-          // Don't close if listening for approval - user should wait
-          return;
+      function changeTierQty(tierId, delta) {
+        const tier = TIERS.find((t) => t.id === tierId);
+        if (!tier) return;
+        const newQty = Math.max(0, (tierQty[tierId] || 0) + delta);
+        tierQty[tierId] = newQty;
+        document.getElementById("qty-" + tierId).textContent = newQty;
+        document.getElementById("minus-" + tierId).disabled = newQty === 0;
+        updateFooterBar();
+      }
+
+      function updateFooterBar() {
+        let totalQty = 0,
+          totalPrice = 0;
+        TIERS.forEach((t) => {
+          totalQty += tierQty[t.id] || 0;
+          totalPrice += (tierQty[t.id] || 0) * t.price;
+        });
+        const bar = document.getElementById("tixFooterBar");
+        bar.classList.toggle("visible", totalQty > 0);
+        document.getElementById(
+          "footerTicketCount"
+        ).textContent = `${totalQty} Ticket${totalQty !== 1 ? "s" : ""}`;
+        document.getElementById("footerTotal").textContent =
+          totalPrice.toLocaleString() + " ETB";
+      }
+
+      function onContinueFromTiers() {
+        // Find first tier with qty > 0
+        const firstWithQty = TIERS.find((t) => (tierQty[t.id] || 0) > 0);
+        if (!firstWithQty) return;
+
+        // Separate seat-map tiers from early-bird
+        const seatmapTiers = TIERS.filter(
+          (t) => t.hasSeatmap && (tierQty[t.id] || 0) > 0
+        );
+        const gaOnly = seatmapTiers.length === 0;
+
+        if (gaOnly) {
+          // Only early bird — skip straight to checkout
+          selectedSeats = {};
+          TIERS.filter((t) => !t.hasSeatmap).forEach((t) => {
+            for (let i = 0; i < (tierQty[t.id] || 0); i++) {
+              const seatId = `${t.id}-auto-${i}`;
+              selectedSeats[seatId] = {
+                tierId: t.id,
+                price: t.price,
+                label: `${t.name} #${i + 1}`,
+                tier: t.tier,
+              };
+            }
+          });
+          showStep("stepCheckout");
+          buildCheckoutUI();
+        } else {
+          // Show seatmap for first seatmap tier
+          currentTierId = seatmapTiers[0].id;
+          showStep("stepSeatmap");
+          renderArenaMap();
+          renderSeatList();
         }
-        document.getElementById("checkoutModal").classList.remove("open");
-        if (approvalUnsubscribe) {
-          approvalUnsubscribe();
-          approvalUnsubscribe = null;
-        }
       }
 
-      // Step navigation
-      function checkoutGoToStep1() {
-        document.getElementById("checkoutStep1").style.display = "block";
-        document.getElementById("checkoutStep2").style.display = "none";
-        document.getElementById("checkoutPending").style.display = "none";
-        document.getElementById("checkoutReceiptStep").style.display = "none";
-        document.getElementById("checkoutFooterStep1").style.display = "block";
-        document.getElementById("checkoutFooterStep2").style.display = "none";
+      // ── STEP 2: SEAT MAP ──────────────────────────────────────────
+      // SVG arena — rectangular venue with ring in center, blocks arranged around it
+      function renderArenaMap() {
+        const tier = TIERS.find((t) => t.id === currentTierId);
+        document.getElementById("seatmapTitle").textContent = tier
+          ? tier.name
+          : "Select Seats";
+
+        // Build filter buttons for all seatmap tiers with qty > 0
+        const activeSeatmapTiers = TIERS.filter(
+          (t) => t.hasSeatmap && (tierQty[t.id] || 0) > 0
+        );
+        document.getElementById("seatFilters").innerHTML = activeSeatmapTiers
+          .map(
+            (t) => `
+    <button onclick="switchSeatmapTier('${t.id}')"
+      style="padding:6px 14px;border-radius:20px;border:1px solid ${
+        currentTierId === t.id ? "var(--gold)" : "var(--border)"
+      };
+      background:${
+        currentTierId === t.id ? "rgba(176,141,62,0.15)" : "transparent"
+      };
+      color:${
+        currentTierId === t.id ? "var(--gold-bright)" : "var(--bone-dim)"
+      };font-size:12px;cursor:pointer;">
+      ${t.name.replace(" Tickets", "")}
+    </button>
+  `
+          )
+          .join("");
+
+        const W = 560,
+          H = 420;
+        const RING_W = 90,
+          RING_H = 70;
+        const CX = W / 2,
+          CY = H / 2;
+
+        // Color map per tier
+        const COLORS = {
+          ringside: "#b08d3e",
+          vip: "#b3141c",
+          "vvip-normal": "#8250c8",
+          "vip-std": "#1e78c8",
+          ga: "#3f8f5f",
+        };
+
+        let svgContent = `
+    <!-- Arena floor -->
+    <rect width="${W}" height="${H}" fill="#1a0808" rx="0"/>
+    <!-- Aisle lines -->
+    <line x1="${CX}" y1="0" x2="${CX}" y2="${
+          CY - RING_H / 2 - 20
+        }" stroke="#2a1a1a" stroke-width="16"/>
+    <line x1="${CX}" y1="${
+          CY + RING_H / 2 + 20
+        }" x2="${CX}" y2="${H}" stroke="#2a1a1a" stroke-width="16"/>
+    <line x1="0" y1="${CY}" x2="${
+          CX - RING_W / 2 - 20
+        }" y2="${CY}" stroke="#2a1a1a" stroke-width="16"/>
+    <line x1="${
+      CX + RING_W / 2 + 20
+    }" y1="${CY}" x2="${W}" y2="${CY}" stroke="#2a1a1a" stroke-width="16"/>
+    <!-- Ring -->
+    <rect x="${CX - RING_W / 2}" y="${
+          CY - RING_H / 2
+        }" width="${RING_W}" height="${RING_H}" fill="#1a0505" stroke="#b3141c" stroke-width="3" rx="4"/>
+    <rect x="${CX - RING_W / 2 + 8}" y="${CY - RING_H / 2 + 8}" width="${
+          RING_W - 16
+        }" height="${
+          RING_H - 16
+        }" fill="none" stroke="rgba(179,20,28,0.4)" stroke-width="1.5" rx="2"/>
+    <text x="${CX}" y="${
+          CY - 6
+        }" text-anchor="middle" font-family="Anton,sans-serif" font-size="14" fill="#fff" letter-spacing="3" opacity="0.9">ETFC</text>
+    <text x="${CX}" y="${
+          CY + 12
+        }" text-anchor="middle" font-family="Anton,sans-serif" font-size="9" fill="#b3141c" letter-spacing="2">RING</text>
+    <!-- ENTRANCE label -->
+    <text x="${CX}" y="16" text-anchor="middle" font-family="monospace" font-size="9" fill="#4a3a3a" letter-spacing="2">ENTRANCE</text>
+  `;
+
+        // Draw seat blocks as rectangles around the ring
+        const BLOCKS = [
+          // Top row — VVIP Ringside
+          {
+            id: "block-rs-l",
+            x: 120,
+            y: 30,
+            w: 140,
+            h: 120,
+            tier: "ringside",
+            label: "VVIP\nRINGSIDE",
+            rows: 6,
+            cols: 8,
+          },
+          {
+            id: "block-rs-r",
+            x: 300,
+            y: 30,
+            w: 140,
+            h: 120,
+            tier: "ringside",
+            label: "VVIP\nRINGSIDE",
+            rows: 6,
+            cols: 8,
+          },
+          // Left side — VVIP Premium
+          {
+            id: "block-prem-l",
+            x: 10,
+            y: 80,
+            w: 100,
+            h: 140,
+            tier: "vip",
+            label: "VVIP\nPREM",
+            rows: 7,
+            cols: 5,
+          },
+          // Right side — VVIP Premium
+          {
+            id: "block-prem-r",
+            x: 450,
+            y: 80,
+            w: 100,
+            h: 140,
+            tier: "vip",
+            label: "VVIP\nPREM",
+            rows: 7,
+            cols: 5,
+          },
+          // Bottom left — VVIP Normal
+          {
+            id: "block-n-bl",
+            x: 10,
+            y: 260,
+            w: 120,
+            h: 130,
+            tier: "vvip-normal",
+            label: "VVIP\nNORMAL",
+            rows: 6,
+            cols: 6,
+          },
+          // Bottom center-left — VIP
+          {
+            id: "block-vip-bl",
+            x: 140,
+            y: 310,
+            w: 110,
+            h: 100,
+            tier: "vip-std",
+            label: "VIP",
+            rows: 5,
+            cols: 6,
+          },
+          // Bottom center-right — VIP
+          {
+            id: "block-vip-br",
+            x: 310,
+            y: 310,
+            w: 110,
+            h: 100,
+            tier: "vip-std",
+            label: "VIP",
+            rows: 5,
+            cols: 6,
+          },
+          // Bottom right — VVIP Normal
+          {
+            id: "block-n-br",
+            x: 430,
+            y: 260,
+            w: 120,
+            h: 130,
+            tier: "vvip-normal",
+            label: "VVIP\nNORMAL",
+            rows: 6,
+            cols: 6,
+          },
+        ];
+
+        BLOCKS.forEach((b) => {
+          const color = COLORS[b.tier] || "#555";
+          const isCurrentTier = tier && b.tier === tier.tier;
+          const opacity = isCurrentTier ? 1 : 0.3;
+
+          svgContent += `
+      <rect x="${b.x}" y="${b.y}" width="${b.w}" height="${b.h}"
+        fill="${color}" fill-opacity="${isCurrentTier ? 0.15 : 0.06}"
+        stroke="${color}" stroke-opacity="${opacity}" stroke-width="1.5" rx="3"/>
+    `;
+
+          // Draw mini seat dots inside each block
+          const dotR = 3,
+            padX = 6,
+            padY = 18;
+          const availW = b.w - padX * 2,
+            availH = b.h - padY - 6;
+          const spacingX = availW / Math.max(b.cols - 1, 1);
+          const spacingY = availH / Math.max(b.rows - 1, 1);
+
+          for (let r = 0; r < b.rows; r++) {
+            for (let c = 0; c < b.cols; c++) {
+              const dx = b.x + padX + c * spacingX;
+              const dy = b.y + padY + r * spacingY;
+              svgContent += `<circle cx="${dx.toFixed(1)}" cy="${dy.toFixed(
+                1
+              )}" r="${dotR}"
+          fill="${color}" fill-opacity="${
+                isCurrentTier ? 0.7 : 0.2
+              }" stroke="none"/>`;
+            }
+          }
+
+          // Block label
+          const lblX = b.x + b.w / 2;
+          const lblY = b.y + 12;
+          const lines = b.label.split("\n");
+          lines.forEach((line, li) => {
+            svgContent += `<text x="${lblX}" y="${
+              lblY + li * 9
+            }" text-anchor="middle"
+        font-family="monospace" font-size="7" fill="${color}"
+        fill-opacity="${
+          isCurrentTier ? 0.9 : 0.4
+        }" letter-spacing="1">${line}</text>`;
+          });
+        });
+
+        svgContent += `
+    <!-- Fighters walkway label -->
+    <text x="${CX}" y="${
+          CY + RING_H / 2 + 14
+        }" text-anchor="middle" font-family="monospace" font-size="7" fill="#3a2a2a" letter-spacing="1">FIGHTERS WALK WAY</text>
+  `;
+
+        document.getElementById(
+          "arenaWrap"
+        ).innerHTML = `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg">${svgContent}</svg>`;
       }
 
-      function checkoutGoToStep2() {
-        // Validate step 1
-        const name = document.getElementById("buyerNameInput").value.trim();
-        const phone = document.getElementById("buyerPhoneInput").value.trim();
-        const email = document.getElementById("buyerEmailInput").value.trim();
-        if (!name) return showCheckoutError("Enter your full name.");
-        if (!phone) return showCheckoutError("Enter your phone number.");
-        if (!/^(09|07)\d{8}$/.test(phone))
-          return showCheckoutError(
-            "Enter a valid Ethiopian phone number (e.g. 0912345678)."
+      function switchSeatmapTier(tierId) {
+        currentTierId = tierId;
+        const tier = TIERS.find((t) => t.id === tierId);
+        document.getElementById("seatmapTitle").textContent = tier
+          ? tier.name
+          : "";
+        renderArenaMap();
+        renderSeatList();
+      }
+
+      // Build the clickable seat grid below the map
+      const BLOCK_SEATS = {
+        ringside: { prefix: "RS", total: 104, rows: 8 },
+        vip: { prefix: "PR", total: 70, rows: 7 },
+        "vvip-normal": { prefix: "VN", total: 72, rows: 6 },
+        "vip-std": { prefix: "VP", total: 60, rows: 5 },
+      };
+
+      function renderSeatList() {
+        const tier = TIERS.find((t) => t.id === currentTierId);
+        if (!tier) return;
+
+        const bsKey = tier.tier;
+        const bs = BLOCK_SEATS[bsKey];
+        if (!bs) return;
+
+        const needed = tierQty[currentTierId] || 0;
+        const alreadyPicked = Object.values(selectedSeats).filter(
+          (s) => s.tierId === currentTierId
+        ).length;
+
+        document.getElementById(
+          "seatListTitle"
+        ).textContent = `Select Your Seat · Pick ${needed} (${alreadyPicked}/${needed} selected)`;
+
+        const seats = [];
+        for (let i = 1; i <= bs.total; i++) {
+          const row = String.fromCharCode(
+            64 + Math.ceil(i / (bs.total / bs.rows))
           );
-        if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
-          return showCheckoutError("Enter a valid email address.");
+          const num = String(i).padStart(3, "0");
+          seats.push({ id: `${bsKey}-${num}`, label: `${row}${num}` });
+        }
 
-        document.getElementById("checkoutStep1").style.display = "none";
-        document.getElementById("checkoutStep2").style.display = "block";
-        document.getElementById("checkoutFooterStep1").style.display = "none";
-        document.getElementById("checkoutFooterStep2").style.display = "block";
+        const grid = document.getElementById("seatGrid");
+        grid.innerHTML = seats
+          .map((s) => {
+            const isSold = false; // TODO: check Firestore seatMap
+            const isSelected = !!selectedSeats[s.id];
+            let cls = isSold
+              ? "sold"
+              : isSelected
+              ? "selected"
+              : `${bsKey} available`;
+            return `<button class="seat-btn ${cls}" onclick="toggleSeat('${
+              s.id
+            }','${currentTierId}',${tier.price},'${s.label}')"
+      ${isSold ? "disabled" : ""}>${s.label}</button>`;
+          })
+          .join("");
 
+        updateSeatmapBar();
+      }
+
+      function toggleSeat(seatId, tierId, price, label) {
+        if (selectedSeats[seatId]) {
+          delete selectedSeats[seatId];
+        } else {
+          const tier = TIERS.find((t) => t.id === tierId);
+          const needed = tierQty[tierId] || 0;
+          const alreadyPicked = Object.values(selectedSeats).filter(
+            (s) => s.tierId === tierId
+          ).length;
+          if (alreadyPicked >= needed) {
+            showMsg(
+              "You've already selected " +
+                needed +
+                " seat(s) for this tier. Deselect one first."
+            );
+            return;
+          }
+          selectedSeats[seatId] = {
+            tierId,
+            price,
+            label,
+            tier: tier?.tier || "",
+          };
+        }
+        renderSeatList();
+      }
+
+      function updateSeatmapBar() {
+        const count = Object.keys(selectedSeats).length;
         const total = Object.values(selectedSeats).reduce(
-          (sum, s) => sum + s.price,
+          (s, v) => s + v.price,
           0
         );
-        document.getElementById("checkoutDepositAmount").textContent =
+        document.getElementById("seatmapSelectedCount").textContent = count;
+        document.getElementById("seatmapSelectedTotal").textContent =
           total.toLocaleString() + " ETB";
+
+        // Check all seatmap tiers are fully satisfied
+        const seatmapTiers = TIERS.filter(
+          (t) => t.hasSeatmap && (tierQty[t.id] || 0) > 0
+        );
+        const allSatisfied = seatmapTiers.every((t) => {
+          const picked = Object.values(selectedSeats).filter(
+            (s) => s.tierId === t.id
+          ).length;
+          return picked >= (tierQty[t.id] || 0);
+        });
+        document.getElementById("seatmapContinueBtn").disabled = !allSatisfied;
       }
 
-      function showCheckoutError(msg) {
-        document.getElementById("submitError").textContent = msg;
-        document.getElementById("submitError").style.display = "block";
+      function goToCheckout() {
+        // Add early bird auto-seats
+        TIERS.filter((t) => !t.hasSeatmap).forEach((t) => {
+          for (let i = 0; i < (tierQty[t.id] || 0); i++) {
+            const seatId = `${t.id}-auto-${i}`;
+            selectedSeats[seatId] = {
+              tierId: t.id,
+              price: t.price,
+              label: `${t.name} #${i + 1}`,
+              tier: t.tier,
+            };
+          }
+        });
+        showStep("stepCheckout");
+        buildCheckoutUI();
       }
 
-      // Show pending state in modal
-      function checkoutShowPending(orderId, refCode) {
-        document.getElementById("checkoutStep1").style.display = "none";
-        document.getElementById("checkoutStep2").style.display = "none";
-        document.getElementById("checkoutPending").style.display = "block";
-        document.getElementById("checkoutFooterStep1").style.display = "none";
-        document.getElementById("checkoutFooterStep2").style.display = "none";
-        listenForApproval(orderId, refCode);
+      function backToTiers() {
+        showStep("stepTier");
+      }
+      function backToSeatmap() {
+        // If there were seatmap tiers, go back there; otherwise back to tiers
+        const hasSeatmap = TIERS.some(
+          (t) => t.hasSeatmap && (tierQty[t.id] || 0) > 0
+        );
+        if (hasSeatmap) {
+          showStep("stepSeatmap");
+          // Remove auto-seats
+          Object.keys(selectedSeats).forEach((id) => {
+            if (id.includes("-auto-")) delete selectedSeats[id];
+          });
+        } else {
+          showStep("stepTier");
+        }
       }
 
-      // Live-updates the pending page the instant admin approves/rejects
-      function listenForApproval(orderId, refCode) {
-        if (!orderId) return;
+      // ── STEP 3: CHECKOUT ──────────────────────────────────────────
+      function buildCheckoutUI() {
+        // Group seats by tier
+        const byTier = {};
+        Object.entries(selectedSeats).forEach(([id, s]) => {
+          if (!byTier[s.tierId]) byTier[s.tierId] = [];
+          byTier[s.tierId].push(s);
+        });
+
+        const ICON_MAP = {
+          "vvip-ringside": "🏆",
+          "vvip-premium": "⭐",
+          "vvip-normal": "🎟",
+          vip: "💺",
+          "early-bird": "🐦",
+        };
+        const BG_MAP = {
+          "vvip-ringside": "#b08d3e",
+          "vvip-premium": "#b3141c",
+          "vvip-normal": "#8250c8",
+          vip: "#1e78c8",
+          "early-bird": "#1eb478",
+        };
+
+        let subtotal = 0;
+        const rows = Object.entries(byTier)
+          .map(([tierId, seats]) => {
+            const tier = TIERS.find((t) => t.id === tierId);
+            const rowTotal = seats.reduce((s, v) => s + v.price, 0);
+            subtotal += rowTotal;
+            const seatLabels = seats
+              .map((s) => s.label)
+              .filter((l) => !l.includes("auto"))
+              .join(", ");
+            return `
+      <div class="checkout-order-row">
+        <div class="checkout-tier-icon" style="background:${
+          BG_MAP[tierId] || "#555"
+        }">${ICON_MAP[tierId] || "🎟"}</div>
+        <div style="flex:1;min-width:0;">
+          <div class="checkout-order-name">${tier?.name || tierId}</div>
+          <div class="checkout-order-seats">${seats.length} ticket${
+              seats.length > 1 ? "s" : ""
+            }${seatLabels ? " · seats " + seatLabels : ""}</div>
+        </div>
+        <div class="checkout-order-price">${rowTotal.toLocaleString()} ETB</div>
+      </div>`;
+          })
+          .join("");
+
+        document.getElementById("checkoutOrderRows").innerHTML = rows;
+        document.getElementById("checkoutSubtotal").textContent =
+          subtotal.toLocaleString() + " ETB";
+        document.getElementById("checkoutPromoDiscount").textContent = "0 ETB";
+        document.getElementById("checkoutTotal").textContent =
+          subtotal.toLocaleString() + " ETB";
+        document.getElementById("pmcRef").textContent = refCode;
+
+        // Pre-fill from session if logged in
+        const session = JSON.parse(
+          localStorage.getItem("etfc_session") || "null"
+        );
+        if (session?.name)
+          document.getElementById("buyerName").value = session.name;
+        if (session?.phone)
+          document.getElementById("buyerPhone").value = session.phone;
+        if (session?.email)
+          document.getElementById("buyerEmail").value = session.email;
+
+        selectCheckoutPayment("mpesa");
+      }
+
+      function selectCheckoutPayment(method) {
+        selectedPayment = method;
+        document
+          .getElementById("pmcMpesa")
+          .classList.toggle("active", method === "mpesa");
+        document
+          .getElementById("pmcTelebirr")
+          .classList.toggle("active", method === "telebirr");
+        const info = PAYMENT_INFO[method];
+        document.getElementById("pmcName").textContent = info.name;
+        document.getElementById("pmcNumber").textContent = info.number;
+      }
+
+      function applyPromo() {
+        const code = document
+          .getElementById("promoInput")
+          .value.trim()
+          .toUpperCase();
+        if (!code) return;
+        showMsg("Promo code '" + code + "' is not valid.");
+      }
+
+      function onFileChosen(input) {
+        const file = input.files[0];
+        if (!file) return;
+        if (file.size > 5 * 1024 * 1024) {
+          showMsg("Screenshot is over 5MB.");
+          input.value = "";
+          return;
+        }
+        chosenFile = file;
+        document.getElementById("uploadLabel").textContent = "✓ " + file.name;
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          document.getElementById("uploadPreview").src = e.target.result;
+          document.getElementById("uploadArea").classList.add("has-file");
+        };
+        reader.readAsDataURL(file);
+      }
+
+      function showMsg(msg) {
+        const el = document.getElementById("checkoutError");
+        el.textContent = msg;
+        el.style.display = "block";
+        setTimeout(() => (el.style.display = "none"), 4000);
+      }
+
+      async function submitOrder() {
+        const name = document.getElementById("buyerName").value.trim();
+        const phone = document.getElementById("buyerPhone").value.trim();
+        const email = document.getElementById("buyerEmail").value.trim();
+        if (!name) return showMsg("Enter your full name.");
+        if (!phone) return showMsg("Enter your phone number.");
+        if (!/^(09|07)\d{8}$/.test(phone))
+          return showMsg("Phone must start with 09 or 07 and be 10 digits.");
+        if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
+          return showMsg("Enter a valid email or leave blank.");
+        if (!chosenFile) return showMsg("Upload your payment screenshot.");
+        if (Object.keys(selectedSeats).length === 0)
+          return showMsg("No seats selected.");
+
+        const btn = document.getElementById("completePurchaseBtn");
+        btn.disabled = true;
+        btn.textContent = "Uploading…";
+
+        try {
+          const fd = new FormData();
+          fd.append("file", chosenFile);
+          fd.append("upload_preset", "etfc_uploads");
+          fd.append("folder", "payment-screenshots");
+          const cr = await fetch(
+            "https://api.cloudinary.com/v1_1/yryolq8j/image/upload",
+            { method: "POST", body: fd }
+          );
+          if (!cr.ok) throw new Error("Screenshot upload failed.");
+          const cd = await cr.json();
+
+          btn.textContent = "Submitting…";
+          const seats = Object.keys(selectedSeats).filter(
+            (id) => !id.includes("-auto-")
+          );
+          const gaSeats = Object.entries(selectedSeats)
+            .filter(([id]) => id.includes("-auto-"))
+            .map(([, v]) => v.label);
+          const totalAmount = Object.values(selectedSeats).reduce(
+            (s, v) => s + v.price,
+            0
+          );
+          const session = JSON.parse(
+            localStorage.getItem("etfc_session") || "null"
+          );
+
+          const res = await fetch("/api/create-order", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              buyerName: name,
+              phone,
+              paymentMethod: selectedPayment,
+              email: email || session?.email || "",
+              userId: session?.uid || "",
+              seats: [...seats, ...gaSeats],
+              totalAmount,
+              screenshotUrl: cd.secure_url,
+              refCode,
+            }),
+          });
+          const data = await res.json();
+          if (!res.ok) throw new Error(data.error || "Could not submit order.");
+
+          localStorage.setItem(
+            "etfc_pending_order",
+            JSON.stringify({ refCode, orderId: data.orderId, ts: Date.now() })
+          );
+          showStep("stepPending");
+          document.getElementById("tixFooterBar").classList.remove("visible");
+          listenForApproval(data.orderId);
+        } catch (err) {
+          showMsg(
+            err.message || "Upload failed — check connection and try again."
+          );
+          btn.disabled = false;
+          btn.textContent = "Complete Purchase";
+        }
+      }
+
+      // ── STEP 4: PENDING ───────────────────────────────────────────
+      function listenForApproval(orderId) {
         if (approvalUnsubscribe) approvalUnsubscribe();
-
         approvalUnsubscribe = db
           .collection("orders")
           .doc(orderId)
@@ -673,660 +1622,99 @@
             (snap) => {
               if (!snap.exists) return;
               const o = snap.data();
-
               if (o.status === "confirmed") {
                 approvalUnsubscribe();
                 localStorage.removeItem("etfc_pending_order");
-                renderCheckoutTicketReady(o);
+                showConfirmedTicket(o);
               } else if (o.status === "rejected") {
                 approvalUnsubscribe();
-                document.getElementById("checkoutWaitMsg").innerHTML =
-                  `<span style="color:var(--crimson-bright);">Your order was not approved${
-                    o.rejectionReason ? `: ${o.rejectionReason}` : "."
-                  }</span> ` +
-                  `Please <a href="tickets.html" style="color:var(--gold-bright);">try again</a>.`;
-                document.getElementById("checkoutOrderStatusPill").className =
-                  "status-pill rejected";
-                document.getElementById("checkoutOrderStatusPill").textContent =
-                  "Rejected";
                 localStorage.removeItem("etfc_pending_order");
+                document.getElementById(
+                  "pendingTicketMount"
+                ).innerHTML = `<div style="color:var(--crimson-bright);padding:16px;background:rgba(179,20,28,0.1);border-radius:8px;border:1px solid var(--crimson);">
+          ❌ Order rejected${
+            o.rejectionReason ? ": " + o.rejectionReason : "."
+          } <a href="tickets.html" style="color:var(--gold-bright);">Try again</a>
+        </div>`;
               }
             },
             (err) => console.error("listenForApproval:", err)
           );
       }
 
-      // Show seat selection again while keeping pending order active
-      function showSeatStepAgain() {
-        closeCheckoutModal(true);
-        // Keep listening for approval in background
-      }
-
-      function renderTicketQR(qrData, containerId) {
-        const el = document.getElementById(containerId);
-        if (!el) return;
-        el.innerHTML = "";
+      function showConfirmedTicket(o) {
+        const seats = (o.seats || []).join(", ") || "—";
+        const ticketCode = o.ticketCode || o.refCode || "—";
+        const qrData = `${window.location.origin}/verify.html?code=${ticketCode}`;
+        document.getElementById("pendingTicketMount").innerHTML = `
+    <div style="background:linear-gradient(135deg,#0d0d0d,#1a0505);border:2px solid var(--gold);border-radius:12px;overflow:hidden;margin-top:8px;">
+      <div style="background:linear-gradient(90deg,var(--crimson) 4px,transparent 4px);padding:16px 20px 12px;">
+        <div style="font-family:var(--font-display);font-size:14px;color:var(--bone-dim);letter-spacing:2px;text-transform:uppercase;">E-Ticket · Confirmed</div>
+        <div style="font-family:var(--font-display);font-size:24px;color:#fff;text-transform:uppercase;margin-top:4px;">ETFC Fight Night</div>
+        <div style="font-size:12px;color:var(--bone-dim);margin-top:2px;">August 27, 2026 · 6:00 PM · Adwa Museum</div>
+      </div>
+      <div style="display:flex;gap:16px;padding:16px 20px;border-top:1px solid rgba(176,141,62,0.2);">
+        <div style="flex:1;">
+          <div style="font-size:10px;color:var(--bone-dim);letter-spacing:1px;text-transform:uppercase;margin-bottom:2px;">Seats</div>
+          <div style="font-family:var(--font-mono);font-size:13px;color:var(--bone);">${seats}</div>
+          <div style="font-size:10px;color:var(--bone-dim);letter-spacing:1px;text-transform:uppercase;margin:10px 0 2px;">Ticket Code</div>
+          <div style="font-family:var(--font-mono);font-size:14px;color:var(--gold-bright);font-weight:700;">${ticketCode}</div>
+        </div>
+        <div id="confirmedQR" style="flex-shrink:0;"></div>
+      </div>
+    </div>
+    <p class="text-dim" style="text-align:center;margin-top:12px;font-size:13px;">✅ Screenshot this ticket — it's your entry pass.</p>
+  `;
         try {
-          new QRCode(el, {
+          new QRCode(document.getElementById("confirmedQR"), {
             text: qrData,
-            width: 104,
-            height: 104,
+            width: 100,
+            height: 100,
             colorDark: "#0d0d0d",
             colorLight: "#ffffff",
             correctLevel: QRCode.CorrectLevel.M,
           });
-        } catch (e) {
-          console.error("QR render failed:", e);
-        }
+        } catch (e) {}
       }
 
-      function renderCheckoutTicketReady(o) {
-        const seats = (o.seats || []).join(", ") || "—";
-        const ticketCode = o.ticketCode || o.refCode || "—";
-        const qrData = `${window.location.origin}/verify.html?code=${ticketCode}`;
-        const qrId = "liveTicketQR";
-
-        document.getElementById("checkoutReceiptMount").innerHTML = `
-          <div class="ticket-card confirmed">
-            <div class="ticket-visual">
-              <div class="ticket-top">
-                <div class="ticket-logo">ET<span>FC</span></div>
-                <span class="ticket-badge">E-TICKET</span>
-              </div>
-              <div class="ticket-main">
-                <div class="ticket-event-info">
-                  <div class="ticket-event-label">ETFC Fight Night</div>
-                  <div class="ticket-event-name">Adwa Museum</div>
-                  <div class="ticket-event-date">${EVENT_DATE_STR} &middot; ${EVENT_TIME_STR}</div>
-                </div>
-                <div class="ticket-qr-wrap" id="${qrId}"></div>
-              </div>
-            </div>
-            <div class="ticket-bottom">
-              <div class="ticket-field">
-                <div class="ticket-field-label">Seats</div>
-                <div class="ticket-field-value seats">${seats}</div>
-              </div>
-              <div class="ticket-field">
-                <div class="ticket-field-label">Section</div>
-                <div class="ticket-field-value">${
-                  (o.seats || [])[0]?.split("-")[0] || "—"
-                }</div>
-              </div>
-              <div class="ticket-field">
-                <div class="ticket-field-label">Ticket Code</div>
-                <div class="ticket-field-value code">${ticketCode}</div>
-              </div>
-            </div>
-          </div>
-          <p class="text-dim" style="text-align:center;">
-            Approved! Screenshot this or find it anytime under
-            <a href="dashboard.html" style="color:var(--gold-bright);">My Tickets</a>.
-          </p>
-        `;
-        renderTicketQR(qrData, qrId);
-
-        document.getElementById("checkoutPending").style.display = "none";
-        document.getElementById("checkoutReceiptStep").style.display = "block";
-      }
-
-      let chosenFile = null;
-      let currentSection = "VVIP Ringside";
-
-      function switchSection(section) {
-        currentSection = section;
-        document.querySelectorAll(".section-tab").forEach((btn) => {
-          btn.classList.toggle("active", btn.dataset.section === section);
+      function resetToTiers() {
+        TIERS.forEach((t) => (tierQty[t.id] = 0));
+        selectedSeats = {};
+        chosenFile = null;
+        TIERS.forEach((t) => {
+          const el = document.getElementById("qty-" + t.id);
+          if (el) {
+            el.textContent = "0";
+            document.getElementById("minus-" + t.id).disabled = true;
+          }
         });
+        updateFooterBar();
+        showStep("stepTier");
+      }
 
-        // Only VVIP Ringside and VVIP Premium use the visual seat map
-        const isVisualMapSection =
-          section === "VVIP Ringside" || section === "VVIP Premium";
-        const mapEl = document.getElementById("seatMapMount");
-        const gaEl = document.getElementById("gaPickerMount");
-
-        if (isVisualMapSection) {
-          if (mapEl) mapEl.style.display = "";
-          if (gaEl) gaEl.style.display = "none";
-          const gaHead = document.querySelector(".ga-picker-head");
-          if (gaHead) gaHead.style.display = "none";
-          if (typeof renderSeatMap === "function") renderSeatMap(section);
-        } else {
-          if (mapEl) mapEl.style.display = "none";
-          const gaHead = document.querySelector(".ga-picker-head");
-          if (gaHead) gaHead.style.display = "";
-          if (gaEl) {
-            gaEl.style.display = "block";
-            renderGaSection(section);
+      // ── UTIL ──────────────────────────────────────────────────────
+      function showStep(stepId) {
+        ["stepTier", "stepSeatmap", "stepCheckout", "stepPending"].forEach(
+          (id) => {
+            const el = document.getElementById(id);
+            if (el) el.style.display = id === stepId ? "block" : "none";
           }
-        }
-      }
-
-      function renderGaSection(section) {
-        const gaEl = document.getElementById("gaPickerMount");
-        if (!gaEl) return;
-        // Find matching GA config
-        const sec =
-          typeof GA_CONFIG !== "undefined"
-            ? GA_CONFIG.find((s) => s.section === section)
-            : null;
-        if (!sec) {
-          gaEl.innerHTML = `<p class="text-dim">No section data.</p>`;
-          return;
-        }
-        const seatIds =
-          typeof getSectionSeatIds === "function" ? getSectionSeatIds(sec) : [];
-        const selectedCount = seatIds.filter(
-          (id) => selectedSeats && selectedSeats[id]
-        ).length;
-        const availableCount = seatIds.filter(
-          (id) =>
-            !(typeof SOLD_SEATS !== "undefined" && SOLD_SEATS.has(id)) &&
-            !(selectedSeats && selectedSeats[id])
-        ).length;
-        gaEl.innerHTML = `
-      <div class="tier-pick-card">
-        <div class="tier-pick-info">
-          <div class="tier-pick-name">${sec.section}</div>
-          <div class="tier-pick-price">${sec.price.toLocaleString()} ETB / seat</div>
-          <div class="tier-pick-avail">${availableCount} available</div>
-          <p class="text-dim" style="font-size:12px;margin-top:6px;">General admission — seats auto-assigned.</p>
-        </div>
-        <div class="tier-pick-stepper">
-          <button type="button" onclick="adjustTierQty('${
-            sec.section
-          }', -1); renderGaSection('${sec.section}')" ${
-          selectedCount === 0 ? "disabled" : ""
-        }>−</button>
-          <span id="tierQty-${sec.section.replace(
-            /\s/g,
-            ""
-          )}">${selectedCount}</span>
-          <button type="button" onclick="adjustTierQty('${
-            sec.section
-          }', 1); renderGaSection('${sec.section}')" ${
-          availableCount === 0 ? "disabled" : ""
-        }>+</button>
-        </div>
-      </div>`;
-      }
-
-      function onScreenshotChosen(input) {
-        const file = input.files[0];
-        if (!file) return;
-        if (file.size > 5 * 1024 * 1024) {
-          showSubmitError(
-            "Screenshot is over 5MB — please choose a smaller image."
-          );
-          input.value = "";
-          return;
-        }
-        chosenFile = file;
-        document.getElementById("uploadLabel").textContent = `✓ ${file.name}`;
-        const area = document.getElementById("screenshotUploadArea");
-        const preview = document.getElementById("screenshotPreview");
-        if (area && preview) {
-          const reader = new FileReader();
-          reader.onload = (e) => {
-            preview.src = e.target.result;
-            area.classList.add("has-file");
-          };
-          reader.readAsDataURL(file);
-        }
-      }
-
-      async function submitOrder() {
-        const errEl = document.getElementById("submitError");
-        const btn = document.getElementById("submitOrderBtn");
-        errEl.style.display = "none";
-
-        const buyerName = document
-          .getElementById("buyerNameInput")
-          .value.trim();
-        const buyerPhone = document
-          .getElementById("buyerPhoneInput")
-          .value.trim();
-        const buyerEmail =
-          document.getElementById("buyerEmailInput")?.value.trim() || "";
-        const paymentMethod = document.getElementById(
-          "selectedPaymentMethod"
-        ).value;
-        const session = JSON.parse(
-          localStorage.getItem("etfc_session") || "null"
         );
-
-        if (!buyerName) return showCheckoutError("Enter your full name.");
-        if (!buyerPhone) return showCheckoutError("Enter your phone number.");
-        if (!/^(09|07)\d{8}$/.test(buyerPhone))
-          return showCheckoutError(
-            "Enter a valid Ethiopian phone number starting with 09 or 07 (10 digits)."
-          );
-        if (buyerEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(buyerEmail))
-          return showCheckoutError(
-            "Enter a valid email address or leave it blank."
-          );
-        if (!chosenFile)
-          return showCheckoutError("Upload your payment screenshot.");
-        if (Object.keys(selectedSeats).length === 0)
-          return showCheckoutError("No seats selected.");
-
-        const seats = Object.keys(selectedSeats);
-        const totalAmount = Object.values(selectedSeats).reduce(
-          (sum, s) => sum + s.price,
-          0
-        );
-
-        btn.setAttribute("disabled", "true");
-        btn.textContent = "Uploading screenshot…";
-
-        try {
-          // Upload to Cloudinary (unsigned preset — no CORS issues, no credit card)
-          const formData = new FormData();
-          formData.append("file", chosenFile);
-          formData.append("upload_preset", "etfc_uploads");
-          formData.append("folder", "payment-screenshots");
-          const cloudRes = await fetch(
-            "https://api.cloudinary.com/v1_1/yryolq8j/image/upload",
-            {
-              method: "POST",
-              body: formData,
-            }
-          );
-          if (!cloudRes.ok)
-            throw new Error("Screenshot upload failed — please try again.");
-          const cloudData = await cloudRes.json();
-          const screenshotUrl = cloudData.secure_url;
-
-          btn.textContent = "Submitting…";
-
-          const res = await fetch("/api/create-order", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              buyerName,
-              phone: buyerPhone,
-              paymentMethod,
-              email: buyerEmail || session?.email || "",
-              userId: session?.uid || "",
-              seats,
-              totalAmount,
-              screenshotUrl,
-            }),
-          });
-          const data = await res.json();
-
-          if (res.status === 409) {
-            showCheckoutError(
-              data.error ||
-                "Some of your seats were just taken. Please choose different seats."
-            );
-            setTimeout(() => {
-              closeCheckoutModal(true);
-              selectedSeats = {};
-              if (typeof renderSeatMap === "function")
-                renderSeatMap(currentSection);
-              renderSelectionPanel();
-            }, 2500);
-            btn.removeAttribute("disabled");
-            btn.textContent = "Submit Order";
-            return;
-          }
-
-          if (!res.ok) throw new Error(data.error || "Could not submit order.");
-
-          // Save so reload doesn't lose the pending state
-          localStorage.setItem(
-            "etfc_pending_order",
-            JSON.stringify({
-              refCode: data.refCode,
-              orderId: data.orderId,
-              ts: Date.now(),
-            })
-          );
-
-          document.getElementById("refCode").textContent = data.refCode;
-          document.getElementById("modalRefCode").textContent = data.refCode;
-          checkoutShowPending(data.orderId, data.refCode);
-        } catch (err) {
-          showCheckoutError(
-            err.message ||
-              "Upload failed — check your connection and try again."
-          );
-          btn.removeAttribute("disabled");
-          btn.textContent = "Submit Order";
-        }
+        window.scrollTo(0, 0);
       }
 
-      // My Tickets Modal
-      const STATUS_ICON = { confirmed: "✅", pending: "⏳", rejected: "❌" };
-      const STATUS_LABEL = {
-        confirmed: "Confirmed",
-        pending: "Pending",
-        rejected: "Rejected",
-      };
-      const BADGE_LABEL = {
-        confirmed: "E-TICKET",
-        pending: "PENDING",
-        rejected: "REJECTED",
-      };
-      const BADGE_CLASS = {
-        confirmed: "",
-        pending: "pending",
-        rejected: "rejected",
-      };
-
-      async function loadMyTickets() {
-        const el = document.getElementById("myTicketsContainer");
-        const user = auth.currentUser;
-
-        if (!user) {
-          el.innerHTML = `<div class="empty-state"><div class="empty-icon">🔒</div><p style="margin:0;">Sign in to view your tickets.</p></div>`;
-          return;
-        }
-
-        el.innerHTML = `<p class="text-dim">Loading…</p>`;
-
-        try {
-          const snap = await db
-            .collection("orders")
-            .where("userId", "==", user.uid)
-            .get();
-          let docs = snap.docs;
-          if (docs.length === 0 && user.email) {
-            const snapEmail = await db
-              .collection("orders")
-              .where("email", "==", user.email)
-              .get();
-            docs = snapEmail.docs;
-          }
-          docs.sort(
-            (a, b) =>
-              (b.data().createdAt?.toMillis?.() || 0) -
-              (a.data().createdAt?.toMillis?.() || 0)
-          );
-
-          if (docs.length === 0) {
-            el.innerHTML = `<div class="empty-state"><div class="empty-icon">🎫</div><p style="margin:0;">No tickets yet — <a href="tickets.html" style="color:var(--gold-bright);">grab seats</a> for the next fight.</p></div>`;
-            return;
-          }
-
-          el.innerHTML = docs
-            .map((doc) => {
-              const o = doc.data();
-              const s = o.status || "pending";
-              const seats = o.seats || [];
-              const seatLabels = seats
-                .map((id) => {
-                  const parts = id.split("-");
-                  return parts.length > 1
-                    ? `${parts[0]} Row ${parts[1]} Seat ${parts[2]}`
-                    : id;
-                })
-                .join(", ");
-
-              return `
-          <div class="ticket-card ${s}">
-            <div class="ticket-visual">
-              <div class="ticket-top">
-                <div class="ticket-logo">ET<span>FC</span></div>
-                <span class="ticket-badge ${BADGE_CLASS[s] || ""}">${
-                BADGE_LABEL[s] || s
-              }</span>
-              </div>
-              <div class="ticket-main">
-                <div class="ticket-event-info">
-                  <div class="ticket-event-name">ETFC Fight Night</div>
-                  <div class="ticket-event-meta">August 27, 2026 · 4:00 PM</div>
-                  <div class="ticket-event-meta">Adwa Museum, Addis Ababa</div>
-                </div>
-              </div>
-              <div class="ticket-bottom">
-                <div class="ticket-field"><span class="ticket-field-label">Seats</span><span class="ticket-field-value">${
-                  seatLabels || "—"
-                }</span></div>
-                <div class="ticket-field"><span class="ticket-field-label">Ref</span><span class="ticket-field-value">${
-                  o.refCode || "—"
-                }</span></div>
-                <div class="ticket-field"><span class="ticket-field-label">Status</span><span class="ticket-field-value status-${s}">${
-                STATUS_LABEL[s] || s
-              }</span></div>
-              </div>
-            </div>
-          </div>`;
-            })
-            .join("");
-        } catch (err) {
-          el.innerHTML = `<p style="color:var(--crimson-bright);">Could not load tickets — ${err.message}</p>`;
-          console.error("tickets:", err);
-        }
-      }
-
-      function openMyTicketsModal() {
-        document.getElementById("myTicketsModal").classList.add("open");
-        loadMyTickets();
-      }
-
-      // ── ROTATING AD BANNER ─────────────────────────────────────────────────
-      const ADS = [
-        {
-          type: "ticket",
-          label: "🔥 LIMITED OFFER",
-          title: "Early Bird Tickets",
-          sub: "6,000 ETB — General admission, only 13 seats left.",
-          cta: "Get Early Bird",
-          action: () => switchSection("Early Bird"),
-          bg: "linear-gradient(135deg, #1a0a00 0%, #2a1500 60%, #1a0a00 100%)",
-          accent: "#d4af5f",
-        },
-        {
-          type: "merch",
-          label: "🛍 OFFICIAL MERCH",
-          title: "Black Full Set",
-          sub: "Fight Night tracksuit — hoodie + shorts. Limited drop.",
-          cta: "Shop Now",
-          action: () => (window.location.href = "merch.html"),
-          img: "merch/black-full.png",
-          bg: "linear-gradient(135deg, #0d0d0d 0%, #1a0d0d 60%, #0d0d0d 100%)",
-          accent: "#b3141c",
-        },
-        {
-          type: "merch",
-          label: "🥊 OFFICIAL GEAR",
-          title: "ETFC Boxing Gloves",
-          sub: "Real leather, fight-night branded. 50% off launch price.",
-          cta: "Shop Now",
-          action: () => (window.location.href = "merch.html"),
-          img: "merch/boxing-glove.png",
-          bg: "linear-gradient(135deg, #0a0d10 0%, #101820 60%, #0a0d10 100%)",
-          accent: "#4aa0e8",
-        },
-        {
-          type: "merch",
-          label: "🛍 OFFICIAL MERCH",
-          title: "White Full Set",
-          sub: "Clean white ETFC full set — rare colourway. Offer ends soon.",
-          cta: "Shop Now",
-          action: () => (window.location.href = "merch.html"),
-          img: "merch/white-full.png",
-          bg: "linear-gradient(135deg, #111 0%, #1a1a1a 60%, #111 100%)",
-          accent: "#d4af5f",
-        },
-      ];
-
-      let adIndex = 0;
-      let adTimer = null;
-
-      function renderAd(idx) {
-        const ad = ADS[idx];
-        const banner = document.getElementById("ticketAdBanner");
-        if (!banner) return;
-
-        const imgHtml = ad.img
-          ? `<div style="width:90px;height:90px;flex-shrink:0;border-radius:8px;overflow:hidden;background:#1a1a1a;border:1px solid rgba(255,255,255,0.08);">
-           <img src="${ad.img}" style="width:100%;height:100%;object-fit:contain;padding:4px;">
-         </div>`
-          : `<div style="width:90px;height:90px;flex-shrink:0;border-radius:8px;background:rgba(255,255,255,0.05);display:flex;align-items:center;justify-content:center;font-size:40px;">🎟</div>`;
-
-        // Dot indicators
-        const dots = ADS.map(
-          (_, i) =>
-            `<span onclick="goToAd(${i})" style="width:6px;height:6px;border-radius:50%;background:${
-              i === idx ? ad.accent : "rgba(255,255,255,0.25)"
-            };display:inline-block;cursor:pointer;transition:background 0.2s;"></span>`
-        ).join("");
-
-        banner.style.background = ad.bg;
-        banner.innerHTML = `
-      <div style="display:flex;align-items:center;gap:16px;padding:16px 20px;" onclick="adClick(${idx})">
-        ${imgHtml}
-        <div style="flex:1;min-width:0;">
-          <div style="font-family:var(--font-mono);font-size:9px;letter-spacing:3px;color:${ad.accent};text-transform:uppercase;margin-bottom:4px;">${ad.label}</div>
-          <div style="font-family:var(--font-display);font-size:clamp(16px,4vw,22px);color:#fff;text-transform:uppercase;line-height:1.1;margin-bottom:4px;">${ad.title}</div>
-          <div style="font-size:12px;color:rgba(255,255,255,0.55);margin-bottom:10px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">${ad.sub}</div>
-          <button style="background:${ad.accent};color:#000;border:none;padding:7px 16px;border-radius:6px;font-family:var(--font-mono);font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;cursor:pointer;">${ad.cta}</button>
-        </div>
-        <div style="position:absolute;top:10px;right:14px;display:flex;gap:5px;align-items:center;">${dots}</div>
-      </div>`;
-      }
-
-      function goToAd(idx) {
-        adIndex = idx;
-        renderAd(idx);
-        clearInterval(adTimer);
-        adTimer = setInterval(nextAd, 5000);
-      }
-
-      function adClick(idx) {
-        ADS[idx].action();
-      }
-
-      function nextAd() {
-        adIndex = (adIndex + 1) % ADS.length;
-        renderAd(adIndex);
-      }
-
-      // Payment method phone numbers
-      const PAYMENT_NUMBERS = {
-        mpesa: "0725767614",
-        telebirr: "0983196199",
-      };
-
-      // Payment methods config
-      const PAYMENT_METHODS = [
-        {
-          id: "mpesa",
-          name: "M-Pesa",
-          icon: "/safaricom.png",
-          accountName: "Efrem Werku Muluneh",
-        },
-        {
-          id: "telebirr",
-          name: "Telebirr",
-          icon: "/telebirr.webp",
-          accountName: "Ager",
-        },
-      ];
-
-      let selectedPaymentMethod = "";
-
-      function openPaymentMethodModal() {
-        const container = document.getElementById("paymentMethodOptions");
-        container.innerHTML = PAYMENT_METHODS.map(
-          (pm) => `
-          <button type="button" class="payment-method-row ${
-            pm.id === selectedPaymentMethod ? "selected" : ""
-          }" onclick="selectPaymentMethod('${pm.id}')">
-            <img src="${pm.icon}" alt="${pm.name}">
-            <span class="pmr-name">${pm.name}</span>
-          </button>
-        `
-        ).join("");
-        document.getElementById("paymentMethodModal").classList.add("open");
-      }
-
-      function closePaymentMethodModal() {
-        document.getElementById("paymentMethodModal").classList.remove("open");
-      }
-
-      function selectPaymentMethod(methodId) {
-        const pm = PAYMENT_METHODS.find((p) => p.id === methodId);
-        if (!pm) return;
-        selectedPaymentMethod = methodId;
-        document.getElementById("selectedPaymentMethod").value = methodId;
-
-        // Update the compact trigger to show the chosen method
-        document.getElementById("paymentMethodTrigger").innerHTML = `
-          <span class="pmt-left">
-            <img src="${pm.icon}" alt="${pm.name}">
-            <span class="pmt-name">${pm.name}</span>
-          </span>
-          <span class="pmt-chevron">›</span>
-        `;
-
-        // Reveal account details only now that a method is actually chosen
-        document.getElementById("payAccountName").textContent = pm.accountName;
-        document.getElementById("payAccountNumber").textContent =
-          PAYMENT_NUMBERS[pm.id];
-        document.getElementById("bankDetailsBox").style.display = "block";
-
-        closePaymentMethodModal();
-      }
-
+      // ── INIT ──────────────────────────────────────────────────────
       document.addEventListener("DOMContentLoaded", () => {
-        renderAd(0);
-        adTimer = setInterval(nextAd, 5000);
-        // Initialize section state — hides GA picker, shows seat map correctly
-        switchSection("VVIP Ringside");
+        renderTierList();
+        // Restore pending order
+        const saved = JSON.parse(
+          localStorage.getItem("etfc_pending_order") || "null"
+        );
+        if (saved?.orderId) {
+          showStep("stepPending");
+          listenForApproval(saved.orderId);
+        }
       });
     </script>
-
-    <!-- MY TICKETS MODAL -->
-    <!-- PAYMENT METHOD PICKER MODAL -->
-    <div class="modal-overlay" id="paymentMethodModal">
-      <div class="modal" style="max-width: 420px">
-        <div class="modal-header">
-          <h3 style="margin: 0">Choose Payment Method</h3>
-          <span class="modal-close" onclick="closePaymentMethodModal()"
-            >&times;</span
-          >
-        </div>
-        <div class="modal-body" id="paymentMethodOptions"></div>
-      </div>
-    </div>
-
-    <div class="modal-overlay" id="myTicketsModal">
-      <div
-        class="modal modal-bet-slip"
-        style="
-          display: flex;
-          flex-direction: column;
-          max-height: 85vh;
-          overflow: hidden;
-        "
-      >
-        <div class="modal-header">
-          <h3>My Tickets</h3>
-          <span
-            class="modal-close"
-            onclick="document.getElementById('myTicketsModal').classList.remove('open')"
-            >&times;</span
-          >
-        </div>
-        <div class="modal-body" style="overflow-y: auto; flex: 1">
-          <div
-            style="
-              display: flex;
-              justify-content: flex-end;
-              margin-bottom: 12px;
-            "
-          >
-            <button class="refresh-btn" onclick="loadMyTickets()">
-              ↻ Refresh
-            </button>
-          </div>
-          <div id="myTicketsContainer"><p class="text-dim">Loading…</p></div>
-        </div>
-      </div>
-    </div>
   </body>
 </html>
