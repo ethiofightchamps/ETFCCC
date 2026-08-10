@@ -347,62 +347,69 @@ function renderTicketQR(qrData, containerId) {
     canvas.height = 560 * scale;
     ctx.scale(scale, scale);
 
+    const isLight = document.documentElement.getAttribute("data-theme") === "light";
+    const bgDark = isLight ? "#1a1a2e" : "#0d0d0d";
+    const bgMid = isLight ? "#2a2a4a" : "#1a0505";
+    const textColor = isLight ? "#e8e8e8" : "#ffffff";
+    const textDim = isLight ? "#a0a0b0" : "#999999";
+    const goldColor = "#b08d3e";
+
     // Draw background
     const gradient = ctx.createLinearGradient(0, 0, 0, 560);
-    gradient.addColorStop(0, "#0d0d0d");
-    gradient.addColorStop(0.5, "#1a0505");
-    gradient.addColorStop(1, "#0d0d0d");
+    gradient.addColorStop(0, bgDark);
+    gradient.addColorStop(0.5, bgMid);
+    gradient.addColorStop(1, bgDark);
     ctx.fillStyle = gradient;
     ctx.fillRect(0, 0, 400, 560);
 
     // Gold top border
-    ctx.fillStyle = "#b08d3e";
+    ctx.fillStyle = goldColor;
     ctx.fillRect(0, 0, 400, 4);
 
     // Header
-    ctx.fillStyle = "#b08d3e";
+    ctx.fillStyle = goldColor;
     ctx.font = "bold 12px 'Oswald', sans-serif";
     ctx.textAlign = "center";
     ctx.fillText("E-TICKET · CONFIRMED", 200, 30);
 
-    ctx.fillStyle = "#fff";
+    ctx.fillStyle = textColor;
     ctx.font = "bold 24px 'Oswald', sans-serif";
     ctx.fillText("ETFC FIGHT NIGHT", 200, 60);
 
-    ctx.fillStyle = "#999";
+    ctx.fillStyle = textDim;
     ctx.font = "11px 'Space Mono', monospace";
     ctx.fillText("August 27, 2026 · 6:00 PM · Adwa Museum", 200, 80);
 
     // Seats
-    ctx.fillStyle = "#999";
+    ctx.fillStyle = textDim;
     ctx.font = "10px 'Space Mono', monospace";
     ctx.fillText("SEATS", 200, 120);
-    ctx.fillStyle = "#fff";
+    ctx.fillStyle = textColor;
     ctx.font = "bold 14px 'Space Mono', monospace";
     ctx.fillText(seats, 200, 140);
 
     // Ticket code
-    ctx.fillStyle = "#999";
+    ctx.fillStyle = textDim;
     ctx.font = "10px 'Space Mono', monospace";
     ctx.fillText("TICKET CODE", 200, 170);
-    ctx.fillStyle = "#b08d3e";
+    ctx.fillStyle = goldColor;
     ctx.font = "bold 16px 'Space Mono', monospace";
     ctx.fillText(ticketCode, 200, 192);
 
     // QR Code placeholder
-    ctx.fillStyle = "#fff";
+    ctx.fillStyle = isLight ? "#ffffff" : "#0d0d0d";
     ctx.fillRect(100, 220, 200, 200);
-    ctx.fillStyle = "#0d0d0d";
+    ctx.fillStyle = isLight ? "#1a1a2e" : "#ffffff";
     ctx.font = "12px 'Space Mono', monospace";
     ctx.fillText("[QR CODE]", 200, 310);
 
     // Sponsor row
-    ctx.fillStyle = "#999";
+    ctx.fillStyle = textDim;
     ctx.font = "9px 'Space Mono', monospace";
     ctx.fillText("PRESENTED BY", 200, 340);
 
     // Bottom info
-    ctx.fillStyle = "#b08d3e";
+    ctx.fillStyle = goldColor;
     ctx.font = "11px 'Space Mono', monospace";
     ctx.fillText("Present at entry · Non-transferable", 200, 400);
 

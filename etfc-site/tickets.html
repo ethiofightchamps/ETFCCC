@@ -209,7 +209,7 @@
       .seatmap-modal-body {
         padding: 0;
       }
-      .seatmap-svg-wrap { min-height: 420px;
+      .seatmap-svg-wrap { min-height: unset;
         width: 100%;
         background: #1a0a0a;
         border-bottom: 1px solid var(--border);
@@ -223,35 +223,44 @@
       }
       .seatmap-image {
         width: 100%;
-        max-width: 800px;
         height: auto;
+        max-width: 100%;
         display: block;
         border-radius: 8px;
-        margin: 0 auto 16px;
+        margin: 0 auto;
         cursor: pointer;
-        transition: transform 0.3s ease, max-height 0.3s ease;
+        transition: transform 0.3s ease;
+        object-fit: contain;
       }
       @media (max-width: 767px) {
+        .seatmap-svg-wrap {
+          min-height: 200px;
+        }
         .seatmap-image {
-          transform: rotate(-90deg) scale(0.6);
-          transform-origin: center;
-          max-height: 180px;
-          overflow: hidden;
+          width: 100%;
+          height: auto;
         }
         .seatmap-image.expanded {
-          transform: rotate(-90deg) scale(1);
-          max-height: none;
-          z-index: 10;
-          position: relative;
+          position: fixed;
+          top: 0; left: 0; right: 0; bottom: 0;
+          width: 100vw;
+          height: 100vh;
+          object-fit: contain;
+          background: #000;
+          z-index: 999;
+          border-radius: 0;
+          margin: 0;
         }
       }
       @media (min-width: 768px) {
+        .seatmap-svg-wrap {
+          min-height: 500px;
+        }
         .seatmap-image {
-          transform: rotate(-90deg);
-          transform-origin: center;
-          max-width: none;
-          max-height: 85vh;
-          width: auto;
+          width: 100%;
+          height: auto;
+          max-height: 75vh;
+          object-fit: contain;
         }
       }
       .seatmap-seat-list {
@@ -890,9 +899,10 @@
           price: 4000,
           icon: "earlybird",
           emoji: "🐦",
-          sub: "General admission · No seat map",
+          sub: "General admission · 13 seats only",
           hasSeatmap: false,
           tier: "ga",
+          maxQty: 13,
         },
       ];
 
@@ -936,10 +946,12 @@
       function changeTierQty(tierId, delta) {
         const tier = TIERS.find((t) => t.id === tierId);
         if (!tier) return;
-        const newQty = Math.max(0, (tierQty[tierId] || 0) + delta);
+        const maxQty = tier.maxQty || Infinity;
+        const newQty = Math.max(0, Math.min(maxQty, (tierQty[tierId] || 0) + delta));
         tierQty[tierId] = newQty;
         document.getElementById("qty-" + tierId).textContent = newQty;
         document.getElementById("minus-" + tierId).disabled = newQty === 0;
+        document.getElementById("plus-" + tierId).disabled = newQty >= maxQty;
         updateFooterBar();
       }
 
@@ -1077,7 +1089,9 @@
           } else {
             allHtml += seatNumbers.map((num) => {
               const seatId = `${tier.tier}-${num}`;
-              const isSold = false; // TODO: check Firestore seatMap
+              const isReserved = (tier.tier === "vvip-normal" && RESERVED_VVIP_NORMAL.has(num)) ||
+                                 (tier.tier === "vip-std" && RESERVED_VIP.has(num));
+              const isSold = isReserved; // Reserved seats show as sold
               const isSelected = !!selectedSeats[seatId];
               const cls = isSold ? "sold" : isSelected ? "selected" : `${cssClass} available`;
               return `<button class="seat-btn ${cls}" onclick="toggleSeat('${seatId}','${tier.id}',${tier.price},'${num}')"
@@ -1126,6 +1140,73 @@
       //
       // Block H (top-left, far):        101-164  — all VIP
       // Block G (left side, far):       165-184  — all VIP
+
+      // Reserved seats (70% VVIP Normal, 80% VIP) - randomized with some consecutive blocks
+      function generateReservedSeats() {
+        const vvipNormalAll = VVIP_NORMAL_SEATS.slice();
+        const vipAll = VIP_SEATS.slice();
+
+        // Shuffle helper
+        const shuffle = (arr) => {
+          for (let i = arr.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [arr[i], arr[j]] = [arr[j], arr[i]];
+          }
+          return arr;
+        };
+
+        // VVIP Normal: 70% reserved = ~59 seats
+        const vvipCount = Math.floor(vvipNormalAll.length * 0.7);
+        const shuffledVvip = shuffle([...vvipNormalAll]);
+        const reservedVvip = new Set(shuffledVvip.slice(0, vvipCount));
+
+        // VIP: 80% reserved = ~115 seats
+        const vipCount = Math.floor(vipAll.length * 0.8);
+        const shuffledVip = shuffle([...vipAll]);
+        const reservedVip = new Set(shuffledVip.slice(0, vipCount));
+
+        // Ensure some consecutive seats are available in each block
+        // Leave at least 2-3 consecutive seats per block available
+        const vvipBlocks = {
+          C: vvipNormalAll.filter(n => n >= 269 && n <= 290),
+          B: vvipNormalAll.filter(n => n >= 329 && n <= 358),
+          A: vvipNormalAll.filter(n => n >= 389 && n <= 400),
+          D: vvipNormalAll.filter(n => n >= 249 && n <= 260),
+          I: vvipNormalAll.filter(n => n >= 241 && n <= 248),
+        };
+
+        Object.values(vvipBlocks).forEach(block => {
+          if (block.length > 4) {
+            // Leave middle 3 seats available
+            const mid = Math.floor(block.length / 2);
+            reservedVvip.delete(block[mid]);
+            reservedVvip.delete(block[mid + 1]);
+            reservedVvip.delete(block[mid - 1]);
+          }
+        });
+
+        const vipBlocks = {
+          C: vipAll.filter(n => n >= 291 && n <= 328),
+          B: vipAll.filter(n => n >= 359 && n <= 388),
+          A: vipAll.filter(n => n >= 401 && n <= 408),
+          D: vipAll.filter(n => n >= 261 && n <= 268),
+          I: vipAll.filter(n => n >= 185 && n <= 240),
+          H: vipAll.filter(n => n >= 101 && n <= 164),
+          G: vipAll.filter(n => n >= 165 && n <= 184),
+        };
+
+        Object.values(vipBlocks).forEach(block => {
+          if (block.length > 5) {
+            // Leave 2-3 consecutive seats available in each block
+            const start = Math.floor(block.length * 0.3);
+            reservedVip.delete(block[start]);
+            reservedVip.delete(block[start + 1]);
+            if (block.length > 6) reservedVip.delete(block[start + 2]);
+          }
+        });
+
+        return { reservedVvip, reservedVip };
+      }
 
       const VVIP_NORMAL_SEATS = [
         // Block C front (closest to ring, bottom-left)
@@ -1181,6 +1262,8 @@
         173,174,175,176,177,178,179,180,
         181,182,183,184,
       ];
+
+      const { reservedVvip: RESERVED_VVIP_NORMAL, reservedVip: RESERVED_VIP } = generateReservedSeats();
 
       // Update seatmap title and selected bar
       function updateSeatmapUI() {
@@ -1555,11 +1638,18 @@
         const seats = (o.seats || []).join(", ") || "—";
         const ticketCode = o.ticketCode || o.refCode || "—";
         const qrData = `${window.location.origin}/verify.html?code=${ticketCode}`;
+
+        // Hide pending UI elements
+        document.querySelector('#stepPending > div[style*="font-size: 56px"]').style.display = 'none';
+        document.querySelector('#stepPending > div[style*="font-size: 24px"]').style.display = 'none';
+        document.querySelector('#stepPending > .status-pill.pending').style.display = 'none';
+        document.querySelector('#stepPending > p.text-dim').style.display = 'none';
+
         document.getElementById("pendingTicketMount").innerHTML = `
-    <div style="background:linear-gradient(135deg,#0d0d0d,#1a0505);border:2px solid var(--gold);border-radius:12px;overflow:hidden;margin-top:8px;">
+    <div style="background:linear-gradient(135deg,var(--obsidian),var(--obsidian-2));border:2px solid var(--gold);border-radius:12px;overflow:hidden;margin-top:8px;">
       <div style="background:linear-gradient(90deg,var(--crimson) 4px,transparent 4px);padding:16px 20px 12px;">
         <div style="font-family:var(--font-display);font-size:14px;color:var(--bone-dim);letter-spacing:2px;text-transform:uppercase;">E-Ticket · Confirmed</div>
-        <div style="font-family:var(--font-display);font-size:24px;color:#fff;text-transform:uppercase;margin-top:4px;">ETFC Fight Night</div>
+        <div style="font-family:var(--font-display);font-size:24px;color:var(--bone);text-transform:uppercase;margin-top:4px;">ETFC Fight Night</div>
         <div style="font-size:12px;color:var(--bone-dim);margin-top:2px;">August 27, 2026 · 6:00 PM · Adwa Museum</div>
       </div>
       <div style="display:flex;gap:16px;padding:16px 20px;border-top:1px solid rgba(176,141,62,0.2);">
@@ -1581,12 +1671,15 @@
     <p class="text-dim" style="text-align:center;margin-top:12px;font-size:12px;">Save or screenshot this ticket — it's your entry pass at the door.</p>
   `;
         try {
+          const isLight = document.documentElement.getAttribute("data-theme") === "light";
+          const darkColor = isLight ? "#1a1a2e" : "#e8e8e8";
+          const lightColor = isLight ? "#ffffff" : "#0d0d0d";
           new QRCode(document.getElementById("confirmedQR"), {
             text: qrData,
             width: 100,
             height: 100,
-            colorDark: "#0d0d0d",
-            colorLight: "#ffffff",
+            colorDark: darkColor,
+            colorLight: lightColor,
             correctLevel: QRCode.CorrectLevel.M,
           });
         } catch (e) {}
@@ -1601,62 +1694,70 @@
         canvas.height = 560 * scale;
         ctx.scale(scale, scale);
 
+        const isLight = document.documentElement.getAttribute("data-theme") === "light";
+        const bgDark = isLight ? "#1a1a2e" : "#0d0d0d";
+        const bgMid = isLight ? "#2a2a4a" : "#1a0505";
+        const textColor = isLight ? "#e8e8e8" : "#ffffff";
+        const textDim = isLight ? "#a0a0b0" : "#999999";
+        const goldColor = "#b08d3e";
+        const crimsonColor = "#b3141c";
+
         // Draw background
         const gradient = ctx.createLinearGradient(0, 0, 0, 560);
-        gradient.addColorStop(0, "#0d0d0d");
-        gradient.addColorStop(0.5, "#1a0505");
-        gradient.addColorStop(1, "#0d0d0d");
+        gradient.addColorStop(0, bgDark);
+        gradient.addColorStop(0.5, bgMid);
+        gradient.addColorStop(1, bgDark);
         ctx.fillStyle = gradient;
         ctx.fillRect(0, 0, 400, 560);
 
         // Gold top border
-        ctx.fillStyle = "#b08d3e";
+        ctx.fillStyle = goldColor;
         ctx.fillRect(0, 0, 400, 4);
 
         // Header
-        ctx.fillStyle = "#b08d3e";
+        ctx.fillStyle = goldColor;
         ctx.font = "bold 12px 'Oswald', sans-serif";
         ctx.textAlign = "center";
         ctx.fillText("E-TICKET · CONFIRMED", 200, 30);
 
-        ctx.fillStyle = "#fff";
+        ctx.fillStyle = textColor;
         ctx.font = "bold 24px 'Oswald', sans-serif";
         ctx.fillText("ETFC FIGHT NIGHT", 200, 60);
 
-        ctx.fillStyle = "#999";
+        ctx.fillStyle = textDim;
         ctx.font = "11px 'Space Mono', monospace";
         ctx.fillText("August 27, 2026 · 6:00 PM · Adwa Museum", 200, 80);
 
         // Seats
-        ctx.fillStyle = "#999";
+        ctx.fillStyle = textDim;
         ctx.font = "10px 'Space Mono', monospace";
         ctx.fillText("SEATS", 200, 120);
-        ctx.fillStyle = "#fff";
+        ctx.fillStyle = textColor;
         ctx.font = "bold 14px 'Space Mono', monospace";
         ctx.fillText(seats, 200, 140);
 
         // Ticket code
-        ctx.fillStyle = "#999";
+        ctx.fillStyle = textDim;
         ctx.font = "10px 'Space Mono', monospace";
         ctx.fillText("TICKET CODE", 200, 170);
-        ctx.fillStyle = "#b08d3e";
+        ctx.fillStyle = goldColor;
         ctx.font = "bold 16px 'Space Mono', monospace";
         ctx.fillText(ticketCode, 200, 192);
 
         // QR Code placeholder
-        ctx.fillStyle = "#fff";
+        ctx.fillStyle = isLight ? "#ffffff" : "#0d0d0d";
         ctx.fillRect(100, 220, 200, 200);
-        ctx.fillStyle = "#0d0d0d";
+        ctx.fillStyle = isLight ? "#1a1a2e" : "#ffffff";
         ctx.font = "12px 'Space Mono', monospace";
         ctx.fillText("[QR CODE]", 200, 310);
 
         // Sponsor row
-        ctx.fillStyle = "#999";
+        ctx.fillStyle = textDim;
         ctx.font = "9px 'Space Mono', monospace";
         ctx.fillText("PRESENTED BY", 200, 340);
 
         // Bottom info
-        ctx.fillStyle = "#b08d3e";
+        ctx.fillStyle = goldColor;
         ctx.font = "11px 'Space Mono', monospace";
         ctx.fillText("Present at entry · Non-transferable", 200, 400);
 
