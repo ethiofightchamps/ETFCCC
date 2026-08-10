@@ -109,14 +109,6 @@ function renderFooter() {
         <a href="merch.html">Merch</a>
         <a href="about.html">About</a>
       </div>
-      <div class="payment-info">
-        <div class="payment-method">
-          <strong>Telebirr:</strong> 0983196199 (ager)
-        </div>
-        <div class="payment-method">
-          <strong>M-Pesa:</strong> 0725767614 — Efrem Werku Muluneh
-        </div>
-      </div>
       <div class="copyright">&copy; 2026 ETFC — Addis Ababa, Ethiopia</div>
     </div>
   </footer>`;
