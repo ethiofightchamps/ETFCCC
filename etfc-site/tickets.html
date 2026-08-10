@@ -221,6 +221,39 @@
         height: auto;
         display: block;
       }
+      .seatmap-image {
+        width: 100%;
+        max-width: 800px;
+        height: auto;
+        display: block;
+        border-radius: 8px;
+        margin: 0 auto 16px;
+        cursor: pointer;
+        transition: transform 0.3s ease, max-height 0.3s ease;
+      }
+      @media (max-width: 767px) {
+        .seatmap-image {
+          transform: rotate(-90deg) scale(0.6);
+          transform-origin: center;
+          max-height: 180px;
+          overflow: hidden;
+        }
+        .seatmap-image.expanded {
+          transform: rotate(-90deg) scale(1);
+          max-height: none;
+          z-index: 10;
+          position: relative;
+        }
+      }
+      @media (min-width: 768px) {
+        .seatmap-image {
+          transform: rotate(-90deg);
+          transform-origin: center;
+          max-width: none;
+          max-height: 70vh;
+          width: auto;
+        }
+      }
       .seatmap-seat-list {
         padding: 16px;
       }
@@ -980,8 +1013,9 @@
         // Load seatmap.png from root directory (single image for reference)
         document.getElementById("arenaWrap").innerHTML = `
           <img src="seatmap.png" alt="Venue Seat Map"
-            style="width:100%;max-width:800px;height:auto;display:block;border-radius:8px;margin:0 auto 16px;transform:rotate(90deg);transform-origin:center;"
-            id="venueMapImg"/>
+            class="seatmap-image"
+            id="venueMapImg"
+            onclick="toggleSeatmapExpand()"/>
         `;
 
         // Render seat grids for ALL active tiers (stacked, highest price first)
@@ -1177,6 +1211,14 @@
           return picked >= (tierQty[t.id] || 0);
         });
         document.getElementById("seatmapContinueBtn").disabled = !allSatisfied;
+      }
+
+      // Toggle seatmap image expand/collapse on mobile
+      function toggleSeatmapExpand() {
+        const img = document.getElementById("venueMapImg");
+        if (img && window.innerWidth < 768) {
+          img.classList.toggle("expanded");
+        }
       }
 
       function toggleSeat(seatId, tierId, price, label) {
