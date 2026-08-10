@@ -285,6 +285,10 @@
         border-color: #1e78c8;
         color: #4aa0e8;
       }
+      .seat-btn.vvip-normal.available {
+        border-color: #8250c8;
+        color: #a070e8;
+      }
 
       .seatmap-legend {
         display: flex;
@@ -674,163 +678,6 @@
       </div>
     </div>
 
-    <!-- ── STEP 3b: PAYMENT & SCREENSHOT ─────────────────────────── -->
-    <div id="stepPayment" style="display: none">
-      <div
-        style="
-          padding: 14px 16px;
-          background: var(--obsidian-2);
-          border-bottom: 1px solid var(--border);
-          display: flex;
-          align-items: center;
-          gap: 12px;
-        "
-      >
-        <button
-          id="paymentBackBtn"
-          onclick="goToBuyerDetailsStep()"
-          style="
-            background: none;
-            border: none;
-            color: var(--bone-dim);
-            font-size: 22px;
-            cursor: pointer;
-            padding: 0;
-          "
-        >
-          ‹
-        </button>
-        <span
-          style="
-            font-family: var(--font-display);
-            font-size: 18px;
-            text-transform: uppercase;
-            color: var(--bone);
-          "
-          >Payment</span
-        >
-      </div>
-
-      <div class="checkout-event-header">
-        <div class="checkout-event-title">ETFC Adwa Fight Night</div>
-        <div class="checkout-event-meta">August 27, 2026 &middot; 6:00 PM</div>
-      </div>
-
-      <!-- Order summary rows injected here -->
-      <div id="paymentOrderRows"></div>
-
-      <!-- Totals -->
-      <div class="checkout-totals">
-        <div class="checkout-total-row">
-          <span>Subtotal</span><span id="paymentSubtotal">0 ETB</span>
-        </div>
-        <div class="checkout-total-row grand">
-          <span>Total</span><span id="paymentTotal">0 ETB</span>
-        </div>
-      </div>
-
-      <p class="checkout-tac">Terms and Conditions accepted</p>
-
-      <!-- Payment accounts - BOTH displayed -->
-      <div
-        style="
-          padding: 12px 20px 4px;
-          font-family: var(--font-mono);
-          font-size: 10px;
-          letter-spacing: 2px;
-          text-transform: uppercase;
-          color: var(--gold-bright);
-        "
-      >
-        Deposit to One of These Accounts
-      </div>
-
-      <div class="payment-accounts-grid" style="padding: 0 20px 16px; display: flex; flex-direction: column; gap: 12px;">
-        <!-- Telebirr Account -->
-        <div class="bank-details-card" style="display:flex;align-items:center;gap:14px;padding:14px 16px;background:var(--obsidian);border:1px solid var(--border);border-radius:10px;">
-          <div style="width:44px;height:44px;border-radius:10px;overflow:hidden;flex-shrink:0;">
-            <img src="/telebirr.jpg" alt="Telebirr" style="width:44px;height:44px;object-fit:cover;"/>
-          </div>
-          <div style="flex:1;">
-            <div style="font-weight:700;font-size:14px;margin-bottom:2px;">Telebirr</div>
-            <div style="font-size:13px;color:var(--bone-dim);">Ager</div>
-          </div>
-          <div style="font-family:var(--font-mono);font-size:15px;color:var(--gold-bright);font-weight:700;">0983196199</div>
-        </div>
-
-        <!-- M-Pesa Account -->
-        <div class="bank-details-card" style="display:flex;align-items:center;gap:14px;padding:14px 16px;background:var(--obsidian);border:1px solid var(--border);border-radius:10px;">
-          <div style="width:44px;height:44px;border-radius:10px;overflow:hidden;flex-shrink:0;">
-            <img src="/mpesa.png" alt="M-Pesa" style="width:44px;height:44px;object-fit:cover;"/>
-          </div>
-          <div style="flex:1;">
-            <div style="font-weight:700;font-size:14px;margin-bottom:2px;">Safaricom M-Pesa</div>
-            <div style="font-size:13px;color:var(--bone-dim);">Efrem Werku Muluneh</div>
-          </div>
-          <div style="font-family:var(--font-mono);font-size:15px;color:var(--gold-bright);font-weight:700;">0725767614</div>
-        </div>
-      </div>
-
-      <!-- Reference Code -->
-      <div class="bank-details-card" style="padding:12px 16px;margin:0 20px 16px;background:var(--obsidian);border:1px solid var(--border);border-radius:10px;">
-        <div class="detail-row highlight-row" style="display:flex;justify-content:space-between;align-items:center;">
-          <span style="color:var(--bone-dim);">Reference Code</span>
-          <span id="paymentRefCode" class="ref-code" style="font-family:var(--font-mono);font-size:14px;color:var(--crimson-bright);font-weight:700;letter-spacing:1px;">ETFC-XXXXXX</span>
-        </div>
-      </div>
-      <p class="hint" style="margin:0 20px 16px;font-size:12px;color:var(--bone-dim);">Include the reference code in your transfer note.</p>
-
-      <!-- Screenshot Upload -->
-      <div class="checkout-details" style="padding: 0 20px 20px;">
-        <div class="field">
-          <label>Payment Screenshot</label>
-          <div
-            class="upload-area"
-            id="paymentUploadArea"
-            onclick="document.getElementById('paymentScreenshotFile').click()"
-          >
-            <div class="upload-icon">📷</div>
-            <span id="paymentUploadLabel">Tap to upload proof of payment</span>
-            <span class="upload-hint">Max 5MB · JPG/PNG</span>
-            <img class="upload-preview" id="paymentUploadPreview" alt="preview" />
-            <input
-              type="file"
-              id="paymentScreenshotFile"
-              accept="image/*"
-              style="display: none"
-              onchange="onPaymentFileChosen(this)"
-            />
-          </div>
-        </div>
-
-        <p
-          id="paymentError"
-          style="
-            color: var(--crimson-bright);
-            font-size: 13px;
-            display: none;
-            margin-top: 10px;
-          "
-        ></p>
-      </div>
-
-      <div style="padding: 0 20px 80px">
-        <button
-          class="btn btn-outline btn-block"
-          style="margin-bottom: 10px;"
-          onclick="goToBuyerDetailsStep()"
-        >
-          ← Back
-        </button>
-        <button
-          class="btn btn-primary btn-block"
-          id="submitOrderBtn"
-          onclick="submitOrder()"
-        >
-          Submit Order
-        </button>
-      </div>
-    </div>
 
     <!-- ── STEP 4: PENDING / SUCCESS ─────────────────────────────── -->
     <div
@@ -869,18 +716,88 @@
 
     <div id="footer-mount"></div>
 
-    <!-- Footer buy bar -->
+    <!-- Footer buy bar — shown only on step 1 (tier selection) -->
     <div class="tix-footer-bar" id="tixFooterBar">
       <div class="tix-footer-summary">
         <span id="footerTicketCount">0 Tickets</span>
         <strong id="footerTotal">0 ETB</strong>
       </div>
-      <button
-        class="btn btn-primary tix-footer-btn"
-        onclick="onContinueFromTiers()"
-      >
-        Continue
+      <button class="btn btn-primary tix-footer-btn" onclick="onContinueFromTiers()">
+        Choose Seats
       </button>
+    </div>
+
+    <!-- ── PAYMENT MODAL (replaces stepPayment full-page step) ─────── -->
+    <div class="modal-overlay" id="paymentModal" style="align-items:flex-end;padding:0;" onclick="if(event.target===this)closePaymentModal()">
+      <div class="modal checkout-modal" style="border-radius:16px 16px 0 0;max-height:92vh;overflow-y:auto;width:100%;max-width:540px;margin:0 auto;">
+        <div class="modal-header" style="position:sticky;top:0;z-index:2;background:var(--obsidian-2);">
+          <button onclick="closePaymentModal()" style="background:none;border:none;color:var(--bone-dim);font-size:22px;cursor:pointer;padding:0;line-height:1;">‹</button>
+          <h3 style="margin:0;flex:1;text-align:center;">Payment</h3>
+          <span style="width:22px;"></span>
+        </div>
+
+        <div class="checkout-event-header">
+          <div class="checkout-event-title">ETFC Adwa Fight Night</div>
+          <div class="checkout-event-meta">August 29, 2026 · 10:00 AM · Adwa Museum</div>
+        </div>
+
+        <div id="paymentModalOrderRows"></div>
+
+        <div class="checkout-totals">
+          <div class="checkout-total-row"><span>Subtotal</span><span id="paymentModalSubtotal">0 ETB</span></div>
+          <div class="checkout-total-row grand"><span>Total</span><span id="paymentModalTotal">0 ETB</span></div>
+        </div>
+
+        <p class="checkout-tac">Terms and Conditions accepted</p>
+
+        <div style="padding:12px 20px 4px;font-family:var(--font-mono);font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--gold-bright);">
+          Deposit to One of These Accounts
+        </div>
+
+        <div style="padding:0 20px 16px;display:flex;flex-direction:column;gap:12px;">
+          <div style="display:flex;align-items:center;gap:14px;padding:14px 16px;background:var(--obsidian);border:1px solid var(--border);border-radius:10px;">
+            <div style="width:44px;height:44px;border-radius:10px;overflow:hidden;flex-shrink:0;">
+              <img src="/telebirr.jpg" alt="Telebirr" style="width:44px;height:44px;object-fit:cover;" onerror="this.parentNode.innerHTML='📱'"/>
+            </div>
+            <div style="flex:1;">
+              <div style="font-weight:700;font-size:14px;margin-bottom:2px;">Telebirr</div>
+              <div style="font-size:13px;color:var(--bone-dim);">Ager</div>
+            </div>
+            <div style="font-family:var(--font-mono);font-size:15px;color:var(--gold-bright);font-weight:700;">0983196199</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:14px;padding:14px 16px;background:var(--obsidian);border:1px solid var(--border);border-radius:10px;">
+            <div style="width:44px;height:44px;border-radius:10px;overflow:hidden;flex-shrink:0;">
+              <img src="/mpesa.png" alt="M-Pesa" style="width:44px;height:44px;object-fit:cover;" onerror="this.parentNode.innerHTML='💳'"/>
+            </div>
+            <div style="flex:1;">
+              <div style="font-weight:700;font-size:14px;margin-bottom:2px;">Safaricom M-Pesa</div>
+              <div style="font-size:13px;color:var(--bone-dim);">Efrem Werku Muluneh</div>
+            </div>
+            <div style="font-family:var(--font-mono);font-size:15px;color:var(--gold-bright);font-weight:700;">0725767614</div>
+          </div>
+        </div>
+
+        <!-- Screenshot Upload -->
+        <div style="padding:0 20px 20px;">
+          <div class="field">
+            <label>Payment Screenshot</label>
+            <div class="upload-area" id="paymentUploadArea" onclick="document.getElementById('paymentScreenshotFile').click()">
+              <div class="upload-icon">📷</div>
+              <span id="paymentUploadLabel">Tap to upload proof of payment</span>
+              <span class="upload-hint">Max 5MB · JPG/PNG</span>
+              <img class="upload-preview" id="paymentUploadPreview" alt="preview" />
+              <input type="file" id="paymentScreenshotFile" accept="image/*" style="display:none" onchange="onPaymentFileChosen(this)" />
+            </div>
+          </div>
+          <p id="paymentError" style="color:var(--crimson-bright);font-size:13px;display:none;margin-top:10px;"></p>
+        </div>
+
+        <div style="padding:0 20px 32px;">
+          <button class="btn btn-primary btn-block" id="submitOrderBtn" onclick="submitOrder()">
+            Submit Order
+          </button>
+        </div>
+      </div>
     </div>
 
     <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
@@ -920,7 +837,7 @@
           price: 30000,
           icon: "normal",
           emoji: "🎟",
-          sub: "60 seats · Includes seat selection",
+          sub: "84 seats · Front rows closest to ring · Includes seat selection",
           hasSeatmap: true,
           tier: "vvip-normal",
         },
@@ -930,7 +847,7 @@
           price: 20000,
           icon: "vip",
           emoji: "💺",
-          sub: "60 seats · Includes seat selection",
+          sub: "222 seats · Includes seat selection",
           hasSeatmap: true,
           tier: "vip-std",
         },
@@ -1048,104 +965,214 @@
 // ── STEP 2: SEAT MAP ──────────────────────────────────────────
       // Uses seatmap.png from root as the visual
       function renderArenaMap() {
-        const tier = TIERS.find((t) => t.id === currentTierId);
-        document.getElementById("seatmapTitle").textContent = tier
-          ? tier.name
-          : "Select Seats";
-
-        // Build filter buttons for all seatmap tiers with qty > 0
+        // Get all seatmap tiers with qty > 0, sorted by price DESC (highest first)
         const activeSeatmapTiers = TIERS.filter(
           (t) => t.hasSeatmap && (tierQty[t.id] || 0) > 0
-        );
-        document.getElementById("seatFilters").innerHTML = activeSeatmapTiers
-          .map(
-            (t) => `
-    <button onclick="switchSeatmapTier('${t.id}')"
-      style="padding:6px 14px;border-radius:20px;border:1px solid ${
-        currentTierId === t.id ? "var(--gold)" : "var(--border)"
-      };
-      background:${
-        currentTierId === t.id ? "rgba(176,141,62,0.15)" : "transparent"
-      };
-      color:${
-        currentTierId === t.id ? "var(--gold-bright)" : "var(--bone-dim)"
-      };font-size:12px;cursor:pointer;">
-      ${t.name.replace(" Tickets", "")}
-    </button>
-  `
-          )
-          .join("");
+        ).sort((a, b) => b.price - a.price);
 
-        // Load seatmap.png from root directory
+        if (activeSeatmapTiers.length === 0) return;
+
+        // Use the highest priced tier as the "main" title
+        const mainTier = activeSeatmapTiers[0];
+        document.getElementById("seatmapTitle").textContent = mainTier.name;
+
+        // Hide filter buttons since we show all tiers at once
+        document.getElementById("seatFilters").innerHTML = "";
+
+        // Load seatmap.png from root directory (single image for reference)
         document.getElementById("arenaWrap").innerHTML = `
           <img src="seatmap.png" alt="Venue Seat Map"
-            style="width:100%;max-width:600px;height:auto;display:block;border-radius:8px;margin:0 auto;"
+            style="width:100%;max-width:800px;height:auto;display:block;border-radius:8px;margin:0 auto 16px;transform:rotate(90deg);transform-origin:center;"
             id="venueMapImg"/>
         `;
+
+        // Render seat grids for ALL active tiers (stacked, highest price first)
+        renderAllSeatGrids(activeSeatmapTiers);
       }
 
-      function switchSeatmapTier(tierId) {
-        currentTierId = tierId;
-        const tier = TIERS.find((t) => t.id === tierId);
-        document.getElementById("seatmapTitle").textContent = tier
-          ? tier.name
-          : "";
-        renderArenaMap();
-        renderSeatList();
-      }
-
-      // Build the clickable seat grid below the map
-      const BLOCK_SEATS = {
-        ringside: { prefix: "RS", total: 9, rows: 3 },
-        vip: { prefix: "PR", total: 12, rows: 4 },
-        "vvip-normal": { prefix: "VN", total: 60, rows: 6 },
-        "vip-std": { prefix: "VP", total: 60, rows: 5 },
-      };
-
-      function renderSeatList() {
-        const tier = TIERS.find((t) => t.id === currentTierId);
-        if (!tier) return;
-
-        const bsKey = tier.tier;
-        const bs = BLOCK_SEATS[bsKey];
-        if (!bs) return;
-
-        const needed = tierQty[currentTierId] || 0;
-        const alreadyPicked = Object.values(selectedSeats).filter(
-          (s) => s.tierId === currentTierId
-        ).length;
-
-        document.getElementById(
-          "seatListTitle"
-        ).textContent = `Select Your Seat · Pick ${needed} (${alreadyPicked}/${needed} selected)`;
-
-        const seats = [];
-        for (let i = 1; i <= bs.total; i++) {
-          const row = String.fromCharCode(
-            64 + Math.ceil(i / (bs.total / bs.rows))
-          );
-          const num = String(i).padStart(3, "0");
-          seats.push({ id: `${bsKey}-${num}`, label: `${row}${num}` });
-        }
-
+      // Render seat grids for ALL selected tiers at once (stacked)
+      function renderAllSeatGrids(activeTiers) {
         const grid = document.getElementById("seatGrid");
-        grid.innerHTML = seats
-          .map((s) => {
-            const isSold = false; // TODO: check Firestore seatMap
-            const isSelected = !!selectedSeats[s.id];
-            let cls = isSold
-              ? "sold"
-              : isSelected
-              ? "selected"
-              : `${bsKey} available`;
-            return `<button class="seat-btn ${cls}" onclick="toggleSeat('${
-              s.id
-            }','${currentTierId}',${tier.price},'${s.label}')"
-      ${isSold ? "disabled" : ""}>${s.label}</button>`;
-          })
-          .join("");
+        let allHtml = "";
 
-        updateSeatmapBar();
+        activeTiers.forEach((tier, tierIndex) => {
+          const needed = tierQty[tier.id] || 0;
+          const alreadyPicked = Object.values(selectedSeats).filter(
+            (s) => s.tierId === tier.id
+          ).length;
+
+          // Pick the right seat list based on tier
+          let seatNumbers = [];
+          let cssClass = "";
+          let tierLabel = "";
+
+          if (tier.tier === "vvip-normal") {
+            seatNumbers = VVIP_NORMAL_SEATS;
+            cssClass = "vvip-normal";
+            tierLabel = "VVIP Normal";
+          } else if (tier.tier === "vip-std") {
+            seatNumbers = VIP_SEATS;
+            cssClass = "vip-std";
+            tierLabel = "VIP";
+          } else if (tier.tier === "ringside") {
+            seatNumbers = [1,2,3,4,5,6,7,8,9];
+            cssClass = "ringside";
+            tierLabel = "VVIP Ringside";
+          } else if (tier.tier === "vip") {
+            seatNumbers = [1,2,3,4,5,6,7,8,9,10,11,12];
+            cssClass = "vip";
+            tierLabel = "VVIP Premium";
+          } else {
+            seatNumbers = [];
+          }
+
+          // Section header for this tier
+          allHtml += `
+            <div class="tier-seat-section" style="margin-bottom:24px;">
+              <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;padding:10px 12px;background:var(--obsidian);border-radius:8px;border:1px solid var(--border);">
+                <div class="tier-icon ${tier.icon}" style="width:32px;height:32px;font-size:16px;">${tier.emoji}</div>
+                <div style="flex:1;">
+                  <div style="font-weight:700;font-size:14px;color:var(--bone);">${tierLabel}</div>
+                  <div style="font-size:12px;color:var(--bone-dim);">Pick ${needed} seat${needed !== 1 ? "s" : ""} · ${alreadyPicked}/${needed} selected</div>
+                </div>
+                <div style="font-family:var(--font-mono);font-size:13px;color:var(--gold-bright);">${tier.price.toLocaleString()} ETB each</div>
+              </div>
+              <div class="seat-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(44px,1fr));gap:8px;">
+          `;
+
+          if (seatNumbers.length === 0) {
+            allHtml += `<div style="grid-column:1/-1;text-align:center;color:var(--bone-dim);padding:20px;">No seat map available for this tier</div>`;
+          } else {
+            allHtml += seatNumbers.map((num) => {
+              const seatId = `${tier.tier}-${num}`;
+              const isSold = false; // TODO: check Firestore seatMap
+              const isSelected = !!selectedSeats[seatId];
+              const cls = isSold ? "sold" : isSelected ? "selected" : `${cssClass} available`;
+              return `<button class="seat-btn ${cls}" onclick="toggleSeat('${seatId}','${tier.id}',${tier.price},'${num}')"
+                ${isSold ? "disabled" : ""}>${num}</button>`;
+            }).join("");
+          }
+
+          allHtml += `
+              </div>
+            </div>
+          `;
+        });
+
+        grid.innerHTML = allHtml;
+        updateSeatmapUI();
+      }
+
+      // Keep switchSeatmapTier for backward compat but make it a no-op
+      function switchSeatmapTier(tierId) {
+        // No-op - we show all tiers at once now
+      }
+
+      // ── REAL VENUE SEAT NUMBERS from the official seat map ────────
+      // VVIP Normal = front rows closest to the ring in each block
+      // VIP         = remaining rows further from the ring
+      //
+      // Block C (bottom-left of ring):  269-328
+      //   VVIP Normal — front rows nearest ring: 269-290
+      //   VIP         — back rows: 291-328
+      //
+      // Block B (bottom-right of ring): 329-388
+      //   VVIP Normal — front rows nearest ring: 329-358
+      //   VIP         — back rows: 359-388
+      //
+      // Block A (right side of ring):   389-408
+      //   VVIP Normal — closest to ring: 389-400
+      //   VIP         — further: 401-408
+      //
+      // Block D (left side):            249-268
+      //   VVIP Normal — closest to ring: 249-260
+      //   VIP         — further: 261-268
+      //
+      // Block I (top-right, far):       185-248
+      //   VVIP Normal — bottom rows nearest walkway/ring: 241-248
+      //   VIP         — rest: 185-240
+      //
+      // Block H (top-left, far):        101-164  — all VIP
+      // Block G (left side, far):       165-184  — all VIP
+
+      const VVIP_NORMAL_SEATS = [
+        // Block C front (closest to ring, bottom-left)
+        269,270,271,272,273,274,275,276,277,
+        278,279,280,281,282,283,
+        284,285,286,287,288,289,290,
+        // Block B front (closest to ring, bottom-right)
+        329,330,331,332,333,334,335,336,337,
+        338,339,340,341,342,343,
+        344,345,346,347,348,349,350,
+        351,352,353,354,355,356,357,358,
+        // Block A (right side, closest to ring)
+        389,390,391,392,393,394,395,396,397,398,399,400,
+        // Block D (left side, closest to ring)
+        249,250,251,252,253,254,255,256,257,258,259,260,
+        // Block I bottom row (nearest walkway)
+        241,242,243,244,245,246,247,248,
+      ];
+
+      const VIP_SEATS = [
+        // Block C back rows
+        291,292,293,294,295,296,297,298,
+        299,300,301,302,303,304,305,306,307,
+        308,309,310,311,312,313,314,315,316,317,
+        318,319,320,321,322,323,324,325,326,327,328,
+        // Block B back rows
+        359,360,361,362,363,364,365,366,367,
+        368,369,370,371,372,373,374,375,376,377,
+        378,379,380,381,382,383,384,385,386,387,388,
+        // Block A back rows
+        401,402,403,404,406,408,
+        // Block D back rows
+        261,262,263,264,265,266,267,268,
+        // Block I main area
+        185,186,187,188,189,190,191,192,
+        193,194,195,196,197,198,199,200,
+        201,202,203,204,205,206,207,208,
+        209,210,211,212,213,214,215,216,
+        217,218,219,220,221,222,223,224,
+        225,226,227,228,229,230,231,232,
+        233,234,235,236,237,238,239,240,
+        // Block H
+        101,102,103,104,105,106,107,108,
+        109,110,111,112,113,114,115,116,
+        117,118,119,120,121,122,123,124,
+        125,126,127,128,129,130,131,132,
+        133,134,135,136,137,138,139,140,
+        141,142,143,144,145,146,147,148,
+        149,150,151,152,153,154,155,156,
+        157,158,159,160,161,162,163,164,
+        // Block G
+        165,166,167,168,169,170,171,172,
+        173,174,175,176,177,178,179,180,
+        181,182,183,184,
+      ];
+
+      // Update seatmap title and selected bar
+      function updateSeatmapUI() {
+        const activeSeatmapTiers = TIERS.filter(
+          (t) => t.hasSeatmap && (tierQty[t.id] || 0) > 0
+        ).sort((a, b) => b.price - a.price);
+
+        if (activeSeatmapTiers.length === 0) return;
+
+        const mainTier = activeSeatmapTiers[0];
+        document.getElementById("seatmapTitle").textContent = mainTier.name;
+
+        // Update the selected bar with total across all tiers
+        const totalCount = Object.keys(selectedSeats).length;
+        const totalPrice = Object.values(selectedSeats).reduce((s, v) => s + v.price, 0);
+        document.getElementById("seatmapSelectedCount").textContent = totalCount;
+        document.getElementById("seatmapSelectedTotal").textContent = totalPrice.toLocaleString() + " ETB";
+
+        // Check all seatmap tiers are fully satisfied
+        const allSatisfied = activeSeatmapTiers.every((t) => {
+          const picked = Object.values(selectedSeats).filter((s) => s.tierId === t.id).length;
+          return picked >= (tierQty[t.id] || 0);
+        });
+        document.getElementById("seatmapContinueBtn").disabled = !allSatisfied;
       }
 
       function toggleSeat(seatId, tierId, price, label) {
@@ -1165,6 +1192,23 @@
             );
             return;
           }
+
+          // Check if user is selecting from a different tier than their "first choice"
+          const otherTierSeats = Object.values(selectedSeats).filter(s => s.tierId !== tierId);
+          if (otherTierSeats.length > 0) {
+            // Get the "first" tier they selected from (the one with seats already picked)
+            const firstTierId = otherTierSeats[0].tierId;
+            const firstTier = TIERS.find(t => t.id === firstTierId);
+            const currentTier = TIERS.find(t => t.id === tierId);
+            
+            if (firstTier && currentTier && firstTierId !== tierId) {
+              const confirmMsg = `You already have ${otherTierSeats.length} seat(s) selected for ${firstTier.name}.\n\nSelecting ${currentTier.name} means you're upgrading/mixing ticket types.\n\nDo you want to continue?`;
+              if (!confirm(confirmMsg)) {
+                return;
+              }
+            }
+          }
+
           selectedSeats[seatId] = {
             tierId,
             price,
@@ -1172,31 +1216,7 @@
             tier: tier?.tier || "",
           };
         }
-        renderSeatList();
-      }
-
-      function updateSeatmapBar() {
-        const count = Object.keys(selectedSeats).length;
-        const total = Object.values(selectedSeats).reduce(
-          (s, v) => s + v.price,
-          0
-        );
-        document.getElementById("seatmapSelectedCount").textContent = count;
-        document.getElementById("seatmapSelectedTotal").textContent =
-          total.toLocaleString() + " ETB";
-
-        // Check all seatmap tiers are fully satisfied
-        const seatmapTiers = TIERS.filter(
-          (t) => t.hasSeatmap && (tierQty[t.id] || 0) > 0
-        );
-        const allSatisfied = seatmapTiers.every((t) => {
-          const picked = Object.values(selectedSeats).filter(
-            (s) => s.tierId === t.id
-          ).length;
-          return picked >= (tierQty[t.id] || 0);
-        });
-        document.getElementById("seatmapContinueBtn").disabled = !allSatisfied;
-      }
+1219:       }
 
       function goToCheckout() {
         // Add early bird auto-seats
@@ -1312,95 +1332,60 @@
         const phone = document.getElementById("buyerPhone").value.trim();
         const errEl = document.getElementById("buyerDetailsError");
 
-        if (!name) {
-          errEl.textContent = "Enter your full name.";
-          errEl.style.display = "block";
-          return;
-        }
-        if (!phone) {
-          errEl.textContent = "Enter your phone number.";
-          errEl.style.display = "block";
-          return;
-        }
-        if (!/^(09|07)\d{8}$/.test(phone)) {
-          errEl.textContent = "Phone must start with 09 or 07 and be 10 digits.";
-          errEl.style.display = "block";
-          return;
-        }
+        if (!name) { errEl.textContent = "Enter your full name."; errEl.style.display = "block"; return; }
+        if (!phone) { errEl.textContent = "Enter your phone number."; errEl.style.display = "block"; return; }
+        if (!/^(09|07)\d{8}$/.test(phone)) { errEl.textContent = "Phone must start with 09 or 07 and be 10 digits."; errEl.style.display = "block"; return; }
         errEl.style.display = "none";
 
-        // Hide footer bar when moving to payment
-        document.getElementById("tixFooterBar").classList.remove("visible");
-
         buildPaymentUI();
-        showStep("stepPayment");
+        // Open as bottom-sheet modal — stays on top of buyer details
+        document.getElementById("paymentModal").classList.add("open");
+        document.body.style.overflow = "hidden";
+      }
+
+      function closePaymentModal() {
+        document.getElementById("paymentModal").classList.remove("open");
+        document.body.style.overflow = "";
       }
 
       function goToBuyerDetailsStep() {
-        showStep("stepBuyerDetails");
+        closePaymentModal();
       }
 
-      // ── STEP 3b: PAYMENT & SCREENSHOT ─────────────────────────────
+      // ── PAYMENT MODAL: build order summary ────────────────────────
       function buildPaymentUI() {
-        // Group seats by tier
         const byTier = {};
         Object.entries(selectedSeats).forEach(([id, s]) => {
           if (!byTier[s.tierId]) byTier[s.tierId] = [];
           byTier[s.tierId].push(s);
         });
 
-        const ICON_MAP = {
-          "vvip-ringside": "🏆",
-          "vvip-premium": "⭐",
-          "vvip-normal": "🎟",
-          vip: "💺",
-          "early-bird": "🐦",
-        };
-        const BG_MAP = {
-          "vvip-ringside": "#b08d3e",
-          "vvip-premium": "#b3141c",
-          "vvip-normal": "#8250c8",
-          vip: "#1e78c8",
-          "early-bird": "#1eb478",
-        };
+        const ICON_MAP = { "vvip-ringside":"🏆","vvip-premium":"⭐","vvip-normal":"🎟",vip:"💺","early-bird":"🐦" };
+        const BG_MAP  = { "vvip-ringside":"#b08d3e","vvip-premium":"#b3141c","vvip-normal":"#8250c8",vip:"#1e78c8","early-bird":"#1eb478" };
 
         let subtotal = 0;
-        const rows = Object.entries(byTier)
-          .map(([tierId, seats]) => {
-            const tier = TIERS.find((t) => t.id === tierId);
-            const rowTotal = seats.reduce((s, v) => s + v.price, 0);
-            subtotal += rowTotal;
-            const seatLabels = seats
-              .map((s) => s.label)
-              .filter((l) => !l.includes("auto"))
-              .join(", ");
-            return `
-        <div class="checkout-order-row">
-          <div class="checkout-tier-icon" style="background:${
-            BG_MAP[tierId] || "#555"
-          }">${ICON_MAP[tierId] || "🎟"}</div>
-          <div style="flex:1;min-width:0;">
-            <div class="checkout-order-name">${tier?.name || tierId}</div>
-            <div class="checkout-order-seats">${seats.length} ticket${
-              seats.length > 1 ? "s" : ""
-            }${seatLabels ? " · seats " + seatLabels : ""}</div>
-          </div>
-          <div class="checkout-order-price">${rowTotal.toLocaleString()} ETB</div>
-        </div>`;
-          })
-          .join("");
+        const rows = Object.entries(byTier).map(([tierId, seats]) => {
+          const tier = TIERS.find((t) => t.id === tierId);
+          const rowTotal = seats.reduce((s, v) => s + v.price, 0);
+          subtotal += rowTotal;
+          const seatLabels = seats.map((s) => s.label).filter((l) => !l.includes("auto")).join(", ");
+          return `<div class="checkout-order-row">
+            <div class="checkout-tier-icon" style="background:${BG_MAP[tierId]||"#555"}">${ICON_MAP[tierId]||"🎟"}</div>
+            <div style="flex:1;min-width:0;">
+              <div class="checkout-order-name">${tier?.name||tierId}</div>
+              <div class="checkout-order-seats">${seats.length} ticket${seats.length>1?"s":""}${seatLabels?" · seats "+seatLabels:""}</div>
+            </div>
+            <div class="checkout-order-price">${rowTotal.toLocaleString()} ETB</div>
+          </div>`;
+        }).join("");
 
-        document.getElementById("paymentOrderRows").innerHTML = rows;
-        document.getElementById("paymentSubtotal").textContent =
-          subtotal.toLocaleString() + " ETB";
-        document.getElementById("paymentTotal").textContent =
-          subtotal.toLocaleString() + " ETB";
-        document.getElementById("paymentRefCode").textContent = refCode;
+        document.getElementById("paymentModalOrderRows").innerHTML = rows;
+        document.getElementById("paymentModalSubtotal").textContent = subtotal.toLocaleString() + " ETB";
+        document.getElementById("paymentModalTotal").textContent = subtotal.toLocaleString() + " ETB";
 
         // Reset file input
         chosenFile = null;
-        document.getElementById("paymentUploadLabel").textContent =
-          "Tap to upload proof of payment";
+        document.getElementById("paymentUploadLabel").textContent = "Tap to upload proof of payment";
         document.getElementById("paymentScreenshotFile").value = "";
         document.getElementById("paymentUploadArea").classList.remove("has-file");
         document.getElementById("paymentUploadPreview").src = "";
@@ -1495,6 +1480,7 @@
             "etfc_pending_order",
             JSON.stringify({ refCode, orderId: data.orderId, ts: Date.now() })
           );
+          closePaymentModal();
           showStep("stepPending");
           document.getElementById("tixFooterBar").classList.remove("visible");
           listenForApproval(data.orderId);
@@ -1558,13 +1544,13 @@
         <div id="confirmedQR" style="flex-shrink:0;"></div>
       </div>
     </div>
-    <p class="text-dim" style="text-align:center;margin-top:12px;font-size:13px;">✅ Screenshot this ticket — it's your entry pass.</p>
-    <div style="margin-top: 16px; display: flex; gap: 12px; justify-content: center;">
-      <button class="btn btn-primary" onclick="downloadTicketImage('${ticketCode}', '${seats}')">
-        📥 Download Ticket Image
+    <div style="margin-top:20px;display:flex;flex-direction:column;gap:10px;">
+      <button class="btn btn-primary btn-block" style="font-size:16px;padding:16px;" onclick="downloadTicketImage('${ticketCode}', '${seats}')">
+        📥 Download Your Ticket
       </button>
-      <a href="verify.html?code=${ticketCode}" class="btn btn-outline">View Verification Page</a>
+      <a href="verify.html?code=${ticketCode}" class="btn btn-outline btn-block" style="text-align:center;">View Verification Page</a>
     </div>
+    <p class="text-dim" style="text-align:center;margin-top:12px;font-size:12px;">Save or screenshot this ticket — it's your entry pass at the door.</p>
   `;
         try {
           new QRCode(document.getElementById("confirmedQR"), {
@@ -1670,13 +1656,7 @@
 
       // ── UTIL ──────────────────────────────────────────────────────
       function showStep(stepId) {
-        [
-          "stepTier",
-          "stepSeatmap",
-          "stepBuyerDetails",
-          "stepPayment",
-          "stepPending",
-        ].forEach((id) => {
+        ["stepTier","stepSeatmap","stepBuyerDetails","stepPending"].forEach((id) => {
           const el = document.getElementById(id);
           if (el) el.style.display = id === stepId ? "block" : "none";
         });
