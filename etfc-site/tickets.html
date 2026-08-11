@@ -1762,10 +1762,13 @@
         ctx.fillText("Present at entry · Non-transferable", 200, 400);
 
         // Download
+        const dataUrl = canvas.toDataURL("image/png");
         const link = document.createElement("a");
         link.download = `ETFC-Ticket-${ticketCode}.png`;
-        link.href = canvas.toDataURL("image/png");
+        link.href = dataUrl;
+        document.body.appendChild(link);
         link.click();
+        document.body.removeChild(link);
       }
 
       function resetToTiers() {
