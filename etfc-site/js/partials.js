@@ -14,32 +14,34 @@ function currentSession() {
 
 function renderNav(activePage) {
   const links = [
-    { href: "fight-card.html", label: "Fight Card", key: "fight-card" },
-    { href: "betting.html", label: "Betting", key: "betting" },
-    { href: "tickets.html", label: "Tickets", key: "tickets" },
-    { href: "merch.html", label: "Merch", key: "merch" },
-    { href: "about.html", label: "About", key: "about" },
+    { href: "fight-card.html", label: "Fight Card", key: "fight-card", i18n: "nav.fight-card" },
+    { href: "betting.html",    label: "Betting",    key: "betting",    i18n: "nav.betting" },
+    { href: "tickets.html",    label: "Tickets",    key: "tickets",    i18n: "nav.tickets" },
+    { href: "merch.html",      label: "Merch",      key: "merch",      i18n: "nav.merch" },
+    { href: "about.html",      label: "About",      key: "about",      i18n: "nav.about" },
   ];
   const linksHtml = links.map(l =>
-    `<a href="${l.href}" class="${activePage === l.key ? 'active' : ''}">${l.label}</a>`
+    `<a href="${l.href}" class="${activePage === l.key ? 'active' : ''}" data-i18n="${l.i18n}">${l.label}</a>`
   ).join("");
 
   const session = currentSession();
   const authHtml = session
     ? `<span class="nav-user" title="${session.email || ''}">${(session.name || 'Account').split(' ')[0]}</span>
-       <a href="dashboard.html" class="nav-link-auth${activePage === 'dashboard' ? ' active' : ''}">My Tickets</a>
-       <a href="#" class="btn btn-outline btn-sm" onclick="logOut(event)">Log Out</a>`
-    : `<a href="login.html" class="nav-link-auth">Log In</a>
-       <a href="signup.html" class="btn btn-outline btn-sm">Sign Up</a>`;
+       <a href="dashboard.html" class="nav-link-auth${activePage === 'dashboard' ? ' active' : ''}" data-i18n="nav.my-tickets">My Tickets</a>
+       <a href="#" class="btn btn-outline btn-sm" onclick="logOut(event)" data-i18n="nav.logout">Log Out</a>`
+    : `<a href="login.html" class="nav-link-auth" data-i18n="nav.login">Log In</a>
+       <a href="signup.html" class="btn btn-outline btn-sm" data-i18n="nav.signup">Sign Up</a>`;
 
-  // Mobile panel: include My Tickets under Tickets when logged in
+  // Mobile panel
   const mobileLinksHtml = links.map(l => {
-    let html = `<a href="${l.href}" class="${activePage === l.key ? 'active' : ''}">${l.label}</a>`;
+    let html = `<a href="${l.href}" class="${activePage === l.key ? 'active' : ''}" data-i18n="${l.i18n}">${l.label}</a>`;
     if (l.key === 'tickets' && session) {
-      html += `<a href="dashboard.html" class="nav-mobile-sublink${activePage === 'dashboard' ? ' active' : ''}">My Tickets</a>`;
+      html += `<a href="dashboard.html" class="nav-mobile-sublink${activePage === 'dashboard' ? ' active' : ''}" data-i18n="nav.my-tickets">My Tickets</a>`;
     }
     return html;
   }).join("");
+
+  const langLabel = (typeof currentLang !== "undefined" && currentLang === "am") ? "EN" : "አማ";
 
   return `
   <nav class="nav">
@@ -47,10 +49,18 @@ function renderNav(activePage) {
       <a href="index.html" class="nav-logo">ET<span>FC</span></a>
       <div class="nav-links">${linksHtml}</div>
       <div class="nav-actions">
+        <button id="langToggleBtn" onclick="toggleLang()" title="Switch language"
+          style="font-family:var(--font-mono);font-size:11px;font-weight:700;
+          padding:0 8px;height:32px;border-radius:6px;border:1px solid var(--border);
+          background:transparent;color:var(--bone-dim);cursor:pointer;letter-spacing:1px;
+          transition:border-color 0.15s,color 0.15s;"
+          onmouseover="this.style.borderColor='var(--gold)';this.style.color='var(--gold)'"
+          onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--bone-dim)'"
+        >${langLabel}</button>
         <div class="theme-toggle" onclick="toggleTheme()" title="Toggle light/dark mode" id="themeToggleBtn"></div>
         <div class="nav-actions-desktop">
           ${authHtml}
-          <a href="tickets.html" class="nav-cta">Get Tickets</a>
+          <a href="tickets.html" class="nav-cta" data-i18n="nav.get-tickets">Get Tickets</a>
         </div>
         <button class="nav-hamburger" onclick="toggleMobileNav()" aria-label="Menu" aria-expanded="false" id="navHamburgerBtn">
           <span></span><span></span><span></span>
@@ -120,4 +130,5 @@ document.addEventListener("DOMContentLoaded", () => {
   if (navMount) navMount.outerHTML = renderNav(navMount.dataset.active || "");
   if (footerMount) footerMount.outerHTML = renderFooter();
   if (typeof updateThemeIcon === "function") updateThemeIcon();
+  if (typeof applyTranslations === "function") applyTranslations();
 });

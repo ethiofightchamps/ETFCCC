@@ -575,19 +575,19 @@
     <div id="nav-mount" data-active="merch"></div>
 
     <div class="merch-hero">
-      <div class="merch-hero-eyebrow">Official ETFC Store</div>
+      <div class="merch-hero-eyebrow"><span data-i18n="merch.eyebrow">Official ETFC Store</span></div>
       <div class="merch-hero-title">ETFC <span>Merch</span></div>
-      <div class="merch-hero-sub">Rep the fight. Limited drop live now.</div>
+      <div class="merch-hero-sub"><span data-i18n="merch.sub">Rep the fight. Limited drop live now.</span></div>
     </div>
 
     <div
       class="merch-offer-banner"
       style="max-width: 1000px; margin: 32px auto 0"
     >
-      🔥 5-Day Launch Offer — <span>Up to 50% Off</span> — Ends Soon
+      🔥 <span data-i18n="merch.offer-banner">5-Day Launch Offer — <span>Up to 50% Off</span> — Ends Soon
     </div>
 
-    <div class="merch-section-label">Fight Night 2026 Collection</div>
+    <div class="merch-section-label"><span data-i18n="merch.collection">Fight Night 2026 Collection</span></div>
 
     <div class="loading-grid" id="merchGrid">
       <!-- Skeletons will be injected here -->
@@ -725,7 +725,7 @@
           style="overflow-y: auto; flex: 1; padding-bottom: 80px"
         >
           <div class="checkout-section">
-            <div class="checkout-title">Order Summary</div>
+            <div class="checkout-title"><span data-i18n="merch.summary">Order Summary</span></div>
             <div id="checkoutSummary"></div>
           </div>
           <div class="checkout-section">
@@ -767,7 +767,7 @@
             <input type="hidden" id="selectedPaymentMethod" value="telebirr" />
           </div>
           <div class="checkout-section">
-            <div class="checkout-title">Your Details</div>
+            <div class="checkout-title"><span data-i18n="merch.your-details">Your Details</span></div>
             <div class="field">
               <label>Full Name</label
               ><input
@@ -797,7 +797,7 @@
             </div>
           </div>
           <div class="checkout-section">
-            <div class="checkout-title">Proof of Payment</div>
+            <div class="checkout-title"><span data-i18n="merch.proof">Proof of Payment</span></div>
             <div
               class="upload-area"
               id="merchUploadArea"
@@ -855,8 +855,8 @@
           style="display: none"
         >
           <div class="success-icon">&#10003;</div>
-          <h3>Order Submitted!</h3>
-          <span class="status-pill pending" id="merchOrderStatusPill">Pending Verification</span>
+          <h3><span data-i18n="merch.submitted">Order Submitted!</span></h3>
+          <span class="status-pill pending" id="merchOrderStatusPill"><span data-i18n="merch.pending">Pending Verification</span></span>
           <p class="text-dim mt-24" id="merchOrderWaitMsg">
             ETFC is reviewing your payment. This will update automatically
             the moment it's approved — no need to reload.
@@ -877,6 +877,7 @@
     <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-storage-compat.js"></script>
     <script src="js/firebase-config.js"></script>
     <script src="js/auth.js"></script>
+    <script src="js/i18n.js"></script>
     <script src="js/partials.js"></script>
     <script src="js/main.js"></script>
     <script src="js/merch-products.js"></script>
@@ -1006,7 +1007,7 @@
             <div class="merch-price">${formatPrice(price)}</div>
             <button class="merch-buy-btn" onclick="event.stopPropagation(); openMerchDetail('${
               p.id
-            }')">Buy</button>
+            }')"><span data-i18n="merch.buy">Buy</span></button>
           </div>
         </div>
       </div>

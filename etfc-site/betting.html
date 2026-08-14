@@ -44,7 +44,7 @@
         </div>
         <div style="display: flex; align-items: center; gap: 12px">
           <button class="btn btn-outline btn-sm" onclick="openMyBetsModal()">
-            My Bets
+            <span data-i18n="bet.my-bets">My Bets</span>
           </button>
           <div
             class="bet-slip-preview"
@@ -134,7 +134,7 @@
         "
       >
         <div class="modal-header">
-          <h3>Place Your Bet</h3>
+          <h3><span data-i18n="bet.place">Place Your Bet</span></h3>
           <span class="modal-close" onclick="closeBetSlip()">&times;</span>
         </div>
         <div
@@ -214,11 +214,11 @@
             <div class="bet-section">
               <div class="section-label">Your Details</div>
               <div class="field">
-                <label>Full Name</label>
+                <label><span data-i18n="bet.full-name">Full Name</span></label>
                 <input type="text" id="betBuyerNameInput" placeholder="As it should appear on your bet slip" autocomplete="name"/>
               </div>
               <div class="field">
-                <label>Phone Number</label>
+                <label><span data-i18n="bet.phone">Phone Number</span></label>
                 <input type="tel" id="betBuyerPhoneInput" placeholder="e.g. 0912345678" autocomplete="tel"/>
               </div>
             </div>
@@ -321,6 +321,7 @@
     <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
     <script src="js/firebase-config.js"></script>
     <script src="js/auth.js"></script>
+    <script src="js/i18n.js"></script>
     <script src="js/partials.js"></script>
     <script src="js/main.js"></script>
     <script>

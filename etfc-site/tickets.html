@@ -675,12 +675,12 @@
         </div>
       </div>
 
-      <p class="checkout-tac">Terms and Conditions accepted</p>
+      <p class="checkout-tac"><span data-i18n="tix.tac">Terms and Conditions accepted</span></p>
 
       <!-- Buyer details -->
       <div class="checkout-details">
         <div class="field">
-          <label>Full Name</label>
+          <label><label data-i18n="tix.full-name">Full Name</label>
           <input
             type="text"
             id="buyerName"
@@ -689,7 +689,7 @@
           />
         </div>
         <div class="field">
-          <label>Phone Number</label>
+          <label><label data-i18n="tix.phone">Phone Number</label>
           <input
             type="tel"
             id="buyerPhone"
@@ -715,7 +715,7 @@
           id="goToPaymentBtn"
           onclick="goToPaymentStep()"
         >
-          Continue to Payment
+          <span data-i18n="tix.continue">Continue to Payment</span>
         </button>
       </div>
     </div>
@@ -735,9 +735,9 @@
           margin-bottom: 8px;
         "
       >
-        Order Submitted
+        <span data-i18n="tix.order-submitted">Order Submitted</span>
       </div>
-      <span class="status-pill pending">Pending Verification</span>
+      <span class="status-pill pending"><span data-i18n="tix.pending">Pending Verification</span></span>
       <p
         class="text-dim"
         style="margin-top: 20px; line-height: 1.6; font-size: 14px"
@@ -752,7 +752,7 @@
         style="margin-top: 24px"
         onclick="resetToTiers()"
       >
-        + Buy More Tickets
+        <span data-i18n="tix.buy-more">+ Buy More Tickets</span>
       </button>
     </div>
 
@@ -793,7 +793,7 @@
         <p class="checkout-tac">Terms and Conditions accepted</p>
 
         <div style="padding:12px 20px 4px;font-family:var(--font-mono);font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--gold-bright);">
-          Deposit to One of These Accounts
+          <span data-i18n="tix.send-exact">Send the exact amount and include the reference code in your transfer.</span>
         </div>
 
         <div style="padding:0 20px 16px;display:flex;flex-direction:column;gap:12px;">
@@ -825,8 +825,8 @@
             <label>Payment Screenshot</label>
             <div class="upload-area" id="paymentUploadArea" onclick="document.getElementById('paymentScreenshotFile').click()">
               <div class="upload-icon">📷</div>
-              <span id="paymentUploadLabel">Tap to upload proof of payment</span>
-              <span class="upload-hint">Max 5MB · JPG/PNG</span>
+              <span id="paymentUploadLabel"><span data-i18n="tix.screenshot-tap">Tap to upload proof of payment</span></span>
+              <span class="upload-hint"><span data-i18n="tix.screenshot-hint">Max 5MB · JPG/PNG</span></span>
               <img class="upload-preview" id="paymentUploadPreview" alt="preview" />
               <input type="file" id="paymentScreenshotFile" accept="image/*" style="display:none" onchange="onPaymentFileChosen(this)" />
             </div>
@@ -848,6 +848,7 @@
     <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
     <script src="js/firebase-config.js"></script>
     <script src="js/auth.js"></script>
+    <script src="js/i18n.js"></script>
     <script src="js/partials.js"></script>
     <script src="js/main.js"></script>
     <script>
@@ -855,54 +856,54 @@
       const TIERS = [
         {
           id: "vvip-ringside",
-          name: "VVIP Ringside Tickets",
+          name: 'VVIP Ringside Tickets',
           price: 100000,
           icon: "ringside",
           emoji: "🏆",
-          sub: "9 seats · Includes seat selection",
+          sub: '9 seats · Includes seat selection · Unlimited food & beverage · Priority access · Access to exclusive areas',
           hasSeatmap: true,
           tier: "ringside",
         },
         {
           id: "vvip-premium",
-          name: "VVIP Premium Tickets",
+          name: 'VVIP Premium Tickets',
           price: 50000,
           icon: "premium",
           emoji: "⭐",
-          sub: "12 seats · Includes seat selection",
+          sub: '12 seats · Includes seat selection · Unlimited food & beverage',
           hasSeatmap: true,
           tier: "vip",
         },
         {
           id: "vvip-normal",
-          name: "VVIP Normal Tickets",
+          name: 'VVIP Normal Tickets',
           price: 30000,
           icon: "normal",
           emoji: "🎟",
-          sub: "84 seats · Front rows closest to ring · Includes seat selection",
+          sub: '84 seats · Front rows closest to ring · Includes seat selection',
           hasSeatmap: true,
           tier: "vvip-normal",
         },
         {
           id: "vip",
-          name: "VIP Tickets",
+          name: 'VIP Tickets',
           price: 20000,
           icon: "vip",
           emoji: "💺",
-          sub: "222 seats · Includes seat selection",
+          sub: '222 seats · Includes seat selection',
           hasSeatmap: true,
           tier: "vip-std",
         },
         {
           id: "early-bird",
-          name: "Early Bird Tickets",
+          name: 'Early Bird Tickets',
           price: 4000,
           icon: "earlybird",
           emoji: "🐦",
-          sub: "General admission · 13 seats only",
+          sub: 'General admission · 26 seats only',
           hasSeatmap: false,
           tier: "ga",
-          maxQty: 13,
+          maxQty: 26,
         },
       ];
 

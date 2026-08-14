@@ -16,18 +16,18 @@
   <div class="auth-card">
 
     <div id="authStepChoice" class="auth-step">
-      <h1>Welcome Back</h1>
-      <p class="sub">Log in to buy tickets or place bets.</p>
+      <h1><span data-i18n="auth.welcome">Welcome Back</span></h1>
+      <p class="sub"><span data-i18n="auth.login-sub">Log in to buy tickets or place bets.</span></p>
       <button class="btn btn-outline btn-block" onclick="signInWithGoogle()">
-        <span style="margin-right:8px;">&#128101;</span>Continue with Google
+        <span style="margin-right:8px;">&#128101;</span><span data-i18n="auth.google">Continue with Google</span>
       </button>
       <div class="auth-divider"><span>or</span></div>
       <div class="field">
-        <label>Email Address</label>
+        <label><span data-i18n="auth.email-addr">Email Address</span></label>
         <input type="email" id="loginEmailInput" placeholder="you@example.com" autocomplete="email">
       </div>
       <button class="btn btn-primary btn-block" onclick="continueLoginWithEmail(event)">Continue</button>
-      <p class="auth-switch">New here? <a href="signup.html">Create an Account</a></p>
+      <p class="auth-switch"><span data-i18n="auth.new-here">New here?</span> <a href="signup.html"><span data-i18n="auth.signup-link">Create an Account</span></a></p>
     </div>
 
     <div id="authStepLogin" class="auth-step" style="display:none;">
@@ -53,7 +53,8 @@
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-storage-compat.js"></script>
 <script src="js/firebase-config.js"></script>
 <script src="js/auth.js"></script>
-<script src="js/partials.js"></script>
+<script src="js/i18n.js"></script>
+    <script src="js/partials.js"></script>
 <script src="js/main.js"></script>
 </body>
 </html>

@@ -16,25 +16,25 @@
   <div class="auth-card">
 
     <div id="authStepChoice" class="auth-step">
-      <h1>Create Account</h1>
-      <p class="sub">Sign up to buy tickets or place bets.</p>
+      <h1><span data-i18n="auth.create">Create Account</span></h1>
+      <p class="sub"><span data-i18n="auth.signup-sub">Sign up to buy tickets or place bets.</span></p>
       <button class="btn btn-outline btn-block" onclick="signInWithGoogle()">
-        <span style="margin-right:8px;">&#128101;</span>Continue with Google
+        <span style="margin-right:8px;">&#128101;</span><span data-i18n="auth.google">Continue with Google</span>
       </button>
       <div class="auth-divider"><span>or</span></div>
       <div class="field">
-        <label>Email Address</label>
+        <label><span data-i18n="auth.email-addr">Email Address</span></label>
         <input type="email" id="emailInput" placeholder="you@example.com">
       </div>
       <button class="btn btn-primary btn-block" onclick="continueSignupWithEmail(event)">Continue</button>
-      <p class="auth-switch">Already have an account? <a href="login.html">Log In</a></p>
+      <p class="auth-switch"><span data-i18n="auth.have-account">Already have an account?</span> <a href="login.html"><span data-i18n="auth.login-link">Log In</span></a></p>
     </div>
 
     <div id="authStepName" class="auth-step" style="display:none;">
       <h3>Your Name</h3>
       <p class="sub">Step 1 of 3</p>
       <div class="field">
-        <label>Full Name</label>
+        <label><span data-i18n="auth.full-name">Full Name</span></label>
         <input type="text" id="nameInput" placeholder="Full Name">
       </div>
       <button class="btn btn-primary btn-block" onclick="goToPhoneStep(event)">Next</button>
@@ -45,7 +45,7 @@
       <h3>Phone Number</h3>
       <p class="sub">Step 2 of 3</p>
       <div class="field">
-        <label>Phone Number</label>
+        <label><span data-i18n="auth.phone">Phone Number</span></label>
         <input type="tel" id="phoneInput" placeholder="09XX XXX XXX" inputmode="numeric" maxlength="10" autocomplete="tel">
         <p class="field-hint" id="phoneHint">10 digits, starting with 09 or 07</p>
       </div>
@@ -64,19 +64,19 @@
         <label>Confirm Password</label>
         <input type="password" id="passwordConfirmInput" placeholder="Confirm Password" autocomplete="new-password">
       </div>
-      <button class="btn btn-primary btn-block" onclick="submitSignupPassword(event)">Send Verification Code</button>
+      <button class="btn btn-primary btn-block" onclick="submitSignupPassword(event)"><span data-i18n="auth.send-code">Send Verification Code</span></button>
       <p class="auth-switch"><a href="#" onclick="showStep('authStepPhone')">&larr; Back</a></p>
     </div>
 
     <div id="authStepOtp" class="auth-step" style="display:none;">
-      <h3>Enter Code</h3>
+      <h3><span data-i18n="auth.enter-code">Enter Code</span></h3>
       <p class="sub">Almost done — we sent a 6-digit code to <span id="otpEmailTarget"></span>.</p>
       <div class="otp-boxes">
         <input maxlength="1"><input maxlength="1"><input maxlength="1">
         <input maxlength="1"><input maxlength="1"><input maxlength="1">
       </div>
-      <button class="btn btn-primary btn-block" onclick="verifyEmailOtp()">Verify &amp; Continue</button>
-      <p class="auth-switch"><a href="#" onclick="submitSignupPassword(event)">Resend code</a></p>
+      <button class="btn btn-primary btn-block" onclick="verifyEmailOtp()"><span data-i18n="auth.verify">Verify &amp; Continue</span></button>
+      <p class="auth-switch"><a href="#" onclick="submitSignupPassword(event)"><span data-i18n="auth.resend">Resend code</span></a></p>
     </div>
 
   </div>
@@ -90,7 +90,8 @@
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-storage-compat.js"></script>
 <script src="js/firebase-config.js"></script>
 <script src="js/auth.js"></script>
-<script src="js/partials.js"></script>
+<script src="js/i18n.js"></script>
+    <script src="js/partials.js"></script>
 <script src="js/main.js"></script>
 </body>
 </html>
