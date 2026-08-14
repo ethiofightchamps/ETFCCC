@@ -45,41 +45,46 @@ module.exports = async (req, res) => {
     return res.status(400).json({ error: "Invalid screenshot URL." });
   }
 
-  try {
-    // Reject if this exact screenshot was already submitted
-    const dupSnap = await db.collection("orders")
-      .where("screenshotUrl", "==", screenshotUrl)
-      .limit(1)
-      .get();
-    if (!dupSnap.empty) {
-      return res.status(400).json({ error: "This payment screenshot has already been used. Upload a new one." });
-    }
-
-    const refCode = generateRefCode();
-    const orderRef = db.collection("orders").doc();
-
-    await db.runTransaction(async (tx) => {
-      const seatRefs = seats.map((seatId) => db.collection("seatMap").doc(seatId));
-      const seatSnaps = await Promise.all(seatRefs.map((ref) => tx.get(ref)));
-
-      const unavailable = [];
-      seatSnaps.forEach((snap, i) => {
-        const status = snap.exists ? snap.data().status : "available";
-        if (status === "pending" || status === "sold") {
-          unavailable.push(seats[i]);
-        }
-      });
-
-      if (unavailable.length > 0) {
-        throw Object.assign(
-          new Error(`These seats are no longer available: ${unavailable.join(", ")}. Please pick different seats.`),
-          { code: "SEATS_TAKEN" }
-        );
+try {
+      // Reject if this exact screenshot was already submitted
+      const dupSnap = await db.collection("orders")
+        .where("screenshotUrl", "==", screenshotUrl)
+        .limit(1)
+        .get();
+      if (!dupSnap.empty) {
+        return res.status(400).json({ error: "This payment screenshot has already been used. Upload a new one." });
       }
 
-      seatRefs.forEach((ref) => {
-        tx.set(ref, { status: "pending", orderId: orderRef.id }, { merge: true });
-      });
+      const refCode = generateRefCode();
+      const orderRef = db.collection("orders").doc();
+
+      await db.runTransaction(async (tx) => {
+        const isEarlyBirdSeat = (seatId) =>
+          typeof seatId === "string" &&
+          (seatId.startsWith("early-bird") || seatId.includes("Early Bird"));
+
+        const seatmapSeats = seats.filter((s) => !isEarlyBirdSeat(s));
+        const seatRefs = seatmapSeats.map((seatId) => db.collection("seatMap").doc(seatId));
+        const seatSnaps = await Promise.all(seatRefs.map((ref) => tx.get(ref)));
+
+        const unavailable = [];
+        seatSnaps.forEach((snap, i) => {
+          const status = snap.exists ? snap.data().status : "available";
+          if (status === "pending" || status === "sold") {
+            unavailable.push(seatmapSeats[i]);
+          }
+        });
+
+        if (unavailable.length > 0) {
+          throw Object.assign(
+            new Error(`These seats are no longer available: ${unavailable.join(", ")}. Please pick different seats.`),
+            { code: "SEATS_TAKEN" }
+          );
+        }
+
+        seatRefs.forEach((ref) => {
+          tx.set(ref, { status: "pending", orderId: orderRef.id }, { merge: true });
+        });
 
       tx.set(orderRef, {
         buyerName,
