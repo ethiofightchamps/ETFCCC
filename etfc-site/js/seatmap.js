@@ -31,7 +31,7 @@ const ZONES = [
   { id:"EARLY_BIRD",    left:10, top:92,  w:80, h:6  },
 ];
 
-const SOLD_SEATS = new Set();
+const SOLD_SEATS = new Set(["VVIP_NORMAL-344", "VVIP_NORMAL-345"]);
 let selectedSeats  = {};
 let blockQty       = {}; // how many seats selected per block
 
